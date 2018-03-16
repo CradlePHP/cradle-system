@@ -20,97 +20,25 @@ use Cradle\Framework\CommandLine;
  * @author   Christian Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
-class Installer
+class Package
 {
-    /**
-     * Checks if a path exists
-     *
-     * @param *string $path
-     */
-    public static function getNextVersion($module)
-    {
-        //module root
-        $root = cradle('global')->path('module');
-
-        $install = $root . '/' . $module . '/install';
-
-        //if there is no install
-        if(!is_dir($install)) {
-            return '0.0.1';
-        }
-
-        //collect and organize all the versions
-        $versions = [];
-        $files = scandir($install, 0);
-        foreach ($files as $file) {
-            if ($file === '.' || $file === '..' || is_dir($install . '/' . $file)) {
-                continue;
-            }
-
-            //get extension
-            $extension = pathinfo($file, PATHINFO_EXTENSION);
-
-            if ($extension !== 'php'
-                && $extension !== 'sh'
-                && $extension !== 'sql'
-            ) {
-                continue;
-            }
-
-            //get base as version
-            $version = pathinfo($file, PATHINFO_FILENAME);
-
-            //validate version
-            if (!(version_compare($version, '0.0.1', '>=') >= 0)) {
-                continue;
-            }
-
-            $versions[] = $version;
-        }
-
-        if(empty($versions)) {
-            return '0.0.1';
-        }
-
-        //sort versions
-        usort($versions, 'version_compare');
-
-        $current = array_pop($versions);
-        $revisions = explode('.', $current);
-        $revisions = array_reverse($revisions);
-
-        $found = false;
-        foreach($revisions as $i => $revision) {
-            if(!is_numeric($revision)) {
-                continue;
-            }
-
-            $revisions[$i]++;
-            $found = true;
-            break;
-        }
-
-        if(!$found) {
-            return $current . '.1';
-        }
-
-        $revisions = array_reverse($revisions);
-        return implode('.', $revisions);
-    }
-
     /**
      * Performs an install
      *
-     * @param *string $path
-     * @param string  $current
-     * @param Closure $callback
+     * @param *string      $path
+     * @param string       $current
+     * @param string|null  $type
      *
      * @return string The current version
      */
-    public static function install($path, $current = '0.0.0', Closure $callback = null)
+    public static function install($name, $current = '0.0.0', $type = null)
     {
-        if(is_null($callback)) {
-            $callback = function() {};
+        $package = cradle()->register($name)->package($name);
+        $path = $package->getPackagePath() . '/install';
+        //if there is no install folder
+        if (!is_dir($path)) {
+            //there's nothing we can do (try composer update first)
+            return $current;
         }
 
         //collect and organize all the versions
@@ -124,10 +52,16 @@ class Installer
             //get extension
             $extension = pathinfo($file, PATHINFO_EXTENSION);
 
+            //valid extensions
             if ($extension !== 'php'
                 && $extension !== 'sh'
                 && $extension !== 'sql'
             ) {
+                continue;
+            }
+
+            //only run updates on a following type
+            if ($type && $type !== $extension) {
                 continue;
             }
 
@@ -155,10 +89,6 @@ class Installer
         foreach ($versions as $version => $files) {
             //if 0.0.0 >= 0.0.1
             if (version_compare($current, $version, '>=')) {
-                continue;
-            }
-
-            if (call_user_func($callback, $version) === false) {
                 continue;
             }
 
