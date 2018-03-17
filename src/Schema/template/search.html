@@ -1,0 +1,121 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/admin/system/schema/search">
+                <i class="fas fa-home"></i> Admin
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="fas fa-database"></i> {{title}}
+        </li>
+    </ol>
+</nav>
+
+<div class="main-padding">
+    {{#if filter.active}}
+        <h3 class="main-title">
+            <i class="fas fa-database"></i> {{number total}} {{title}}
+        </h3>
+    {{else}}
+        <h3 class="main-title">
+            <i class="fas fa-database"></i> {{number total}} Inactive {{title}}
+        </h3>
+    {{/if}}
+
+    <div class="clearfix mb-4 search-actions">
+        <div class="btn-group" role="group" aria-label="...">
+            <a class="btn btn-primary" href="?filter[active]=1">
+                Active
+            </a>
+            <a class="btn btn-danger" href="?filter[active]=0">
+                Inactive
+            </a>
+        </div>
+
+        <div class="float-right">
+            <a class="btn btn-success" href="/admin/system/schema/create?redirect_uri={{redirecturl}}">
+                <i class="fas fa-plus"></i> Create Schema
+            </a>
+        </div>
+    </div>
+
+    <form method="post">
+        <div class="table-overflow">
+        {{#if rows}}
+            <!-- START: TABLE -->
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Actions</th>
+                        <th>Schema</th>
+                        <th>Relations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each rows}}
+                        <tr data-id="{{name}}">
+                            <td>
+                                <a
+                                    class="text-purple"
+                                    href="/admin/system/schema/create?copy={{name}}&redirect_uri={{redirecturl}}"
+                                    title="Copy {{../schema.singular}}"
+                                >
+                                    <i class="fa fa-copy"></i>
+                                </a>
+                                {{#if ../filter.active}}
+                                    <a class="text-info" title="Edit" href="/admin/system/schema/update/{{name}}?redirect_uri={{redirecturl}}">
+                                    <i class="fas fa-edit"></i></a>
+                                    &nbsp;
+                                    {{#if disable}}
+                                        <i class="fas fa-lock fa-fw"></i>
+                                    {{else}}
+                                        <a class="text-danger" title="Remove" href="/admin/system/schema/remove/{{name}}?redirect={{redirecturl}}"
+                                        class="text-danger remove"><i class="fas fa-times"></i></a>
+                                    {{/if}}
+                                {{else}}
+                                    <a title="Restore" href="/admin/system/schema/restore/{{name}}?redirect_uri={{redirecturl}}" class="text-success restore">
+                                    <i class="fas fa-external-link-alt"></i></a>
+                                {{/if}}
+                            </td>
+                            <td>
+                                <a href="/admin/system/object/{{name}}/search"><i class="{{icon}}"></i> {{capital singular}}</a>
+                                <p>{{detail}}</p>
+                            </td>
+                            <td>
+                                {{#if relations.length}}
+                                    {{#each relations}}
+                                        <div class="relation">
+                                            <i class="fas fa-arrow-right"></i>
+                                            {{#when many '==' 0}}
+                                                <span>1:0</span>
+                                            {{/when}}
+                                            {{#when many '==' 1}}
+                                                <span>1:1</span>
+                                            {{/when}}
+                                            {{#when many '==' 2}}
+                                                <span>1:N</span>
+                                            {{/when}}
+                                            {{#when many '==' 3}}
+                                                <span>N:N</span>
+                                            {{/when}}
+                                            <i class="fas fa-arrow-right"></i>
+                                            {{name}}
+                                        </div>
+                                    {{/each}}
+                                {{else}}
+                                    &nbsp;
+                                {{/if}}
+                            </td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            <!-- END: TABLE -->
+        {{else}}
+            <!-- START: NO RESULTS -->
+            <div class="well no-results">No Results Found</div>
+            <!-- END: NO RESULTS -->
+        {{/if}}
+        </table>
+    </form>
+</div>

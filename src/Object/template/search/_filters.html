@@ -1,0 +1,435 @@
+{{#each schema.fields}}
+    {{#in ../schema.filterable @key}}
+        {{#notin 'password,files,images,textarea,wysiwyg,markdown,none,hide,active' field.type}}
+            <div class="form-group">
+                <label for="filter[{{@key}}]">{{label}}</label>
+                {{#in 'text,slug,file,image,uuid' field.type}}
+                    <input
+                        class="form-control"
+                        name="filter[{{@key}}]"
+                        type="text"
+                        value="{{scope ../filter @key}}"
+                        {{#each field.attributes}}
+                            {{@key}}="{{this}}"
+                        {{/each}}
+                    />
+                {{/in}}
+                {{#in 'email,search,url,color,week,month' field.type}}
+                    <input
+                        class="form-control"
+                        name="filter[{{@key}}]"
+                        type="{{field.type}}"
+                        value="{{scope ../filter @key}}"
+                        {{#each field.attributes}}
+                            {{@key}}="{{this}}"
+                        {{/each}}
+                    />
+                {{/in}}
+                {{#when field.type '===' 'mask'}}
+                    <input
+                        class="form-control"
+                        data-do="mask-field"
+                        name="filter[{{@key}}]"
+                        type="text"
+                        value="{{scope ../filter @key}}"
+                        {{#each field.attributes}}
+                            {{@key}}="{{this}}"
+                        {{/each}}
+                    />
+                {{/when}}
+                {{#when field.type '===' 'number'}}
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <input
+                                class="form-control"
+                                name="span[{{@key}}][0]"
+                                type="number"
+                                value="{{#scope ../span @key}}{{0}}{{/scope}}"
+                                {{#each field.attributes}}
+                                    {{@key}}="{{this}}"
+                                {{/each}}
+                            />
+                            <label for="span[{{@key}}][0]">Min</label>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input
+                                class="form-control"
+                                name="span[{{@key}}][1]"
+                                type="number"
+                                value="{{#scope ../span @key}}{{1}}{{/scope}}"
+                                {{#each field.attributes}}
+                                    {{@key}}="{{this}}"
+                                {{/each}}
+                            />
+                            <label for="span[{{@key}}][1]">Max</label>
+                        </div>
+                    </div>
+                {{/when}}
+                {{#when field.type '===' 'small'}}
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <input
+                                class="form-control"
+                                max="9"
+                                min="0"
+                                name="span[{{@key}}][0]"
+                                step="1"
+                                type="number"
+                                value="{{#scope ../span @key}}{{0}}{{/scope}}"
+                                {{#each field.attributes}}
+                                    {{@key}}="{{this}}"
+                                {{/each}}
+                            />
+                            <label for="span[{{@key}}][0]">Min</label>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input
+                                class="form-control"
+                                max="9"
+                                min="0"
+                                name="span[{{@key}}][1]"
+                                step="1"
+                                type="number"
+                                value="{{#scope ../span @key}}{{1}}{{/scope}}"
+                                {{#each field.attributes}}
+                                    {{@key}}="{{this}}"
+                                {{/each}}
+                            />
+                            <label for="span[{{@key}}][1]">Max</label>
+                        </div>
+                    </div>
+                {{/when}}
+                {{#when field.type '===' 'float'}}
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <input
+                                class="form-control"
+                                name="span[{{@key}}][0]"
+                                step="0.00001"
+                                type="number"
+                                value="{{#scope ../span @key}}{{0}}{{/scope}}"
+                                {{#each field.attributes}}
+                                    {{@key}}="{{this}}"
+                                {{/each}}
+                            />
+                            <label for="span[{{@key}}][0]">Min</label>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input
+                                class="form-control"
+                                name="span[{{@key}}][1]"
+                                step="0.00001"
+                                type="number"
+                                value="{{#scope ../span @key}}{{1}}{{/scope}}"
+                                {{#each field.attributes}}
+                                    {{@key}}="{{this}}"
+                                {{/each}}
+                            />
+                            <label for="span[{{@key}}][1]">Max</label>
+                        </div>
+                    </div>
+                {{/when}}
+                {{#when field.type '===' 'price'}}
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <input
+                                class="form-control"
+                                name="span[{{@key}}][0]"
+                                step="0.01"
+                                type="number"
+                                value="{{#scope ../span @key}}{{0}}{{/scope}}"
+                                {{#each field.attributes}}
+                                    {{@key}}="{{this}}"
+                                {{/each}}
+                            />
+                            <label for="span[{{@key}}][0]">Min</label>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input
+                                class="form-control"
+                                name="span[{{@key}}][1]"
+                                step="0.01"
+                                type="number"
+                                value="{{#scope ../span @key}}{{1}}{{/scope}}"
+                                {{#each field.attributes}}
+                                    {{@key}}="{{this}}"
+                                {{/each}}
+                            />
+                            <label for="span[{{@key}}][1]">Max</label>
+                        </div>
+                    </div>
+                {{/when}}
+                {{#when field.type '===' 'range'}}
+                    <input
+                        class="irs-hidden-input"
+                        data-do="multirange-field"
+                        name="filter[{{@key}}]"
+                        tabindex="-1"
+                        type="hidden"
+                        value="{{scope ../filter @key}}"
+                        {{#each field.attributes}}
+                            {{@key}}="{{this}}"
+                        {{/each}}
+                    />
+                {{/when}}
+                {{#when field.type '===' 'date'}}
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <input
+                                aria-haspopup="true"
+                                aria-expanded="false"
+                                class="form-control date"
+                                data-do="date-field"
+                                name="span[{{@key}}][0]"
+                                type="text"
+                                value="{{#scope ../span @key}}{{0}}{{/scope}}"
+                                {{#each field.attributes}}
+                                    {{@key}}="{{this}}"
+                                {{/each}}
+                            />
+                            <label for="span[{{@key}}][0]">Start Date</label>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input
+                                aria-haspopup="true"
+                                aria-expanded="false"
+                                class="form-control date"
+                                data-do="date-field"
+                                name="span[{{@key}}][1]"
+                                type="text"
+                                value="{{#scope ../span @key}}{{1}}{{/scope}}"
+                                {{#each field.attributes}}
+                                    {{@key}}="{{this}}"
+                                {{/each}}
+                            />
+                            <label for="span[{{@key}}][1]">End Date</label>
+                        </div>
+                    </div>
+                {{/when}}
+                {{#when field.type '===' 'time'}}
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <input
+                                aria-haspopup="true"
+                                aria-expanded="false"
+                                class="form-control date"
+                                data-do="time-field"
+                                name="span[{{@key}}][0]"
+                                type="text"
+                                value="{{#scope ../span @key}}{{0}}{{/scope}}"
+                                {{#each field.attributes}}
+                                    {{@key}}="{{this}}"
+                                {{/each}}
+                            />
+                            <label for="span[{{@key}}][0]">Start Time</label>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input
+                                aria-haspopup="true"
+                                aria-expanded="false"
+                                class="form-control date"
+                                data-do="time-field"
+                                name="span[{{@key}}][1]"
+                                type="text"
+                                value="{{#scope ../span @key}}{{1}}{{/scope}}"
+                                {{#each field.attributes}}
+                                    {{@key}}="{{this}}"
+                                {{/each}}
+                            />
+                            <label for="span[{{@key}}][1]">End Time</label>
+                        </div>
+                    </div>
+                {{/when}}
+                {{#when field.type '===' 'datetime'}}
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <input
+                                aria-haspopup="true"
+                                aria-expanded="false"
+                                class="form-control date"
+                                data-do="datetime-field"
+                                name="span[{{@key}}][0]"
+                                type="text"
+                                value="{{#scope ../span @key}}{{0}}{{/scope}}"
+                                {{#each field.attributes}}
+                                    {{@key}}="{{this}}"
+                                {{/each}}
+                            />
+                            <label for="span[{{@key}}][0]">Start Date</label>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input
+                                aria-haspopup="true"
+                                aria-expanded="false"
+                                class="form-control date"
+                                data-do="datetime-field"
+                                name="span[{{@key}}][1]"
+                                type="text"
+                                value="{{#scope ../span @key}}{{1}}{{/scope}}"
+                                {{#each field.attributes}}
+                                    {{@key}}="{{this}}"
+                                {{/each}}
+                            />
+                            <label for="span[{{@key}}][1]">End Date</label>
+                        </div>
+                    </div>
+                {{/when}}
+                {{#when field.type '===' 'checkbox'}}
+                    <label class="checkbox checkbox-2">
+                        <input
+                            name="filter[{{@key}}]"
+                            type="checkbox"
+                            value="1"
+                            {{#when ../filter @key '==' 1}}checked{{/when}}
+                            {{#each field.attributes}}
+                                {{@key}}="{{this}}"
+                            {{/each}}
+                        />
+                        <span>{{field.attributes.placeholder}}</span>
+                    </label>
+                {{/when}}
+                {{#when field.type '===' 'switch'}}
+                    <input
+                        name="{{@key}}"
+                        type="hidden"
+                        value="0"
+                    />
+                    <label class="switch switch-1">
+                        <input
+                            name="filter[{{@key}}]"
+                            type="checkbox"
+                            value="1"
+                            {{#when ../filter @key '==' 1}}checked{{/when}}
+                            {{#each field.attributes}}
+                                {{@key}}="{{this}}"
+                            {{/each}}
+                        />
+                        <span>{{field.attributes.placeholder}}</span>
+                    </label>
+                {{/when}}
+                {{#when field.type '===' 'knob'}}
+                    <input
+                        class="form-control"
+                        data-do="knob-field"
+                        name="filter[{{@key}}]"
+                        type="text"
+                        value="{{scope ../filter @key}}"
+                        {{#each field.attributes}}
+                            {{@key}}="{{this}}"
+                        {{/each}}
+                    />
+                {{/when}}
+                {{#when field.type '===' 'select'}}
+                    <select
+                        class="form-control"
+                        name="filter[{{@key}}]"
+                        {{#each field.attributes}}
+                            {{@key}}="{{this}}"
+                        {{/each}}
+                    >
+                        <option value="">Choose One</option>
+                        {{#each field.options}}
+                            <option
+                                value="{{./key}}"
+                                {{#when ../../filter ../@key '==' key}}selected{{/when}}
+                            >
+                                {{value}}
+                            </option>
+                        {{/each}}
+                    </select>
+                {{/when}}
+                {{#when field.type '===' 'multiselect'}}
+                    <select
+                        class="form-control"
+                        data-do="select-field"
+                        multiple="multiple"
+                        name="multiple[{{@key}}][]"
+                        {{#each field.attributes}}
+                            {{@key}}="{{this}}"
+                        {{/each}}
+                    >
+                        {{#each field.options}}
+                            <option
+                                value="{{./key}}"
+                                {{#when ../../multiple ../@key '==' key}}selected{{/when}}
+                            >
+                                {{value}}
+                            </option>
+                        {{/each}}
+                    </select>
+                {{/when}}
+                {{#when field.type '===' 'checkboxes'}}
+                    <div{{#each field.attributes}} {{@key}}="{{this}}"{{/each}}>
+                        {{#each field.options}}
+                            <label class="checkbox checkbox-2">
+                                <input
+                                    name="multiple[{{@key}}][]"
+                                    type="checkbox"
+                                    value="{{./key}}"
+                                    {{#when ../../multiple ../@key '==' key}}checked{{/when}}
+                                />
+                                {{value}}
+                            </label>
+                        {{/each}}
+                    </div>
+                {{/when}}
+                {{#when field.type '===' 'radios'}}
+                    <div{{#each field.attributes}} {{@key}}="{{this}}"{{/each}}>
+                        {{#each field.options}}
+                            <label class="radio radio-2">
+                                <input
+                                    name="filter[{{@key}}]"
+                                    type="radio"
+                                    value="{{./key}}"
+                                    {{#when ../../filter ../@key '==' key}}checked{{/when}}
+                                />
+                                {{value}}
+                            </label>
+                        {{/each}}
+                    </div>
+                {{/when}}
+                {{#when field.type '===' 'tag'}}
+                    <div
+                        data-do="tag-field"
+                        class="tag-field"
+                        data-name="multiple[{{@key}}]"
+                        {{#each field.attributes}}
+                            {{@key}}="{{this}}"
+                        {{/each}}
+                    >
+                        {{#loop ../item @key}}
+                            <div class="tag">
+                                <input
+                                    class="tag-input text-field"
+                                    type="text"
+                                    name="multiple[{{../@key}}][]"
+                                    value="{{this}}"
+                                />
+                                <a
+                                    class="remove"
+                                    href="javascript:void(0)"
+                                >
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </div>
+                        {{/loop}}
+                    </div>
+                {{/when}}
+                {{#when field.type '===' 'multirange'}}
+                    <input
+                        class="irs-hidden-input"
+                        data-do="multirange-field"
+                        data-type="double"
+                        name="filter[{{@key}}]"
+                        tabindex="-1"
+                        type="hidden"
+                        value="{{scope ../filter @key}}"
+                        {{#each field.attributes}}
+                            {{@key}}="{{this}}"
+                        {{/each}}
+                    />
+                {{/when}}
+            </div>
+        {{/notin}}
+    {{/in}}
+{{/each}}

@@ -6,23 +6,21 @@
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
-namespace Cradle\Package\System\Object;
+namespace Cradle\Package\System;
 
 use Cradle\Package\System\Schema;
-
 use Cradle\Module\Utility\Service\NoopService;
-
 use Cradle\Helper\InstanceTrait;
 
 /**
  * Formatter layer
  *
- * @vendor   Acme
- * @package  object
- * @author   John Doe <john@acme.com>
+ * @vendor   cradle
+ * @package  system
+ * @author   Christan Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
-class Factory
+class Object
 {
     use InstanceTrait;
 

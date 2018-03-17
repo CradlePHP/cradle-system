@@ -1,0 +1,146 @@
+{{#format ../schema this 'list'}}
+    {{#when format '===' 'none'}}
+        {{#in ../../schema.filterable name}}
+            <td>
+                <a href="?{{query 'filter' name value}}">
+                    {{value}}
+                </a>
+            </td>
+        {{else}}
+            <td>{{value}}</td>
+        {{/in}}
+    {{/when}}
+    {{#when format '===' 'lower'}}
+        {{#in ../../schema.filterable name}}
+            <td>
+                <a href="?{{query 'filter' name value}}">
+                    {{lower value}}
+                </a>
+            </td>
+        {{else}}
+            <td>{{tolower value}}</td>
+        {{/in}}
+    {{/when}}
+    {{#when format '===' 'upper'}}
+        {{#in ../../schema.filterable name}}
+            <td>
+                <a href="?{{query 'filter' name value}}">
+                    {{upper value}}
+                </a>
+            </td>
+        {{else}}
+            <td>{{upper value}}</td>
+        {{/in}}
+    {{/when}}
+    {{#when format '===' 'capital'}}
+        {{#in ../../schema.filterable name}}
+            <td>
+                <a href="?{{query 'filter' name value}}">
+                    {{capital value}}
+                </a>
+            </td>
+        {{else}}
+            <td>{{capital value}}</td>
+        {{/in}}
+    {{/when}}
+    {{#when format '===' 'length'}}
+        <td>{{chars value parameters}}</td>
+    {{/when}}
+    {{#when format '===' 'words'}}
+        <td>{{words value parameters}}</td>
+    {{/when}}
+    {{#when format '===' 'html'}}
+        {{#in ../../schema.filterable name}}
+            <td>
+                <a href="?{{query 'filter' name value}}">
+                    {{{value}}}
+                </a>
+            </td>
+        {{else}}
+            <td>{{{value}}}</td>
+        {{/in}}
+    {{/when}}
+    {{#when format '===' 'markdown'}}
+        <td>{{{markdown value}}}</td>
+    {{/when}}
+    {{#when format '===' 'number'}}
+        <td>{{number value}}</td>
+    {{/when}}
+    {{#when format '===' 'price'}}
+        <td>{{price value}}</td>
+    {{/when}}
+    {{#when format '===' 'yes'}}
+        {{#in ../../schema.filterable name}}
+            <td>
+                <a href="?{{query 'filter' name value}}">
+                    {{#if value}}Yes{{else}}No{{/if}}
+                </a>
+            </td>
+        {{else}}
+            <td>{{#if value}}Yes{{else}}No{{/if}}</td>
+        {{/in}}
+    {{/when}}
+    {{#when format '===' 'date'}}
+        <td>
+            {{#if value}}
+                {{date value parameters}}
+            {{else}}
+                &nbsp;
+            {{/if}}
+        </td>
+    {{/when}}
+    {{#when format '===' 'relative'}}
+        <td>
+            {{#if value}}
+                {{relative value parameters}}
+            {{else}}
+                &nbsp;
+            {{/if}}
+        </td>
+    {{/when}}
+    {{#when format '===' 'strip'}}
+        <td>{{strip value parameters}}</td>
+    {{/when}}
+    {{#when format '===' 'link'}}
+        <td><a href="{{compile parameters.0 ../this}}">{{compile parameters.1 ../this}}</a></td>
+    {{/when}}
+    {{#when format '===' 'image'}}
+        {{#if value}}
+            <td>
+                <img
+                    src="{{value}}"
+                    width="{{parameters.0}}"
+                    onerror="this.src='/images/default-image.png'"
+                    height="{{parameters.1}}"
+                />
+            </td>
+        {{else}}
+            <td><img src="/images/default-image.png" width="100" height="100" /></td>
+        {{/if}}
+    {{/when}}
+    {{#when format '===' 'email'}}
+        <td><a href="mailto:{{value}}">{{compile parameters ../this}}</a></td>
+    {{/when}}
+    {{#when format '===' 'phone'}}
+        <td><a href="tel:{{value}}">{{compile parameters ../this}}</a></td>
+    {{/when}}
+    {{#when format '===' 'custom'}}
+        <td>{{{compile parameters ../this}}}</td>
+    {{/when}}
+    {{#when format '===' 'comma'}}
+        <td>{{join value ','}}</td>
+    {{/when}}
+    {{#when format '===' 'space'}}
+        <td>{{join value ' '}}</td>
+    {{/when}}
+    {{#when format '===' 'tag'}}
+        <td>
+            {{#each value}}
+                <div class="badge badge-orange">{{this}}</div>
+            {{/each}}
+        </td>
+    {{/when}}
+    {{#when format '===' 'formula'}}
+        <td>{{formula parameters ../this}}</td>
+    {{/when}}
+{{/format}}

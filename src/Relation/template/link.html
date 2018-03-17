@@ -1,0 +1,79 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/admin">
+                <i class="fas fa-home"></i> Admin
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="/admin/system/object/{{schema.name}}/search">
+                <i class="fas fa-{{schema.icon}}"></i> {{schema.plural}}
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="/admin/system/object/{{relation.name}}/search/{{schema.name}}/{{scope row schema.primary}}">
+                <i class="fas fa-{{relation.icon}}"></i> {{row.suggestion}} - {{relation.plural}}
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="fas fa-link"></i> {{title}}
+        </li>
+    </ol>
+</nav>
+
+<div class="main-padding">
+    <h3 class="main-title">
+        <i class="{{schema.icon}}"></i>
+        {{row.suggestion}}
+    </h3>
+
+    <form class="box" method="post">
+        <div class="box-head box-success">
+            <div class="box-title">
+                <i class="fa fa-link"></i> {{title}}
+            </div>
+        </div>
+        <div class="box-body box-padding">
+            <div class="form-group{{#has errors relation.primary2}} has-error{{/has}}">
+                <div>
+                    <input
+                        autocomplete="off"
+                        class="form-control suggestion-label-{{relation.name}}"
+                        name="suggestion_name"
+                        placeholder="Enter {{relation.singular}}"
+                        type="text"
+                        value="{{item.suggestion_name}}"
+                    />
+                    <input
+                        class="suggestion-value-{{relation.name}}"
+                        name="{{relation.primary2}}"
+                        type="hidden"
+                        value="{{scope item relation.primary2}}"
+                    />
+                    <div
+                        class="input-suggestion d-none"
+                        data-do="suggestion-field"
+                        data-format="{{relation.suggestion}}"
+                        data-target-label="input.suggestion-label-{{relation.name}}"
+                        data-target-value="input.suggestion-value-{{relation.name}}"
+                        {{#in valid_relations relation.name}}
+                            data-url="/admin/system/object/{{relation.name}}/search?q={QUERY}&render=false"
+                        {{else}}
+                            data-url="/admin/{{relation.name}}/search?q={QUERY}&render=false"
+                        {{/in}}
+                        data-value="{{relation.primary}}"
+                    ></div>
+                    {{#has errors relation.primary2}}
+                        <span class="help-text">{{scope errors relation.primary2}}</span>
+                    {{/has}}
+                </div>
+            </div>
+        </div>
+        <div class="box-foot box-light">
+            <div class="box-left">
+                <input type="hidden" name="csrf" value="{{csrf}}" />
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>

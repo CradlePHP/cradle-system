@@ -15,15 +15,15 @@ use Cradle\Storm\SqlFactory;
 use Cradle\Module\Utility\Service\SqlServiceInterface;
 use Cradle\Module\Utility\Service\AbstractSqlService;
 
-use Cradle\Module\System\Schema;
-use Cradle\Module\System\Exception;
+use Cradle\Package\System\Schema;
+use Cradle\Package\System\Exception;
 
 /**
  * Object SQL Service
  *
- * @vendor   Acme
- * @package  object
- * @author   John Doe <john@acme.com>
+ * @vendor   cradle
+ * @package  system
+ * @author   Christan Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
 class SqlService

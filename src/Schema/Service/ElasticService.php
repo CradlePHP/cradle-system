@@ -7,9 +7,9 @@
  * distributed with this package.
  */
 
-namespace Cradle\Package\System\Object\Service;
+namespace Cradle\Package\System\Schema\Service;
 
-use Cradle\Package\System\Object\Service;
+use Cradle\Package\System\Schema\Service;
 use Cradle\Package\System\Schema;
 
 use Elasticsearch\Client as Resource;

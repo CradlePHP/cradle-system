@@ -1,0 +1,58 @@
+<tr class="object-field{{#if disable}} field-disabled{{/if}}" data-index="{{@index}}">
+    <td class="object-action" nowrap="nowrap" valign="middle">
+        {{#if disable}}
+            <i class="fas fa-lock fa-fw"></i>
+        {{else}}
+            <a
+                class="field-edit-trigger text-warning"
+                data-do="modal-open"
+                data-on="click"
+                href="javascript:void(0)"
+            >
+                <i class="fas fa-edit fa-fw"></i>
+            </a>
+        {{/if}}
+        <a
+            class="field-move-up-trigger"
+            data-do="move-up"
+            data-on="click"
+            data-level="2"
+            href="javascript:void(0)"
+        >
+            <i class="fas fa-arrow-up fa-fw"></i>
+        </a>
+        <a
+            class="field-move-down-trigger"
+            data-do="move-down"
+            data-on="click"
+            data-level="2"
+            href="javascript:void(0)"
+        >
+            <i class="fas fa-arrow-down fa-fw"></i>
+        </a>
+        {{#if disable}}
+            <i class="fas fa-lock fa-fw"></i>
+        {{else}}
+            <a
+                class="field-remove-trigger text-danger"
+                data-do="field-remove"
+                data-on="click"
+                data-level="2"
+                href="javascript:void(0)"
+            >
+                <i class="fas fa-times fa-fw"></i>
+            </a>
+        {{/if}}
+
+        {{> update}}
+    </td>
+    <td class="field-name-value">{{name}}</td>
+    <td class="field-label-value">{{label}}</td>
+    <td class="field-type-value">{{field.type}}</td>
+    <td class="field-list-value">{{list.format}}</td>
+    <td class="field-detail-value">{{detail.format}}</td>
+    <td class="field-default-value">{{#if default}}{{default}}{{else}}--{{/if}}</td>
+    <td class="field-searchable-value">{{#if searchable}}Yes{{else}}No{{/if}}</td>
+    <td class="field-filterable-value">{{#if filterable}}Yes{{else}}No{{/if}}</td>
+    <td class="field-sortable-value">{{#if sortable}}Yes{{else}}No{{/if}}</td>
+</tr>

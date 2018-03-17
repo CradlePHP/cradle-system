@@ -18,9 +18,9 @@ use Cradle\Module\Utility\ServiceInterface;
 /**
  * Service layer
  *
- * @vendor   Acme
- * @package  object
- * @author   John Doe <john@acme.com>
+ * @vendor   cradle
+ * @package  system
+ * @author   Christan Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
 class Service implements ServiceInterface
@@ -37,7 +37,7 @@ class Service implements ServiceInterface
     public static function get($name, $key = 'main')
     {
         if (in_array($name, ['sql', 'redis', 'elastic'])) {
-            $resource = cradle()->package('global')->service($name . '-' . $key);
+            $resource = $this->package('global')->service($name . '-' . $key);
 
             if ($resource) {
                 if ($name === 'sql') {

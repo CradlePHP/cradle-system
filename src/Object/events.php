@@ -7,12 +7,14 @@
  * distributed with this package.
  */
 
-use Cradle\Package\System\Object\Service;
-use Cradle\Package\System\Object\Validator;
-use Cradle\Package\System\Schema;
-use Cradle\Package\System\Exception;
+use Cradle\Package\System\Object\Service as ObjectService;
+use Cradle\Package\System\Object\Validator as ObjectValidator;
+use Cradle\Package\System\Object\Schema as ObjectSchema;
 
-use Cradle\Storm\SqlException;
+use Cradle\Package\System\Schema;
+use Cradle\Package\System\Exception as SystemException;
+
+use Cradle\Sql\SqlException;
 
 use Cradle\Http\Request;
 use Cradle\Http\Response;
@@ -32,7 +34,7 @@ $cradle->on('system-object-create', function ($request, $response) {
     }
 
     if (!isset($data['schema'])) {
-        throw Exception::forNoSchema();
+        throw SystemException::forNoSchema();
     }
 
     $schema = Schema::i($data['schema']);
@@ -40,7 +42,7 @@ $cradle->on('system-object-create', function ($request, $response) {
     //----------------------------//
     // 2. Validate Data
     $errors = $schema
-        ->model()
+        ->object()
         ->validator()
         ->getCreateErrors($data);
 
@@ -54,7 +56,7 @@ $cradle->on('system-object-create', function ($request, $response) {
     //----------------------------//
     // 3. Prepare Data
     $data = $schema
-        ->model()
+        ->object()
         ->formatter()
         ->formatData(
             $data,
@@ -65,9 +67,9 @@ $cradle->on('system-object-create', function ($request, $response) {
     //----------------------------//
     // 4. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->model()->service('sql');
-    $objectRedis = $schema->model()->service('redis');
-    $objectElastic = $schema->model()->service('elastic');
+    $objectSql = $schema->object()->service('sql');
+    $objectRedis = $schema->object()->service('redis');
+    $objectElastic = $schema->object()->service('elastic');
     //save object to database
     $results = $objectSql->create($data);
 
@@ -114,7 +116,7 @@ $cradle->on('system-object-detail', function ($request, $response) {
     }
 
     if (!isset($data['schema'])) {
-        throw Exception::forNoSchema();
+        throw SystemException::forNoSchema();
     }
 
     $schema = Schema::i($data['schema']);
@@ -143,9 +145,9 @@ $cradle->on('system-object-detail', function ($request, $response) {
     //----------------------------//
     // 4. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->model()->service('sql');
-    $objectRedis = $schema->model()->service('redis');
-    $objectElastic = $schema->model()->service('elastic');
+    $objectSql = $schema->object()->service('sql');
+    $objectRedis = $schema->object()->service('redis');
+    $objectElastic = $schema->object()->service('elastic');
 
     $results = null;
 
@@ -205,7 +207,7 @@ $cradle->on('system-object-remove', function ($request, $response) {
     $data = $response->getResults();
 
     if (!$request->hasStage('schema')) {
-        throw Exception::forNoSchema();
+        throw SystemException::forNoSchema();
     }
 
     $schema = Schema::i($request->getStage('schema'));
@@ -216,9 +218,9 @@ $cradle->on('system-object-remove', function ($request, $response) {
     //----------------------------//
     // 4. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->model()->service('sql');
-    $objectRedis = $schema->model()->service('redis');
-    $objectElastic = $schema->model()->service('elastic');
+    $objectSql = $schema->object()->service('sql');
+    $objectRedis = $schema->object()->service('redis');
+    $objectElastic = $schema->object()->service('elastic');
 
     //save to database
     if ($active) {
@@ -270,7 +272,7 @@ $cradle->on('system-object-restore', function ($request, $response) {
     $data = $response->getResults();
 
     if (!$request->hasStage('schema')) {
-        throw Exception::forNoSchema();
+        throw SystemException::forNoSchema();
     }
 
     $schema = Schema::i($request->getStage('schema'));
@@ -281,9 +283,9 @@ $cradle->on('system-object-restore', function ($request, $response) {
     //----------------------------//
     // 4. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->model()->service('sql');
-    $objectRedis = $schema->model()->service('redis');
-    $objectElastic = $schema->model()->service('elastic');
+    $objectSql = $schema->object()->service('sql');
+    $objectRedis = $schema->object()->service('redis');
+    $objectElastic = $schema->object()->service('elastic');
 
     //save to database
     $payload = [];
@@ -316,7 +318,7 @@ $cradle->on('system-object-search', function ($request, $response) {
     }
 
     if (!isset($data['schema'])) {
-        throw Exception::forNoSchema();
+        throw SystemException::forNoSchema();
     }
 
     $schema = Schema::i($data['schema']);
@@ -330,9 +332,9 @@ $cradle->on('system-object-search', function ($request, $response) {
     //----------------------------//
     // 4. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->model()->service('sql');
-    $objectRedis = $schema->model()->service('redis');
-    $objectElastic = $schema->model()->service('elastic');
+    $objectSql = $schema->object()->service('sql');
+    $objectRedis = $schema->object()->service('redis');
+    $objectElastic = $schema->object()->service('elastic');
 
     $results = false;
 
@@ -390,7 +392,7 @@ $cradle->on('system-object-update', function ($request, $response) {
     }
 
     if (!isset($data['schema'])) {
-        throw Exception::forNoSchema();
+        throw SystemException::forNoSchema();
     }
 
     $schema = Schema::i($data['schema']);
@@ -398,7 +400,7 @@ $cradle->on('system-object-update', function ($request, $response) {
     //----------------------------//
     // 2. Validate Data
     $errors = $schema
-        ->model()
+        ->object()
         ->validator()
         ->getUpdateErrors($data);
 
@@ -412,7 +414,7 @@ $cradle->on('system-object-update', function ($request, $response) {
     //----------------------------//
     // 3. Prepare Data
     $data = $schema
-        ->model()
+        ->object()
         ->formatter()
         ->formatData(
             $data,
@@ -423,9 +425,9 @@ $cradle->on('system-object-update', function ($request, $response) {
     //----------------------------//
     // 4. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->model()->service('sql');
-    $objectRedis = $schema->model()->service('redis');
-    $objectElastic = $schema->model()->service('elastic');
+    $objectSql = $schema->object()->service('sql');
+    $objectRedis = $schema->object()->service('redis');
+    $objectElastic = $schema->object()->service('elastic');
 
     //save object to database
     $results = $objectSql->update($data);
@@ -519,7 +521,7 @@ $cradle->on('system-object-import', function ($request, $response) {
     ];
 
     if (!isset($data['schema'])) {
-        throw Exception::forNoSchema();
+        throw SystemException::forNoSchema();
     }
 
     $schema = Schema::i($data['schema']);
@@ -550,7 +552,7 @@ $cradle->on('system-object-import', function ($request, $response) {
 
     foreach ($data['rows'] as $i => $row) {
         $error = $schema
-            ->model()
+            ->object()
             ->validator()
             ->getCreateErrors($row);
 
@@ -585,11 +587,11 @@ $cradle->on('system-object-import', function ($request, $response) {
 
         $rowResponse = Response::i()->load();
 
-        cradle()->trigger('system-object-detail', $rowRequest, $rowResponse);
+        $this->trigger('system-object-detail', $rowRequest, $rowResponse);
 
         if ($rowResponse->hasResults()) {
             // trigger single object update event
-            cradle()->trigger('system-object-update', $rowRequest, $rowResponse);
+            $this->trigger('system-object-update', $rowRequest, $rowResponse);
 
             // check response if there is an error
             if ($rowResponse->isError()) {
@@ -613,7 +615,7 @@ $cradle->on('system-object-import', function ($request, $response) {
         }
 
         // trigger single object update event
-        cradle()->trigger('system-object-create', $rowRequest, $rowResponse);
+        $this->trigger('system-object-create', $rowRequest, $rowResponse);
 
         // check response if there is an error
         if ($rowResponse->isError()) {
@@ -656,7 +658,7 @@ $cradle->on('system-object-import', function ($request, $response) {
                 ->setStage($primary2, $request->getStage('id'));
 
             //now link it
-            cradle()->trigger('system-object-link', $linkRequest, $linkResponse);
+            $this->trigger('system-object-link', $linkRequest, $linkResponse);
         }
 
         $results['new'] ++;
@@ -681,7 +683,7 @@ $cradle->on('system-object-link', function ($request, $response) {
     }
 
     if (!isset($data['schema1'], $data['schema2'])) {
-        throw Exception::forNoSchema();
+        throw SystemException::forNoSchema();
     }
 
     $schema = Schema::i($data['schema1']);
@@ -710,9 +712,9 @@ $cradle->on('system-object-link', function ($request, $response) {
     //----------------------------//
     // 3. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->model()->service('sql');
-    $objectRedis = $schema->model()->service('redis');
-    $objectElastic = $schema->model()->service('elastic');
+    $objectSql = $schema->object()->service('sql');
+    $objectRedis = $schema->object()->service('redis');
+    $objectElastic = $schema->object()->service('elastic');
 
     try {
         $results = $objectSql->link(
@@ -750,7 +752,7 @@ $cradle->on('system-object-unlink', function ($request, $response) {
     }
 
     if (!isset($data['schema1'], $data['schema2'])) {
-        throw Exception::forNoSchema();
+        throw SystemException::forNoSchema();
     }
 
     $schema = Schema::i($data['schema1']);
@@ -779,9 +781,9 @@ $cradle->on('system-object-unlink', function ($request, $response) {
     //----------------------------//
     // 3. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->model()->service('sql');
-    $objectRedis = $schema->model()->service('redis');
-    $objectElastic = $schema->model()->service('elastic');
+    $objectSql = $schema->object()->service('sql');
+    $objectRedis = $schema->object()->service('redis');
+    $objectElastic = $schema->object()->service('elastic');
 
     try {
         $results = $objectSql->unlink(
@@ -819,7 +821,7 @@ $cradle->on('system-object-unlinkall', function ($request, $response) {
     }
 
     if (!isset($data['schema1'], $data['schema2'])) {
-        throw Exception::forNoSchema();
+        throw SystemException::forNoSchema();
     }
 
     $schema = Schema::i($data['schema1']);
@@ -834,9 +836,9 @@ $cradle->on('system-object-unlinkall', function ($request, $response) {
     //----------------------------//
     // 3. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->model()->service('sql');
-    $objectRedis = $schema->model()->service('redis');
-    $objectElastic = $schema->model()->service('elastic');
+    $objectSql = $schema->object()->service('sql');
+    $objectRedis = $schema->object()->service('redis');
+    $objectElastic = $schema->object()->service('elastic');
 
     $results = $objectSql->unlinkAll(
         $data['schema2'],

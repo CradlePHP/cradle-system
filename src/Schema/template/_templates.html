@@ -1,0 +1,425 @@
+<script id="field-modal-template" type="text/x-template">
+    <div class="modal fade modal-create" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Field</h5>
+                    <button
+                        class="close"
+                        data-do="modal-cancel"
+                        data-on="click"
+                        type="button"
+                    >
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" data-index="{INDEX}">
+                    <div class="form-group form-group-label">
+                        <label class="control-label">Label</label>
+                        <div>
+                            <input
+                                class="field-label form-control"
+                                placeholder="Field Title"
+                                name="fields[{INDEX}][label]"
+                                type="text"
+                            />
+                        </div>
+                    </div>
+                    <div class="form-group form-group-name">
+                        <label class="control-label">Keyword</label>
+                        <div>
+                            <input
+                                class="field-name form-control"
+                                data-do="slugger"
+                                data-source="input[name='fields[{INDEX}][label]']"
+                                data-upper="0"
+                                data-space="_"
+                                name="fields[{INDEX}][name]"
+                                placeholder="Enter a unique keyword"
+                                type="text"
+                            />
+                        </div>
+                    </div>
+                    <div class="form-group form-group-type">
+                        <label class="control-label">Type</label>
+                        <div>
+                            <select
+                                class="field-type form-control"
+                                data-do="field-type"
+                                data-on="change"
+                                name="fields[{INDEX}][field][type]"
+                            >
+                                {{> options_type}}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-validation">
+                        <label class="control-label">Validation</label>
+                        <div>
+                            <button
+                                class="btn btn-info"
+                                data-do="validation-add"
+                                data-on="click"
+                                type="button"
+                            >
+                                Add Validation
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-list">
+                        <label class="control-label">List Format</label>
+                        <div>
+                            <select
+                                class="field-list form-control"
+                                data-do="field-list"
+                                data-on="change"
+                                name="fields[{INDEX}][list][format]"
+                            >
+                                {{> options_format}}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-detail">
+                        <label class="control-label">Detail Format</label>
+                        <div>
+                            <select
+                                class="field-detail form-control"
+                                data-do="field-detail"
+                                data-on="change"
+                                name="fields[{INDEX}][detail][format]"
+                            >
+                                {{> options_format}}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-group-default">
+                        <label class="control-label">Default</label>
+                        <div>
+                            <input
+                                class="field-default form-control"
+                                placeholder="Default Value"
+                                name="fields[{INDEX}][default]"
+                                type="text"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="form-group  form-group-indexes">
+                        <div>
+                            <label class="checkbox checkbox-2">
+                                <input
+                                    class="field-searchable"
+                                    name="fields[{INDEX}][searchable]"
+                                    type="checkbox"
+                                    value="1"
+                                />
+                                <span>Searchable</span>
+                            </label>
+                            <br />
+                            <label class="checkbox checkbox-2">
+                                <input
+                                    class="field-filterable"
+                                    name="fields[{INDEX}][filterable]"
+                                    type="checkbox"
+                                    value="1"
+                                />
+                                <span>Filterable</span>
+                            </label>
+                            <br />
+                            <label class="checkbox checkbox-2">
+                                <input
+                                    class="field-sortable"
+                                    name="fields[{INDEX}][sortable]"
+                                    type="checkbox"
+                                    value="1"
+                                />
+                                <span>Sortable</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button
+                        class="btn btn-danger"
+                        data-do="modal-cancel"
+                        data-on="click"
+                        type="button"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        class="btn btn-primary"
+                        data-do="modal-save"
+                        data-on="click"
+                        type="button"
+                    >
+                        Done
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="field-row-template" type="text/x-template">
+    <tr class="object-field" data-index="{INDEX}">
+        <td class="object-action" nowrap="nowrap" valign="middle">
+            <a
+                class="field-edit-trigger text-warning"
+                data-do="modal-open"
+                data-on="click"
+                href="javascript:void(0)"
+            >
+                <i class="fas fa-edit"></i>
+            </a>
+            <a
+                class="field-move-up-trigger"
+                data-do="move-up"
+                data-on="click"
+                data-level="2"
+                href="javascript:void(0)"
+            >
+                <i class="fas fa-arrow-up"></i>
+            </a>
+            <a
+                class="field-move-down-trigger"
+                data-do="move-down"
+                data-on="click"
+                data-level="2"
+                href="javascript:void(0)"
+            >
+                <i class="fas fa-arrow-down"></i>
+            </a>
+            <a
+                class="field-remove-trigger text-danger"
+                data-do="field-remove"
+                data-on="click"
+                data-level="2"
+                href="javascript:void(0)"
+            >
+                <i class="fas fa-times"></i>
+            </a>
+        </td>
+        <td class="field-name-value"></td>
+        <td class="field-label-value"></td>
+        <td class="field-type-value"></td>
+        <td class="field-list-value"></td>
+        <td class="field-detail-value"></td>
+        <td class="field-default-value"></td>
+        <td class="field-searchable-value"></td>
+        <td class="field-filterable-value"></td>
+        <td class="field-sortable-value"></td>
+    </tr>
+</script>
+
+<script id="field-validation-template" type="text/x-template">
+    <div class="validation-row" data-index="{INDEX_2}">
+        <div class="input-group">
+            <select
+                class="form-control"
+                data-do="field-validation"
+                data-on="change"
+                name="fields[{INDEX_1}][validation][{INDEX_2}][method]"
+            >
+                {{> options_validation}}
+            </select>
+            <span class="input-group-btn">
+                <a
+                    class="btn btn-danger"
+                    data-do="remove"
+                    data-on="click"
+                    data-level="3"
+                    href="javascript:void(0)"
+                >
+                    <i class="fas fa-times"></i>
+                </a>
+            </span>
+        </div>
+        <input
+            name="fields[{INDEX_1}][validation][{INDEX_2}][message]"
+            class="form-control validation-message"
+            placeholder="Error Message"
+            type="text"
+        />
+    </div>
+</script>
+
+<script id="field-input-template" type="text/x-template">
+    <div class="input-input">
+        <input
+            name="{NAME}"
+            class="form-control"
+            type="text"
+        />
+    </div>
+</script>
+
+<script id="field-pair-template" type="text/x-template">
+    <div class="input-pair">
+        <input
+            name="{NAME_1}"
+            class="form-control"
+            type="text"
+        />
+        <input
+            name="{NAME_2}"
+            class="form-control"
+            type="text"
+        />
+    </div>
+</script>
+
+<script id="field-attributes-template" type="text/x-template">
+    <div class="input-attributes">
+        <button
+            data-do="attribute-add"
+            data-name="{NAME}"
+            data-on="click"
+            class="attribute-add btn btn-info"
+            type="button"
+        >
+            Add Attribute
+        </button>
+    </div>
+</script>
+
+<script id="field-attribute-row-template" type="text/x-template">
+    <div
+        class="attribute-row"
+        data-do="attribute-field"
+        data-name="{NAME}"
+    >
+        <input
+            class="form-control attribute-key"
+            placeholder="Attribute"
+            type="text"
+        />
+        <input
+            class="form-control attribute-value"
+            placeholder="Value"
+            type="text"
+        />
+        <a
+            class="btn btn-danger"
+            data-do="remove"
+            data-on="click"
+            data-level="1"
+            href="javascript:void(0)"
+        >
+            <i class="fas fa-times"></i>
+        </a>
+    </div>
+</script>
+
+<script id="field-options-template" type="text/x-template">
+    <div class="input-options">
+        <button
+            data-do="option-add"
+            data-name="{NAME}"
+            data-on="click"
+            class="btn btn-info option-add"
+            type="button"
+        >
+            Add Option
+        </button>
+    </div>
+</script>
+
+<script id="field-option-row-template" type="text/x-template">
+    <div class="option-row input-group" data-index="{INDEX}">
+        <input
+            class="form-control option-value"
+            name="{NAME}"
+            placeholder="Value"
+            type="text"
+        />
+        <span class="input-group-btn">
+            <a
+                class="btn btn-danger"
+                data-do="option-remove"
+                data-on="click"
+                data-level="2"
+                href="javascript:void(0)"
+            >
+                <i class="fas fa-times"></i>
+            </a>
+        </span>
+    </div>
+</script>
+
+<script id="field-keyval-template" type="text/x-template">
+    <div class="input-keyval">
+        <button
+            data-do="keyval-add"
+            data-name="{NAME}"
+            data-on="click"
+            class="keyval-add btn btn-info"
+            type="button"
+        >
+            Add Option
+        </button>
+    </div>
+</script>
+
+<script id="field-keyval-row-template" type="text/x-template">
+    <div class="keyval-row" data-index="{INDEX}">
+        <input
+            class="form-control keyval-key"
+            name="{NAME_1}"
+            placeholder="Key"
+            type="text"
+        />
+        <input
+            class="form-control keyval-value"
+            name="{NAME_2}"
+            placeholder="Value"
+            type="text"
+        />
+        <a
+            class="btn btn-danger"
+            data-do="remove"
+            data-on="click"
+            data-level="1"
+            href="javascript:void(0)"
+        >
+            <i class="fas fa-times"></i>
+        </a>
+    </div>
+</script>
+
+<script id="relation-row-template" type="text/x-template">
+    <div class="relation-row" data-index="{INDEX}">
+        <a
+            class="text-danger"
+            data-do="relation-remove"
+            data-level="1"
+            data-on="click"
+            href="javascript:void(0)"
+        >
+            <i class="fas fa-times"></i>
+        </a>
+        <strong
+            class="schema-relation-singular"
+            data-default="??"
+            data-do="copy-to-text"
+            data-trigger="input.schema-singular"
+        >
+            {SINGULAR}
+        </strong>
+        <i class="fas fa-arrow-right"></i>
+        <select class="form-control relation-many" name="{NAME_1}">
+            <option value="0">1:0</option>
+            <option value="1">1:1</option>
+            <option value="2">1:N</option>
+            <option value="3">N:N</option>
+        </select>
+        <i class="fas fa-arrow-right"></i>
+        <input
+            class="form-control relation-name"
+            name="{NAME_2}"
+            placeholder="Enter Schema Keyword"
+            type="text"
+        />
+    </div>
+</script>

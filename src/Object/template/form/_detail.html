@@ -1,0 +1,85 @@
+<div class="row">
+    <div class="col-sm-8">
+        <div class="box">
+            <div class="box-head box-default">
+                <div class="box-title">{{detail.suggestion}}</div>
+            </div>
+            <div class="box-body box-padding">
+                <table class="table table-striped">
+                    <tbody>
+                        {{> object_form_format}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {{#if schema.relations.length}}
+        <div class="col-sm-4">
+            <div class="box">
+                <div class="box-head box-light">
+                    <div class="box-title">{{_ 'Relations'}}</div>
+                </div>
+                <div class="box-body box-padding">
+                    <table class="table table-striped">
+                        <tbody>
+                            {{#relations schema.name 0}}
+                                {{#has ../detail name}}
+                                    {{#scope ../detail name}}
+                                        <tr>
+                                            <td>{{../singular}}</td>
+                                            <td>
+                                                <a href="/admin/system/object/{{../name}}/update/{{scope this ../primary}}">
+                                                    {{suggest ../this this}}
+                                                </a>
+                                                &nbsp;&nbsp;
+                                                <a
+                                                    class="text-pink remove"
+                                                    href="/admin/system/object/{{../../schema.name}}/{{scope ../../item ../../schema.primary}}/unlink/{{../name}}/{{scope this ../primary}}?redirect_uri={{../../redirect}}"
+                                                    title="Remove {{../singular}}"
+                                                >
+                                                    <i class="fa fa-unlink"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {{/scope}}
+                                {{/has}}
+                            {{/relations}}
+                            {{#relations schema.name 1}}
+                                {{#has ../detail primary}}
+                                    <tr>
+                                        <td>{{singular}}</td>
+                                        <td>
+                                            <a href="/admin/system/object/{{name}}/update/{{scope ../detail primary}}">
+                                                {{suggest this ../detail}}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {{/has}}
+                            {{/relations}}
+                            {{#relations schema.name 2}}
+                                <tr>
+                                    <td>{{singular}}</td>
+                                    <td>
+                                        <a href="/admin/system/object/{{../schema.name}}/{{scope ../detail ../schema.primary}}/search/{{name}}">
+                                            {{_ 'View All %s' plural}}
+                                        </a>
+                                    </td>
+                                </tr>
+                            {{/relations}}
+                            {{#relations schema.name 3}}
+                                <tr>
+                                    <td>{{singular}}</td>
+                                    <td>
+                                        <a href="/admin/system/object/{{../schema.name}}/{{scope ../detail ../schema.primary}}/search/{{name}}">
+                                            {{_ 'View All %s' plural}}
+                                        </a>
+                                    </td>
+                                </tr>
+                            {{/relations}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {{/if}}
+</div>

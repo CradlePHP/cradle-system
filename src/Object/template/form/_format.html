@@ -1,0 +1,94 @@
+{{#format schema detail 'detail'}}
+    {{#otherwise format '===' 'hide'}}
+        <tr>
+            <td><strong>{{label}}</strong></td>
+            {{#when format '===' 'none'}}
+                <td>{{value}}</td>
+            {{/when}}
+            {{#when format '===' 'lower'}}
+                <td>{{lower value}}</td>
+            {{/when}}
+            {{#when format '===' 'upper'}}
+                <td>{{upper value}}</td>
+            {{/when}}
+            {{#when format '===' 'capital'}}
+                <td>{{capital value}}</td>
+            {{/when}}
+            {{#when format '===' 'length'}}
+                <td>{{chars value parameters}}</td>
+            {{/when}}
+            {{#when format '===' 'words'}}
+                <td>{{words value parameters}}</td>
+            {{/when}}
+            {{#when format '===' 'html'}}
+                <td>{{{value}}}</td>
+            {{/when}}
+            {{#when format '===' 'markdown'}}
+                <td>{{{markdown value}}}</td>
+            {{/when}}
+            {{#when format '===' 'number'}}
+                <td>{{number value}}</td>
+            {{/when}}
+            {{#when format '===' 'price'}}
+                <td>{{price value}}</td>
+            {{/when}}
+            {{#when format '===' 'yes'}}
+                <td>{{#if value}}Yes{{else}}No{{/if}}</td>
+            {{/when}}
+            {{#when format '===' 'date'}}
+                <td>
+                    {{#if value}}
+                        {{date value parameters}}
+                    {{else}}
+                        &nbsp;
+                    {{/if}}
+                </td>
+            {{/when}}
+            {{#when format '===' 'relative'}}
+                <td>
+                    {{#if value}}
+                        {{relative value parameters}}
+                    {{else}}
+                        &nbsp;
+                    {{/if}}
+                </td>
+            {{/when}}
+            {{#when format '===' 'strip'}}
+                <td>{{{strip value parameters}}}</td>
+            {{/when}}
+            {{#when format '===' 'link'}}
+                <td><a href="{{compile parameters.0 ../this}}">{{compile parameters.1 ../detail}}</a></td>
+            {{/when}}
+            {{#when format '===' 'image'}}
+                <td><img src="{{value}}" width="{{parameters.0}}" height="{{parameters.1}}" /></td>
+            {{/when}}
+            {{#when format '===' 'email'}}
+                <td><a href="mailto:{{value}}">{{compile parameters ../detail}}</a></td>
+            {{/when}}
+            {{#when format '===' 'phone'}}
+                <td><a href="tel:{{value}}">{{compile parameters ../detail}}</a></td>
+            {{/when}}
+            {{#when format '===' 'custom'}}
+                <td>{{{compile parameters ../detail}}}</td>
+            {{/when}}
+            {{#when format '===' 'comma'}}
+                <td>{{join value ','}}</td>
+            {{/when}}
+            {{#when format '===' 'space'}}
+                <td>{{join value ' '}}</td>
+            {{/when}}
+            {{#when format '===' 'tag'}}
+                <td>
+                    {{#each value}}
+                        <div class="badge badge-orange">{{this}}</div>
+                    {{/each}}
+                </td>
+            {{/when}}
+            {{#when format '===' 'formula'}}
+                <td>
+                    {{formula parameters ../detail}}
+                </td>
+            {{/when}}
+        </tr>
+    {{/otherwise}}
+{{/format}}

@@ -9,6 +9,7 @@
 namespace Cradle\Package\System\Object;
 
 use Cradle\Package\System\Schema;
+use Cradle\Package\System\Object\Service as ObjectService;
 
 use Cradle\Module\Utility\Validator as UtilityValidator;
 
@@ -17,9 +18,9 @@ use Cradle\Helper\InstanceTrait;
 /**
  * Validator layer
  *
- * @vendor   Acme
- * @package  object
- * @author   John Doe <john@acme.com>
+ * @vendor   cradle
+ * @package  system
+ * @author   Christan Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
 class Validator

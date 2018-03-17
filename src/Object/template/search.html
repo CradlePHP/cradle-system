@@ -1,0 +1,149 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/admin">
+                <i class="fas fa-home"></i> Admin
+            </a>
+        </li>
+        {{#if relation.suggestion}}
+            <li class="breadcrumb-item">
+                <a href="/admin/system/object/{{relation.schema.name}}/search">
+                    <i class="{{relation.schema.icon}}"></i> {{relation.schema.plural}}
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="/admin/system/object/{{relation.schema.name}}/update/{{scope relation.data relation.schema.primary}}">
+                    {{relation.suggestion}}
+                </a>
+            </li>
+        {{/if}}
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="fas fa-{{schema.icon}}"></i> {{schema.plural}}
+        </li>
+    </ol>
+</nav>
+
+<div class="main-padding">
+    {{#when filter schema.active '===' '0'}}
+        <h3 class="main-title">
+            {{#if relation.suggestion}}
+                <i class="{{relation.schema.icon}}"></i>
+                {{relation.suggestion}}
+                <i class="fas fa-arrow-right"></i>
+            {{/if}}
+            <i class="fa fa-{{schema.icon}}"></i>
+            {{number total}} Inactive {{schema.plural}}
+            {{#if q.0}}
+                matching {{q.0}}
+            {{/if}}
+        </h3>
+    {{else}}
+        <h3 class="main-title">
+            {{#if relation.suggestion}}
+                <i class="{{relation.schema.icon}}"></i>
+                {{relation.suggestion}}
+                <i class="fas fa-arrow-right"></i>
+            {{/if}}
+            <i class="fa fa-{{schema.icon}}"></i>
+            {{number total}} {{schema.plural}}
+            {{#if q.0}}
+                matching {{q.0}}
+            {{/if}}
+        </h3>
+    {{/when}}
+
+    {{#if rows.length}}
+        <div class="box search-filters">
+            <div class="box-head box-default">
+                <h3 class="box-title">Filters</h3>
+            </div>
+            <form method="get">
+                <div class="box-body box-padding">
+                    <div class="form-group">
+                        <label for="q">Search</label>
+                        <input
+                            class="form-control"
+                            name="q"
+                            placeholder="Enter Search {{schema.plural}}"
+                            type="search"
+                            value="{{q}}"
+                        />
+                    </div>
+
+                    {{#if schema.filterable.length}}
+                        {{> object_search_form}}
+                    {{else}}
+                        {{#if filterable_relations.length}}
+                            {{> object_search_form}}
+                        {{/if}}
+                    {{/if}}
+                </div>
+                <div class="box-foot box-light">
+                    <div class="box-left">
+                        <button class="btn btn-danger" type="reset">Reset</button>
+                    </div>
+                    <div class="box-right">
+                        <button class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <form method="post">
+            {{> object_search_actions}}
+
+            <div class="table-overflow">
+                <table class="table table-responsive-sm table-striped table-data">
+                    <thead>
+                        {{> object_search_head}}
+                    </thead>
+                    <tbody>
+                        {{#each rows}}
+                            <tr data-id="{{scope this ../schema.primary}}">
+                                <td class="table-bulk-checkbox">
+                                    <label class="checkbox checkbox-1">
+                                        <input type="checkbox" name="{{../schema.primary}}[]" value="{{scope this ../schema.primary}}" />
+                                        <span></span>
+                                    </label>
+                                </td>
+                                <td class="table-actions">
+                                    {{> object_search_row_actions}}
+                                </td>
+                                <td>{{scope this ../schema.primary}}</td>
+                                {{#each ../schema.relations}}
+                                    {{#when many '==' 1}}
+                                        <td>
+                                            <a
+                                                href="/admin/system/object/{{name}}/update/{{scope ../this primary}}"
+                                                target="_blank"
+                                            >
+                                                {{suggest this ../this}}
+                                            </a>
+                                        </td>
+                                    {{/when}}
+                                {{/each}}
+                                {{> object_search_row_format}}
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+
+        <ul class="pagination">
+            {{#pager total range}}
+                <li class="page-item{{#if active}} active{{/if}}">
+                    <a class="page-link" href="?{{href}}">{{page}}</a>
+                </li>
+            {{/pager}}
+        </ul>
+    {{else}}
+        {{> object_search_actions}}
+
+        <!-- START: NO RESULTS -->
+        <div class="alert alert-info no-results">
+            <center>No Results Found.</center>
+        </div>
+        <!-- END: NO RESULTS -->
+    {{/if}}
+</div>

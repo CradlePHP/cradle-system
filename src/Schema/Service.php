@@ -9,6 +9,8 @@
 namespace Cradle\Package\System\Schema;
 
 use Cradle\Package\System\Schema\Service\SqlService;
+use Cradle\Package\System\Schema\Service\RedisService;
+use Cradle\Package\System\Schema\Service\ElasticService;
 
 use Cradle\Module\Utility\Service\NoopService;
 use Cradle\Module\Utility\ServiceInterface;
@@ -16,9 +18,9 @@ use Cradle\Module\Utility\ServiceInterface;
 /**
  * Service layer
  *
- * @vendor   Acme
- * @package  object
- * @author   John Doe <john@acme.com>
+ * @vendor   cradle
+ * @package  system
+ * @author   Christan Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
 class Service implements ServiceInterface
@@ -34,13 +36,20 @@ class Service implements ServiceInterface
      */
     public static function get($name, $key = 'main')
     {
-        //for now only sql
-        if (in_array($name, ['sql'])) {
-            $resource = cradle()->package('global')->service($name . '-' . $key);
+        if (in_array($name, ['sql', 'redis', 'elastic'])) {
+            $resource = $this->package('global')->service($name . '-' . $key);
 
             if ($resource) {
                 if ($name === 'sql') {
                     return new SqlService($resource);
+                }
+
+                if ($name === 'redis') {
+                    return new RedisService($resource);
+                }
+
+                if ($name === 'elastic') {
+                    return new ElasticService($resource);
                 }
             }
         }

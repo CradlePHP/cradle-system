@@ -1,0 +1,38 @@
+<select
+    class="field-list form-control"
+    data-do="field-list"
+    data-on="change"
+    name="fields[{{@index}}][list][format]"
+>
+    {{> options_format list}}
+</select>
+
+{{#if list.parameters.length}}
+    {{#is_array list.parameters}}
+        <div class="input-options">
+            <div class="input-pair">
+                <input
+                    name="fields[{{@index}}][list][parameters][0]"
+                    class="form-control"
+                    type="text"
+                    value="{{list.parameters.0}}"
+                />
+                <input
+                    name="fields[{{@index}}][list][parameters][1]"
+                    class="form-control"
+                    type="text"
+                    value="{{list.parameters.1}}"
+                />
+            </div>
+        </div>
+    {{else}}
+        <div class="input-input">
+            <input
+                class="form-control"
+                name="fields[{{@index}}][list][parameters]"
+                type="text"
+                value="{{list.parameters}}"
+            />
+        </div>
+    {{/is_array}}
+{{/if}}

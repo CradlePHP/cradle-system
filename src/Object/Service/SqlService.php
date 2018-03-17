@@ -10,20 +10,20 @@
 namespace Cradle\Package\System\Object\Service;
 
 use PDO as Resource;
-use Cradle\Storm\SqlFactory;
+use Cradle\Sql\SqlFactory;
 
 use Cradle\Module\Utility\Service\SqlServiceInterface;
 use Cradle\Module\Utility\Service\AbstractSqlService;
 
 use Cradle\Package\System\Schema;
-use Cradle\Package\System\Exception;
+use Cradle\Package\System\Exception as SystemException;
 
 /**
  * Object SQL Service
  *
- * @vendor   Acme
- * @package  object
- * @author   John Doe <john@acme.com>
+ * @vendor   cradle
+ * @package  system
+ * @author   Christan Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
 class SqlService
@@ -59,7 +59,7 @@ class SqlService
     public function create(array $data)
     {
         if (is_null($this->schema)) {
-            throw Exception::forNoSchema();
+            throw SystemException::forNoSchema();
         }
 
         $table = $this->schema->getName();
@@ -97,7 +97,7 @@ class SqlService
     public function exists($object, $key, $value)
     {
         if (is_null($this->schema)) {
-            throw Exception::forNoSchema();
+            throw SystemException::forNoSchema();
         }
 
         $search = $this
@@ -119,7 +119,7 @@ class SqlService
     public function get($key, $id)
     {
         if (is_null($this->schema)) {
-            throw Exception::forNoSchema();
+            throw SystemException::forNoSchema();
         }
 
         $search = $this
@@ -226,7 +226,7 @@ class SqlService
     public function link($relation, $primary1, $primary2)
     {
         if (is_null($this->schema)) {
-            throw Exception::forNoSchema();
+            throw SystemException::forNoSchema();
         }
 
         $name = $this->schema->getName();
@@ -234,12 +234,12 @@ class SqlService
         $table = $name . '_' . $relation;
 
         if (!isset($relations[$table])) {
-            throw Exception::forNoRelation($name, $relation);
+            throw SystemException::forNoRelation($name, $relation);
         }
 
         $relation = $relations[$table];
 
-        $model = $this->resource->model();
+        $model = $this->resource->object();
         $model[$relation['primary1']] = $primary1;
         $model[$relation['primary2']] = $primary2;
 
@@ -257,15 +257,15 @@ class SqlService
     public function remove($id)
     {
         if (is_null($this->schema)) {
-            throw Exception::forNoSchema();
+            throw SystemException::forNoSchema();
         }
 
         $table = $this->schema->getName();
         $primary = $this->schema->getPrimaryFieldName();
         //please rely on SQL CASCADING ON DELETE
-        $model = $this->resource->model();
+        $model = $this->resource->object();
         $model[$primary] = $id;
-        $model->remove($table);
+        return $model->remove($table);
     }
 
     /**
@@ -279,7 +279,7 @@ class SqlService
     public function search(array $data = [])
     {
         if (is_null($this->schema)) {
-            throw Exception::forNoSchema();
+            throw SystemException::forNoSchema();
         }
 
         $filter = [];
@@ -520,7 +520,7 @@ class SqlService
     public function unlink($relation, $primary1, $primary2)
     {
         if (is_null($this->schema)) {
-            throw Exception::forNoSchema();
+            throw SystemException::forNoSchema();
         }
 
         $name = $this->schema->getName();
@@ -528,12 +528,12 @@ class SqlService
         $table = $name . '_' . $relation;
 
         if (!isset($relations[$table])) {
-            throw Exception::forNoRelation($name, $relation);
+            throw SystemException::forNoRelation($name, $relation);
         }
 
         $relation = $relations[$table];
 
-        $model = $this->resource->model();
+        $model = $this->resource->object();
         $model[$relation['primary1']] = $primary1;
         $model[$relation['primary2']] = $primary2;
 
@@ -550,7 +550,7 @@ class SqlService
     public function update(array $data)
     {
         if (is_null($this->schema)) {
-            throw Exception::forNoSchema();
+            throw SystemException::forNoSchema();
         }
 
         $table = $this->schema->getName();

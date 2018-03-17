@@ -17,9 +17,9 @@ use Cradle\Helper\InstanceTrait;
 /**
  * Formatter layer
  *
- * @vendor   Acme
- * @package  object
- * @author   John Doe <john@acme.com>
+ * @vendor   cradle
+ * @package  system
+ * @author   Christan Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
 class Formatter

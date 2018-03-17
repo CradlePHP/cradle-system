@@ -1,0 +1,956 @@
+<script type="text/javascript">
+(function($) {
+    $.fn.extend({
+        compile: function(variables) {
+            var template = this.text();
+
+            for(var key in variables) {
+                template = template.replace(
+                    new RegExp('\{' + key + '\}', 'ig'),
+                    variables[key]
+                );
+            }
+
+            return $(template);
+        },
+        getObjectIndex: function() {
+            var index = this
+                .parents('div.modal-body')
+                .eq(0)
+                .attr('data-index');
+
+            if(typeof index === 'undefined') {
+                index = this.parents('tr.object-field')
+                    .eq(0)
+                    .attr('data-index');
+            }
+
+            return index;
+        }
+    });
+
+    var copy = null;
+
+    $(window).on('copy-to-text-init', function(e, target) {
+        var trigger = $(target).attr('data-trigger');
+        var value = $(target).attr('data-default') || '';
+
+        $(trigger).change(function() {
+            $(target).html($(this).val() || value);
+        });
+    });
+
+    $(window).on('modal-open-click', function(e, trigger) {
+        $(trigger).siblings('div.modal').eq(0).modal({
+            backdrop: 'static',
+            keyboard: false
+        });
+
+        copy = $(trigger)
+            .siblings('div.modal')
+            .eq(0)
+            .find('div.modal-body')
+            .clone();
+    });
+
+    $(window).on('modal-cancel-click', function(e, trigger) {
+        var modal = $(trigger).parents('div.modal').eq(0).modal('hide');
+
+        if(modal.hasClass('modal-update')) {
+            modal
+                .find('div.modal-body')
+                .replaceWith(copy);
+
+            copy.doon();
+            copy = null;
+        } else {
+            modal.modal('hidden.bs.modal', function() {
+                modal.remove();
+            });
+        }
+    });
+
+    $(window).on('modal-save-click', function(e, trigger) {
+        var modal = $(trigger).parents('div.modal').eq(0);
+
+        var error = false;
+        $('.is-error', modal).removeClass('is-error');
+        $('div.error-message', modal).remove();
+
+        var label = $('input.field-label', modal);
+        if(!label.val().length) {
+            error = true;
+
+            label
+                .addClass('is-error')
+                .after('<div class="error-message">Label cannot be empty</div>');
+        }
+
+        var type = $('select.field-type', modal).val();
+        var name = $('input.field-name', modal);
+
+        if(!name.val().length) {
+            error = true;
+            name
+                .addClass('is-error')
+                .after('<div class="error-message">Keyword cannot be empty.</div>');
+        } else if(name.val() === 'id') {
+            error = true;
+            name
+                .addClass('is-error')
+                .after('<div class="error-message">Keyword is using a reserved word.</div>');
+        } else if(name.val() === 'active' && type !== 'active') {
+            error = true;
+            name
+                .addClass('is-error')
+                .after('<div class="error-message">Keyword is using a reserved word.</div>');
+        } else if(name.val() === 'created' && type !== 'created') {
+            error = true;
+            name
+                .addClass('is-error')
+                .after('<div class="error-message">Keyword is using a reserved word.</div>');
+        } else if(name.val() === 'updated' && type !== 'updated') {
+            error = true;
+            name
+                .addClass('is-error')
+                .after('<div class="error-message">Keyword is using a reserved word.</div>');
+        } else {
+            var value = name.val();
+
+            $('input.field-name').not(name).each(function() {
+                if($(this).val() === value) {
+                    error = true;
+                    name
+                        .addClass('is-error')
+                        .after('<div class="error-message">Keyword already exists.</div>');
+                }
+            });
+        }
+
+        var keys = [];
+        $('div.attribute-row', modal).each(function() {
+            var value = $('input.attribute-value', this);
+            if(!value.val().length) {
+                error = true;
+                value.addClass('is-error');
+                $(this).after('<div class="error-message">Value cannot be empty.</div>');
+            }
+
+            var key = $('input.attribute-key', this);
+            if(!key.val().length) {
+                error = true;
+                key.addClass('is-error');
+                $(this).after('<div class="error-message">Key cannot be empty.</div>');
+            } else {
+                if(keys.indexOf(key.val()) !== -1) {
+                    error = true;
+                    key.addClass('is-error');
+                    $(this).after('<div class="error-message">Key previously used.</div>');
+                }
+
+                keys.push(key.val());
+            }
+        });
+
+        $('input.validation-message', modal).each(function() {
+            if(!$(this).val().length) {
+                error = true;
+                $(this)
+                    .addClass('is-error')
+                    .after('<div class="error-message">Message cannot be empty.</div>');
+            }
+        });
+
+        $('input.option-value', modal).each(function() {
+            if(!$(this).val().length) {
+                error = true;
+                $(this)
+                    .addClass('is-error')
+                    .after('<div class="error-message">Option cannot be empty.</div>');
+            }
+        });
+
+        $('div.input-input input', modal).each(function() {
+            if(!$(this).val().length) {
+                error = true;
+                $(this)
+                    .addClass('is-error')
+                    .after('<div class="error-message">Value cannot be empty.</div>');
+            }
+        });
+
+        $('div.input-pair input', modal).each(function() {
+            if(!$(this).val().length) {
+                error = true;
+                $(this)
+                    .addClass('is-error')
+                    .after('<div class="error-message">Value cannot be empty.</div>');
+            }
+        });
+
+
+        if(error) {
+            return;
+        }
+
+        modal.modal('hide');
+
+        if(modal.hasClass('modal-create')) {
+            var target = modal.attr('data-target');
+            var index = $('div.modal-body', modal).attr('data-index');
+
+            $('#field-row-template')
+                .compile({ INDEX: index })
+                .appendTo(target)
+                .doon()
+                .find('td.object-action')
+                .append(modal
+                    .removeClass('modal-create')
+                    .addClass('modal-update')
+                );
+        }
+
+        var row = $(trigger).parents('tr.object-field').eq(0);
+
+        var name = $('input.field-name', modal).val();
+        $('td.field-name-value', row).html(name);
+
+        var label = $('input.field-label', modal).val();
+        $('td.field-label-value', row).html(label);
+
+        var type = $('select.field-type', modal).val();
+        $('td.field-type-value', row).html(type);
+
+        var list = $('select.field-list', modal).val();
+        $('td.field-list-value', row).html(list);
+
+        var detail = $('select.field-detail', modal).val();
+        $('td.field-detail-value', row).html(detail);
+
+        var value = $('input.field-default', modal).val();
+        $('td.field-default-value', row).html(value.length ? value: '--');
+
+        var searchable = $('input.field-searchable', modal)[0].checked;
+        $('td.field-searchable-value', row).html(searchable ? 'Yes': 'No');
+
+        var filterable = $('input.field-filterable', modal)[0].checked;
+        $('td.field-filterable-value', row).html(filterable ? 'Yes': 'No');
+
+        var sortable = $('input.field-sortable', modal)[0].checked;
+        $('td.field-sortable-value', row).html(sortable ? 'Yes': 'No');
+
+        copy = null;
+    });
+
+    $(window).on('remove-click', function(e, trigger) {
+        var level = parseInt($(trigger).attr('data-level'));
+
+        var target = $(trigger);
+
+        if(!isNaN(level)) {
+            for(var i = 0; i < level; i++) {
+                target = target.parent();
+            }
+        }
+
+        // get error message element
+        var err = target.nextAll('.error-message');
+
+        target.remove();
+
+        // remove if error message exist
+        if(err.length) {
+            for(var i = 0; i < 2; i++) {
+                if (err[i] !== undefined) {
+                    err[i].remove();
+                }
+            }
+        }
+    });
+
+    $(window).on('option-remove-click', function(e, trigger) {
+        var container = $(trigger)
+            .parents('div.input-options')
+            .eq(0);
+
+        var format = $('button.option-add', container).attr('data-name');
+
+        $(window).trigger('remove-click', trigger);
+
+        $('div.option-row', container).each(function(i) {
+            $(this)
+                .attr('data-index', i)
+                .find('input.option-value')
+                .attr('name', format.replace('{INDEX}', i));
+        });
+    });
+
+    $(window).on('field-remove-click', function(e, trigger) {
+        $(window).trigger('remove-click', trigger);
+        reindexFields();
+    });
+
+    $(window).on('field-add-click', function(e, trigger) {
+        var target = $(trigger).attr('data-target');
+        var index = $('tr', target).length;
+
+        $('#field-modal-template')
+            .compile({ INDEX: index })
+            .appendTo(document.body)
+            .modal({
+                backdrop: 'static',
+                keyboard: false
+            })
+            .attr('data-target', target)
+            .doon();
+    });
+
+    $(window).on('field-type-init', function(e, trigger) {
+        $(window).trigger('field-type-change', trigger);
+    });
+
+    $(window).on('field-type-change', function(e, trigger) {
+        if(trigger.tagName === 'OPTION') {
+            trigger = $(trigger).parent();
+        }
+
+        trigger = $(trigger);
+
+        var row = trigger.parents('div.modal-body').eq(0);
+        var option = $('option[value="' + trigger.val() + '"]', trigger);
+
+        //configuration
+        var fieldset = (option.attr('data-fieldset') || '').split('|');
+        var format = (option.attr('data-format') || '').split('|');
+        var index = (option.attr('data-index') || '').split('|');
+
+        var value = option.attr('data-default');
+        var label = option.attr('data-label');
+        var name = option.attr('data-name');
+        var searchable = option.attr('data-searchable');
+        var filterable = option.attr('data-filterable');
+        var sortable = option.attr('data-sortable');
+
+        var validation = option.attr('data-validation');
+
+        //reset
+        $('select.field-list optgroup', row).show();
+        $('select.field-detail optgroup', row).show();
+        $('input.field-searchable', row).attr('disabled', false);
+        $('input.field-filterable', row).attr('disabled', false);
+        $('input.field-sortable', row).attr('disabled', false);
+
+        //determine ui
+        ['attributes', 'options', 'keyval'].forEach(function(ui) {
+            if(fieldset.indexOf(ui) === -1) {
+                trigger.parent().find('div.input-' + ui).remove();
+            } else if(!trigger.parent().find('div.input-' + ui).length) {
+                var name = ui;
+                if(name === 'keyval') {
+                    name = 'options';
+                }
+
+                var template = 'fields[{INDEX}][field][' + name + '][{INDEX}]';
+                var html = $('#field-' + ui + '-template')
+                    .compile({
+                        NAME: template.replace(
+                            '{INDEX}',
+                            trigger.getObjectIndex()
+                        )
+                    })
+                    .doon();
+
+                trigger.after(html);
+            }
+        });
+
+        //determine valid formats
+        ['string', 'number', 'date', 'html', 'json'].forEach(function(type) {
+            if(format.indexOf(type) === -1) {
+                var list = $('select.field-list optgroup.filter-group-' + type, row).hide();
+                if($('option:selected', list).length) {
+                    list.parent().val('none');
+                    $(window).trigger('field-list-change', list.parent());
+                }
+
+                var detail = $('select.field-detail optgroup.filter-group-' + type, row).hide();
+                if($('option:selected', detail).length) {
+                    detail.parent().val('none');
+                    $(window).trigger('field-detail-change', detail.parent());
+                }
+            }
+        });
+
+        //determine index
+        ['searchable', 'filterable', 'sortable'].forEach(function(feature) {
+            if(index.indexOf(feature) === -1) {
+                $('input.field-' + feature, row)
+                    .attr('checked', false)
+                    .attr('disabled', true);
+            }
+        });
+
+        //determine label
+        if(label && label.length) {
+            $('input.field-label', row).val(label);
+            $('div.form-group-label', row).hide();
+        } else {
+            $('div.form-group-label', row).show();
+        }
+
+        //determine name
+        if(name && name.length) {
+            $('input.field-name', row).val(name);
+            $('div.form-group-name', row).hide();
+        } else {
+            $('div.form-group-name', row).show();
+        }
+
+        //determine validation
+        if(parseInt(validation) === 0) {
+            $('div.validation-row', row).remove();
+            $('div.form-group-validation', row).hide();
+        } else if(validation && validation.length) {
+            $('div.form-group-validation', row).show();
+        }
+
+        //determine default
+        if(value && value.length) {
+            $('input.field-default', row).val(value);
+            $('div.form-group-default', row).hide();
+        } else {
+            $('div.form-group-default', row).show();
+        }
+
+        //determine searchable
+        if(searchable && searchable.length) {
+            if(searchable == 1) {
+                $('input.field-searchable', row).prop('checked', true);
+            } else {
+                $('input.field-searchable', row).prop('checked', false);
+            }
+
+            $('input.field-searchable', row).parent().hide();
+        } else {
+            $('input.field-searchable', row).parent().show();
+        }
+
+        //determine filterable
+        if(filterable && filterable.length) {
+            if(filterable == 1) {
+                $('input.field-filterable', row).prop('checked', true);
+            } else {
+                $('input.field-filterable', row).prop('checked', false);
+            }
+
+            $('input.field-filterable', row).parent().hide();
+        } else {
+            $('input.field-filterable', row).parent().show();
+        }
+
+        //determine sortable
+        if(sortable && sortable.length) {
+            if(sortable == 1) {
+                $('input.field-sortable', row).prop('checked', true);
+            } else {
+                $('input.field-sortable', row).prop('checked', false);
+            }
+
+            $('input.field-sortable', row).parent().hide();
+        } else {
+            $('input.field-sortable', row).parent().show();
+        }
+    });
+
+    $(window).on('attribute-add-click', function(e, trigger) {
+        var name = $(trigger).attr('data-name');
+        var template = $('#field-attribute-row-template')
+            .compile({ NAME: name })
+
+        var row = $(template).doon();
+
+        $(trigger).before(row);
+    });
+
+    $(window).on('attribute-field-init', function(e, target) {
+        $('input.attribute-key', target).change(function() {
+            var format = $(target).attr('data-name');
+            var name = format.replace('{INDEX}', $(this).val());
+            $('input.attribute-value', target).attr('name', name);
+        });
+    });
+
+    $(window).on('option-add-click', function(e, trigger) {
+        var last = $(trigger).parent().find('div.option-row:last');
+
+        var index = 0;
+        if(last.length) {
+            index = parseInt(last.attr('data-index')) + 1;
+        }
+
+        var name = $(trigger)
+            .attr('data-name')
+            .replace('{INDEX}', index);
+
+        var row = $('#field-option-row-template')
+            .compile({
+                NAME: name,
+                INDEX: index
+            })
+            .doon();
+
+        $(trigger).before(row);
+    });
+
+    $(window).on('keyval-add-click', function(e, trigger) {
+        var last = $(trigger).parent().find('div.keyval-row:last');
+
+        var index = 0;
+        if(last.length) {
+            index = parseInt(last.attr('data-index')) + 1;
+        }
+
+        var name = $(trigger)
+            .attr('data-name')
+            .replace('{INDEX}', index);
+
+        var row = $('#field-keyval-row-template')
+            .compile({
+                NAME_1: name + '[key]',
+                NAME_2: name + '[value]',
+                INDEX: index
+            })
+            .doon();
+
+        $(trigger).before(row);
+    });
+
+    $(window).on('validation-add-click', function(e, trigger) {
+        var last = $(trigger).parent().find('div.validation-row:last');
+
+        var index = 0;
+        if(last.length) {
+            index = parseInt(last.attr('data-index')) + 1;
+        }
+
+        var group = $('#field-validation-template')
+            .compile({
+                INDEX_1: $(trigger).getObjectIndex(),
+                INDEX_2: index
+            })
+            .doon();
+
+        $(trigger).before(group);
+    });
+
+    $(window).on('field-validation-change', function(e, trigger) {
+        trigger = $(trigger);
+
+        var container = trigger.parent().parent();
+
+        switch(trigger.val()) {
+            case 'none':    case 'required':  case 'empty':
+            case 'unique':  case 'number':    case 'float':
+            case 'email':   case 'url':       case 'hex':
+            case 'cc':      case 'price':     case 'date':
+            case 'date':    case 'datetime':
+                container.find('div.input-input').remove();
+                container.find('div.input-options').remove();
+                break;
+            case 'ne':        case 'lt':        case 'lte':
+            case 'gt':        case 'gte':       case 'char_lt':
+            case 'char_lte':  case 'char_gt':   case 'char_gte':
+            case 'word_lt':   case 'word_lte':  case 'word_gt':
+            case 'word_gte':  case 'regex':
+                container.find('div.input-options').remove();
+                if(!container.find('div.input-input').length) {
+                    var template = 'fields[{INDEX}][validation][{INDEX}][parameters]';
+                    var parameters = $('#field-input-template')
+                        .compile({
+                            NAME: template
+                                .replace('{INDEX}', trigger.getObjectIndex())
+                                .replace('{INDEX}', container.attr('data-index'))
+                        })
+                        .doon();
+
+                    trigger.parent().after(parameters);
+                }
+                break;
+            case 'one':
+                container.find('div.input-input').remove();
+                if(!container.find('div.input-options').length) {
+                    var template = 'fields[{INDEX}][validation][{INDEX}][parameters][{INDEX}]';
+                    var parameters = $('#field-options-template')
+                        .compile({
+                            NAME: template
+                                .replace('{INDEX}', trigger.getObjectIndex())
+                                .replace('{INDEX}', container.attr('data-index'))
+                        })
+                        .doon();
+
+                    trigger.parent().after(parameters);
+                }
+                break;
+        }
+    });
+
+    $(window).on('field-list-change', function(e, trigger) {
+        trigger = $(trigger);
+
+        var option = $('option[value="' + trigger.val() + '"]', trigger);
+        var fieldset = option.attr('data-fieldset') || '';
+
+        trigger.parent().find('div.input-input').remove();
+        trigger.parent().find('div.input-pair').remove();
+
+        //determine ui
+        switch(fieldset) {
+            case 'input':
+                var placeholder = option.attr('data-placeholder') || '';
+                var template = 'fields[{INDEX}][list][parameters]';
+                var input = $('#field-input-template')
+                    .compile({
+                        NAME: template.replace('{INDEX}', trigger.getObjectIndex())
+                    })
+                    .doon();
+
+                $('input', input).attr('placeholder',placeholder);
+
+                trigger.after(input);
+                break;
+            case 'pair':
+                var name1 = 'fields[{INDEX}][list][parameters][0]';
+                var name2 = 'fields[{INDEX}][list][parameters][1]';
+                var placeholder = [
+                    option.attr('data-placeholder-1') || '',
+                    option.attr('data-placeholder-2') || ''
+                ];
+
+                var input = $('#field-pair-template')
+                    .compile({
+                        NAME_1: name1.replace('{INDEX}', trigger.getObjectIndex()),
+                        NAME_2: name2.replace('{INDEX}', trigger.getObjectIndex())
+                    })
+                    .doon();
+
+                $('input', input).each(function(i) {
+                    $(this).attr('placeholder', placeholder[i]);
+                });
+
+                trigger.after(input);
+                break;
+        }
+    });
+
+    $(window).on('field-detail-change', function(e, trigger) {
+        trigger = $(trigger);
+
+        var option = $('option[value="' + trigger.val() + '"]', trigger);
+        var fieldset = option.attr('data-fieldset') || '';
+
+        trigger.parent().find('div.input-input').remove();
+        trigger.parent().find('div.input-pair').remove();
+
+        //determine ui
+        switch(fieldset) {
+            case 'input':
+                var placeholder = option.attr('data-placeholder') || '';
+                var template = 'fields[{INDEX}][detail][parameters]';
+                var input = $('#field-input-template')
+                    .compile({
+                        NAME: template.replace('{INDEX}', trigger.getObjectIndex())
+                    })
+                    .doon();
+
+                $('input', input).attr('placeholder',placeholder);
+
+                trigger.after(input);
+                break;
+            case 'pair':
+                var name1 = 'fields[{INDEX}][detail][parameters][0]';
+                var name2 = 'fields[{INDEX}][detail][parameters][1]';
+                var placeholder = [
+                    option.attr('data-placeholder-1') || '',
+                    option.attr('data-placeholder-2') || ''
+                ];
+
+                var input = $('#field-pair-template')
+                    .compile({
+                        NAME_1: name1.replace('{INDEX}', trigger.getObjectIndex()),
+                        NAME_2: name2.replace('{INDEX}', trigger.getObjectIndex())
+                    })
+                    .doon();
+
+                $('input', input).each(function(i) {
+                    $(this).attr('placeholder', placeholder[i]);
+                });
+
+                trigger.after(input);
+                break;
+        }
+    });
+
+    $(window).on('move-up-click', function(e, trigger) {
+        var row = $(trigger).parent().parent();
+
+        if(row.attr('data-index') == 0) {
+            return;
+        }
+
+        row.prev().before(row);
+        reindexFields();
+    });
+
+    $(window).on('move-down-click', function(e, trigger) {
+        var row = $(trigger).parent().parent();
+
+        var last = row.parent().find('tr.object-field').length - 1;
+
+        if(row.attr('data-index') == last) {
+            return;
+        }
+
+        row.next().after(row);
+        reindexFields();
+    });
+
+    $(window).on('relation-add-click', function(e, trigger) {
+        var last = $(trigger).parent().find('div.relation-row:last');
+
+        var index = 0;
+        if(last.length) {
+            index = parseInt(last.attr('data-index')) + 1;
+        }
+
+        var name = $(trigger)
+            .attr('data-name')
+            .replace('{INDEX}', index);
+
+        var value = $(trigger).attr('data-default') || '';
+
+        var singular = $('input.schema-singular').val() || '??';
+
+        var row = $('#relation-row-template')
+            .compile({
+                SINGULAR: singular,
+                NAME_1: name + '[many]',
+                NAME_2: name + '[name]',
+                INDEX: index
+            })
+            .doon();
+
+        $(trigger).before(row);
+    });
+
+    $(window).on('relation-remove-click', function(e, trigger) {
+        $(window).trigger('remove-click', trigger);
+        reindexRelations();
+    });
+
+    var reindexFields = function() {
+        var format = {
+            disable: 'fields[{INDEX}][disable]',
+            label: 'fields[{INDEX}][label]',
+            name: 'fields[{INDEX}][name]',
+            type: 'fields[{INDEX}][field][type]',
+            list: 'fields[{INDEX}][list][format]',
+            detail: 'fields[{INDEX}][detail][format]',
+            value: 'fields[{INDEX}][default]',
+            searchable: 'fields[{INDEX}][searchable]',
+            filterable: 'fields[{INDEX}][filterable]',
+            sortable: 'fields[{INDEX}][sortable]'
+        };
+
+        $('tr.object-field').each(function(i) {
+            $(this).attr('data-index', i);
+
+            $('div.modal-body', this).attr('data-index', i);
+
+            $('input.field-label', this).attr(
+                'name',
+                format.label.replace('{INDEX}', i)
+            );
+
+            $('input.field-disabled', this).attr(
+                'name',
+                format.disable.replace('{INDEX}', i)
+            );
+
+            $('input.field-name', this).attr(
+                'name',
+                format.name.replace('{INDEX}', i)
+            );
+
+            $('select.field-type', this).each(function() {
+                $(this).attr(
+                    'name',
+                    format.type.replace('{INDEX}', i)
+                );
+
+                $('div.input-keyval', $(this).parent()).each(function() {
+                    var format = 'fields[{INDEX}][field][options][{INDEX}]';
+
+                    format = format.replace('{INDEX}', i);
+                    $('button.option-add', this).attr('data-name', format);
+
+                    $('div.keyval-row', this).each(function() {
+                        var j = $(this).attr('data-index');
+                        $(this)
+                            .find('input.keyval-key')
+                            .attr('name', format.replace('{INDEX}', j) + '[key]');
+
+                        $(this)
+                            .find('input.keyval-value')
+                            .attr('name', format.replace('{INDEX}', j) + '[value]');
+                    });
+                });
+
+                $('div.input-attributes', $(this).parent()).each(function() {
+                    var format = 'fields[{INDEX}][field][attributes][{INDEX}]';
+
+                    format = format.replace('{INDEX}', i);
+                    $('button.attribute-add', this).attr('data-name', format);
+
+                    $('div.attribute-row', this).each(function() {
+                        $(this)
+                            .attr('data-name', format)
+                            .find('input.attribute-value')
+                            .attr('name', format.replace(
+                                '{INDEX}',
+                                $('input.attribute-key', this).val()
+                            ));
+                    });
+                });
+
+            });
+
+            $('select.field-list', this).each(function() {
+                $(this).attr(
+                    'name',
+                    format.list.replace('{INDEX}', i)
+                );
+
+                var name = 'fields[{INDEX}][list][parameters]';
+                $('div.input-input input', $(this).parent()).attr(
+                    'name',
+                    name.replace('{INDEX}', i)
+                );
+
+                name = 'fields[{INDEX}][list][parameters][{INDEX}]';
+                $('div.input-pair input', $(this).parent()).each(function(j) {
+                    $(this).attr(
+                        'name',
+                        name
+                            .replace('{INDEX}', i)
+                            .replace('{INDEX}', j)
+                    );
+                });
+            });
+
+            $('select.field-detail', this).each(function() {
+                $(this).attr(
+                    'name',
+                    format.detail.replace('{INDEX}', i)
+                );
+
+                var name = 'fields[{INDEX}][detail][parameters]';
+                $('div.input-input input', $(this).parent()).attr(
+                    'name',
+                    name.replace('{INDEX}', i)
+                );
+
+                name = 'fields[{INDEX}][detail][parameters][{INDEX}]';
+                $('div.input-pair input', $(this).parent()).each(function(j) {
+                    $(this).attr(
+                        'name',
+                        name
+                            .replace('{INDEX}', i)
+                            .replace('{INDEX}', j)
+                    );
+                });
+            });
+
+            $('input.field-default', this).attr(
+                'name',
+                format.value.replace('{INDEX}', i)
+            );
+
+            $('input.field-searchable', this).attr(
+                'name',
+                format.searchable.replace('{INDEX}', i)
+            );
+
+            $('input.field-filterable', this).attr(
+                'name',
+                format.filterable.replace('{INDEX}', i)
+            );
+
+            $('input.field-sortable', this).attr(
+                'name',
+                format.sortable.replace('{INDEX}', i)
+            );
+
+            $('div.validation-row', this).each(function() {
+                var format = 'fields[{INDEX}][validation][{INDEX}][method]';
+                var j = $(this).attr('data-index');
+
+                $('select', this).attr('name', format
+                    .replace('{INDEX}', i)
+                    .replace('{INDEX}', j)
+                );
+
+                format = 'fields[{INDEX}][validation][{INDEX}][message]';
+
+                $('input.validation-message', this).attr('name', format
+                    .replace('{INDEX}', i)
+                    .replace('{INDEX}', j)
+                );
+
+                $('div.input-input input', this).each(function() {
+                    var format = 'fields[{INDEX}][validation][{INDEX}][parameters]';
+                    $(this).attr('name', format
+                        .replace('{INDEX}', i)
+                        .replace('{INDEX}', j)
+                    );
+                });
+
+                $('div.input-options', this).each(function() {
+                    var format = 'fields[{INDEX}][validation][{INDEX}][parameters][{INDEX}]';
+
+                    format = format.replace('{INDEX}', i);
+                    $('button.option-add', this).attr('data-name', format);
+
+                    $('div.option-row', this).each(function(k) {
+                        var k = $(this).attr('data-index');
+                        $(this)
+                            .find('input.option-value')
+                            .attr('name', format
+                                .replace('{INDEX}', j)
+                                .replace('{INDEX}', k)
+                            );
+                    });
+                });
+            });
+        });
+    };
+
+    var reindexRelations = function() {
+        var format = $('button.relation-add').attr('data-name');
+
+        $('div.relation-row').each(function(i) {
+            $(this).attr('data-index', i);
+            $('select.relation-many', this)
+                .attr(
+                    'name',
+                    format.replace('{INDEX}', i) + '[many]'
+                );
+
+            $('input.relation-name', this)
+                .attr(
+                    'name',
+                    format.replace('{INDEX}', i) + '[name]'
+                );
+        });
+    };
+})(jQuery);
+</script>

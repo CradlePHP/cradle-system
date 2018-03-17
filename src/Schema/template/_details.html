@@ -1,0 +1,38 @@
+<select
+    class="field-detail form-control"
+    data-do="field-detail"
+    data-on="change"
+    name="fields[{{@index}}][detail][format]"
+>
+    {{> options_format detail}}
+</select>
+
+{{#if detail.parameters.length}}
+    {{#is_array detail.parameters}}
+        <div class="input-options">
+            <div class="input-pair">
+                <input
+                    name="fields[{{@index}}][detail][parameters][0]"
+                    class="form-control"
+                    type="text"
+                    value="{{detail.parameters.0}}"
+                />
+                <input
+                    name="fields[{{@index}}][detail][parameters][1]"
+                    class="form-control"
+                    type="text"
+                    value="{{detail.parameters.1}}"
+                />
+            </div>
+        </div>
+    {{else}}
+        <div class="input-input">
+            <input
+                class="form-control"
+                name="fields[{{@index}}][detail][parameters]"
+                type="text"
+                value="{{detail.parameters}}"
+            />
+        </div>
+    {{/is_array}}
+{{/if}}

@@ -8,10 +8,10 @@
  */
 namespace Cradle\Package\System;
 
-use Cradle\Package\System\Schema\Service;
-use Cradle\Package\System\Object\Factory;
+use Cradle\Package\System\Object;
 
 use Cradle\Data\Registry;
+use Cradle\Helper\InstanceTrait;
 
 use Cradle\Http\Request;
 use Cradle\Http\Response;
@@ -34,11 +34,16 @@ class Schema extends Registry
      */
     public function __construct($name)
     {
+        if ($name instanceof \Closure) {
+            foreach (debug_backtrace() as $trace) {
+                echo $trace['file'] .' - ' . $trace['line'] . '<br />';
+            }
+        }
         $this->data = $name;
         if (!is_array($this->data)) {
-            $this->data = cradle()
+            $this->data = $this
                 ->package('global')
-                ->config('schema/' . $name);
+                ->config('admin/schema/' . $name);
         }
 
         if (!$this->data || empty($this->data)) {
@@ -414,7 +419,7 @@ class Schema extends Registry
         $response = Response::i()->load();
         $request = Request::i()->load();
 
-        cradle()->trigger('system-schema-search', $request, $response);
+        $this->trigger('system-schema-search', $request, $response);
         $rows = $response->getResults('rows');
 
         if (empty($rows)) {
@@ -535,7 +540,7 @@ class Schema extends Registry
             return $suggestion;
         }
 
-        $template = cradle('global')->handlebars()->compile($this->data['suggestion']);
+        $template = $this->package('global')->handlebars()->compile($this->data['suggestion']);
 
         return $template($data);
     }
@@ -637,13 +642,13 @@ class Schema extends Registry
     }
 
     /**
-     * Returns an Object Model
+     * Returns an Object
      *
-     * @return ObjectModel
+     * @return Object
      */
-    public function model()
+    public function object()
     {
-        return Factory::i($this);
+        return Object::i($this);
     }
 
     /**
