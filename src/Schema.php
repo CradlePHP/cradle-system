@@ -1,7 +1,6 @@
 <?php //-->
 /**
- * This file is part of a Custom Project
- * (c) 2017-2019 Acme Inc
+ * This file is part of a package designed for the CradlePHP Project.
  *
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
@@ -20,8 +19,8 @@ use Cradle\Http\Response;
  * Object Schema Manager. This was made
  * take advantage of pass-by-ref
  *
- * @vendor   Acme
- * @package  system
+ * @vendor   Cradle
+ * @package  System
  * @author   John Doe <john@acme.com>
  * @standard PSR-2
  */

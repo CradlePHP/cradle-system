@@ -1,7 +1,6 @@
 <?php //-->
 /**
- * This file is part of a Custom Project.
- * (c) 2016-2018 Acme Products Inc.
+ * This file is part of a package designed for the CradlePHP Project.
  *
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
@@ -27,13 +26,7 @@ cradle(function() {
      */
     $admin->get('/system/object/:schema/search', function ($request, $response) {
         //----------------------------//
-        // 1. Security Checks
-        if (!$this->package('cradlephp/cradle-role')->hasPermissions($request, $response)) {
-            return;
-        }
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         //get schema data
         $schema = Schema::i($request->getStage('schema'));
 
@@ -120,7 +113,7 @@ cradle(function() {
         }
 
         //----------------------------//
-        // 3. Render Template
+        // 2. Render Template
         //set the class name
         $class = 'page-admin-system-object-search page-admin';
 
@@ -159,13 +152,7 @@ cradle(function() {
      */
     $admin->get('/system/object/:schema/create', function ($request, $response) {
         //----------------------------//
-        // 1. Security Checks
-        if (!$this->package('cradlephp/cradle-role')->hasPermissions($request, $response)) {
-            return;
-        }
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         //get schema data
         $schema = Schema::i($request->getStage('schema'));
 
@@ -267,7 +254,7 @@ cradle(function() {
         }
 
         //----------------------------//
-        // 3. Render Template
+        // 2. Render Template
         //set the class name
         $class = 'page-admin-system-object-create page-admin';
 
@@ -312,13 +299,7 @@ cradle(function() {
      */
     $admin->get('/system/object/:schema/update/:id', function ($request, $response) {
         //----------------------------//
-        // 1. Security Checks
-        if (!$this->package('cradlephp/cradle-role')->hasPermissions($request, $response)) {
-            return;
-        }
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         //get schema data
         $schema = Schema::i($request->getStage('schema'));
 
@@ -429,7 +410,7 @@ cradle(function() {
         $data['redirect'] = urlencode($request->getServer('REQUEST_URI'));
 
         //----------------------------//
-        // 3. Render Template
+        // 2. Render Template
         //set the class name
         $class = 'page-admin-system-object-update page-admin';
 
@@ -451,16 +432,16 @@ cradle(function() {
                 'form_format'
             ]);
 
-        //if we only want the body
-        if ($request->getStage('render') === 'body') {
-            return;
-        }
-
         //set content
         $response
             ->setPage('title', $data['title'])
             ->setPage('class', $class)
             ->setContent($body);
+
+        //if we only want the body
+        if ($request->getStage('render') === 'body') {
+            return;
+        }
 
         //render page
         $this->trigger('render-admin-page', $request, $response);
@@ -474,13 +455,7 @@ cradle(function() {
      */
     $admin->post('/system/object/:schema/search', function ($request, $response) {
         //----------------------------//
-        // 1. Security Checks
-        if (!$this->package('cradlephp/cradle-role')->hasPermissions($request, $response)) {
-            return;
-        }
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         //get schema data
         $schema = Schema::i($request->getStage('schema'));
 
@@ -506,7 +481,7 @@ cradle(function() {
         }
 
         //----------------------------//
-        // 3. Process Request
+        // 2. Process Request
         $errors = [];
         foreach ($ids as $id) {
             //table_id, 1 for example
@@ -544,7 +519,7 @@ cradle(function() {
         }
 
         //----------------------------//
-        // 4. Interpret Results
+        // 3. Interpret Results
         //redirect
         $redirect = sprintf(
             '%s/system/object/%s/search',
@@ -591,13 +566,7 @@ cradle(function() {
      */
     $admin->post('/system/object/:schema/create', function ($request, $response) {
         //----------------------------//
-        // 1. Security Checks
-        if (!$this->package('cradlephp/cradle-role')->hasPermissions($request, $response)) {
-            return;
-        }
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         //get schema data
         $schema = Schema::i($request->getStage('schema'));
 
@@ -639,20 +608,12 @@ cradle(function() {
             }
         }
 
-        //TODO make a better way of doing this
-        //if(//special shot out to user
-        //    in_array('user', $schema->getRelations())
-        //    && !$request->hasStage('user_id')
-        //) {
-        //    $request->setStage('user_id', $request->getSession('me', 'user_id'));
-        //}
-
         //----------------------------//
-        // 3. Process Request
+        // 2. Process Request
         $this->trigger('system-object-create', $request, $response);
 
         //----------------------------//
-        // 4. Interpret Results
+        // 3. Interpret Results
         //if the event returned an error
         if ($response->isError()) {
             //determine route
@@ -719,13 +680,7 @@ cradle(function() {
      */
     $admin->post('/system/object/:schema/update/:id', function ($request, $response) {
         //----------------------------//
-        // 1. Security Checks
-        if (!$this->package('cradlephp/cradle-role')->hasPermissions($request, $response)) {
-            return;
-        }
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         //get schema data
         $schema = Schema::i($request->getStage('schema'));
 
@@ -774,11 +729,11 @@ cradle(function() {
         }
 
         //----------------------------//
-        // 3. Process Request
+        // 2. Process Request
         $this->trigger('system-object-update', $request, $response);
 
         //----------------------------//
-        // 4. Interpret Results
+        // 3. Interpret Results
         //if the event returned an error
         if ($response->isError()) {
             //determine route
@@ -847,13 +802,7 @@ cradle(function() {
      */
     $admin->get('/system/object/:schema/remove/:id', function ($request, $response) {
         //----------------------------//
-        // 1. Security Checks
-        if (!$this->package('cradlephp/cradle-role')->hasPermissions($request, $response)) {
-            return;
-        }
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         //get schema data
         $schema = Schema::i($request->getStage('schema'));
 
@@ -864,11 +813,24 @@ cradle(function() {
         );
 
         //----------------------------//
-        // 3. Process Request
+        // 2. Process Request
         $this->trigger('system-object-remove', $request, $response);
 
         //----------------------------//
-        // 4. Interpret Results
+        // 3. Interpret Results
+        if (!$response->isError()) {
+            //record logs
+            $this->log(
+                sprintf(
+                    '%s #%s removed',
+                    $schema->getSingular(),
+                    $request->getStage('id')
+                ),
+                $request,
+                $response
+            );
+        }
+
         //redirect
         $redirect = sprintf(
             '%s/system/object/%s/search',
@@ -894,17 +856,6 @@ cradle(function() {
             //add a flash
             $message = $this->package('global')->translate('%s was Removed', $schema->getSingular());
             $this->package('global')->flash($message, 'success');
-
-            //record logs
-            $this->log(
-                sprintf(
-                    '%s #%s removed',
-                    $schema->getSingular(),
-                    $request->getStage('id')
-                ),
-                $request,
-                $response
-            );
         }
 
         $this->package('global')->redirect($redirect);
@@ -918,13 +869,7 @@ cradle(function() {
      */
     $admin->get('/system/object/:schema/restore/:id', function ($request, $response) {
         //----------------------------//
-        // 1. Security Checks
-        if (!$this->package('cradlephp/cradle-role')->hasPermissions($request, $response)) {
-            return;
-        }
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         //get schema data
         $schema = Schema::i($request->getStage('schema'));
 
@@ -935,11 +880,24 @@ cradle(function() {
         );
 
         //----------------------------//
-        // 3. Process Request
+        // 2. Process Request
         $this->trigger('system-object-restore', $request, $response);
 
         //----------------------------//
-        // 4. Interpret Results
+        // 3. Interpret Results
+        if (!$response->isError()) {
+            //record logs
+            $this->log(
+                sprintf(
+                    '%s #%s restored.',
+                    $schema->getSingular(),
+                    $request->getStage('id')
+                ),
+                $request,
+                $response
+            );
+        }
+
         //redirect
         $redirect = sprintf(
             '%s/system/object/%s/search',
@@ -965,17 +923,6 @@ cradle(function() {
             //add a flash
             $message = $this->package('global')->translate('%s was Restored', $schema->getSingular());
             $this->package('global')->flash($message, 'success');
-
-            //record logs
-            $this->log(
-                sprintf(
-                    '%s #%s restored.',
-                    $schema->getSingular(),
-                    $request->getStage('id')
-                ),
-                $request,
-                $response
-            );
         }
 
         $this->package('global')->redirect($redirect);
@@ -989,26 +936,16 @@ cradle(function() {
      */
     $admin->post('/system/object/:schema/import', function ($request, $response) {
         //----------------------------//
-        // 1. Security Checks
-        if (!$this->package('cradlephp/cradle-role')->hasPermissions($request, $response)) {
-            //Set JSON Content
-            return $response->setContent(json_encode([
-                'error' => true,
-                'message' => 'Unauthorized.'
-            ]));
-        }
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         $schema = Schema::i($request->getStage('schema'));
 
         //----------------------------//
-        // 3. Process Request
+        // 2. Process Request
         //get schema data
         $this->trigger('system-object-import', $request, $response);
 
         //----------------------------//
-        // 4. Interpret Results
+        // 3. Interpret Results
         //if the import event returned errors
         if ($response->isError()) {
             $errors = [];
@@ -1060,19 +997,7 @@ cradle(function() {
      */
     $admin->get('/system/object/:schema/export/:type', function ($request, $response) {
         //----------------------------//
-        // 1. Security Checks
-        // set redirect
-        $request->setStage('redirect', sprintf(
-            '%s/system/object/%s/search',
-            $this->config('settings', 'admin'),
-            $request->getStage('schema')
-        ));
-        if (!$this->package('cradlephp/cradle-role')->hasPermissions($request, $response)) {
-            return;
-        }
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         //get schema data
         $schema = Schema::i($request->getStage('schema'));
 
@@ -1112,9 +1037,12 @@ cradle(function() {
 
         $request->setStage('range', 0);
 
-        //trigger job
+        //----------------------------//
+        // 2. Process Request
         $this->trigger('system-object-search', $request, $response);
 
+        //----------------------------//
+        // 3. Interpret Results
         //get the output type
         $type = $request->getStage('type');
         //get the rows

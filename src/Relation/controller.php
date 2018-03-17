@@ -1,7 +1,6 @@
 <?php //-->
 /**
- * This file is part of a Custom Project.
- * (c) 2016-2018 Acme Products Inc.
+ * This file is part of a package designed for the CradlePHP Project.
  *
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
@@ -27,10 +26,7 @@ cradle(function() {
      */
     $admin->get('/system/object/:schema1/:id/search/:schema2', function ($request, $response) {
         //----------------------------//
-        // 1. Route Permissions
-        //re routing will take care of this
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         $schema = Schema::i($request->getStage('schema1'));
         $relation = $schema->getRelations($request->getStage('schema2'));
 
@@ -98,7 +94,7 @@ cradle(function() {
             ->setStage('relation', 'suggestion', $suggestion);
 
         //----------------------------//
-        // 3. Render Template
+        // 2. Render Template
         //now let the original search take over
         $this->routeTo(
             'get',
@@ -120,10 +116,7 @@ cradle(function() {
      */
     $admin->get('/system/object/:schema1/:id/create/:schema2', function ($request, $response) {
         //----------------------------//
-        // 1. Route Permissions
-        //re routing will take care of this
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         $id = $request->getStage('id');
         $schema1 = Schema::i($request->getStage('schema1'));
         $schema2 = $request->getStage('schema2');
@@ -162,7 +155,7 @@ cradle(function() {
             ->setStage('relation', 'suggestion', $suggestion);
 
         //----------------------------//
-        // 3. Render Template
+        // 2. Render Template
         //now let the original search take over
         $this->routeTo(
             'get',
@@ -184,13 +177,7 @@ cradle(function() {
      */
     $admin->get('/system/object/:schema1/:id/link/:schema2', function ($request, $response) {
         //----------------------------//
-        // 1. Route Permissions
-        if (!$this->package('cradlephp/cradle-role')->hasPermissions($request, $response)) {
-            return;
-        }
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         //get schema data
         $schema = Schema::i($request->getStage('schema1'));
 
@@ -301,9 +288,9 @@ cradle(function() {
         }
 
         //----------------------------//
-        // 3. Render Template
+        // 2. Render Template
         //set the class name
-        $class = 'page-admin-system-object-link page-admin';
+        $class = 'page-admin-system-relation-link page-admin';
 
         //determine the title
         $data['title'] = $this->package('global')->translate(
@@ -338,7 +325,8 @@ cradle(function() {
      * @param Response $response
      */
     $admin->post('/system/object/:schema1/:id/search/:schema2', function ($request, $response) {
-        //variable list
+        //----------------------------//
+        // 1. Prepare Data
         $id = $request->getStage('id');
         $schema1 = Schema::i($request->getStage('schema1'));
         $schema2 = Schema::i($request->getStage('schema2'));
@@ -363,6 +351,8 @@ cradle(function() {
             ->setStage('route', $redirect)
             ->setStage('redirect_uri', $redirect);
 
+        //----------------------------//
+        // 2. Process Request
         //now let the original create take over
         $this->routeTo(
             'post',
@@ -374,6 +364,9 @@ cradle(function() {
             $request,
             $response
         );
+
+        //----------------------------//
+        // 3. Interpret Results
     });
 
     /**
@@ -383,7 +376,8 @@ cradle(function() {
      * @param Response $response
      */
     $admin->post('/system/object/:schema1/:id/create/:schema2', function ($request, $response) {
-        //variable list
+        //----------------------------//
+        // 1. Prepare Data
         $id = $request->getStage('id');
         $schema1 = Schema::i($request->getStage('schema1'));
         $schema2 = Schema::i($request->getStage('schema2'));
@@ -423,6 +417,8 @@ cradle(function() {
             ->setStage('route', $route)
             ->setStage('redirect_uri', 'false');
 
+        //----------------------------//
+        // 2. Process Request
         //now let the original create take over
         $this->routeTo(
             'post',
@@ -435,6 +431,8 @@ cradle(function() {
             $response
         );
 
+        //----------------------------//
+        // 3. Interpret Results
         //if there's an error or there's content
         if ($response->isError() || $response->hasContent()) {
             return;
@@ -458,7 +456,7 @@ cradle(function() {
             ->setStage($primary2, $response->getResults($schema2->getPrimaryFieldName()));
 
         //now link it
-        $this->trigger('system-object-link', $request, $response);
+        $this->trigger('system-relation-link', $request, $response);
 
         //if we dont want to redirect
         if ($redirect === 'false') {
@@ -483,12 +481,7 @@ cradle(function() {
      */
     $admin->post('/system/object/:schema1/:id/link/:schema2', function ($request, $response) {
         //----------------------------//
-        // 1. Route Permissions
-        //only for admin
-        $this->package('global')->requireLogin('admin');
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         $schema = Schema::i($request->getStage('schema1'));
         $relation = $schema->getRelations($request->getStage('schema2'));
 
@@ -526,7 +519,7 @@ cradle(function() {
             ->setStage('redirect_uri', 'false');
 
         //----------------------------//
-        // 3. Process Request
+        // 2. Process Request
         $route = sprintf(
             '%s/system/object/%s/%s/link/%s/%s',
             $this->config('settings', 'admin'),
@@ -539,7 +532,7 @@ cradle(function() {
         $this->routeTo('get', $route, $request, $response);
 
         //----------------------------//
-        // 4. Interpret Results
+        // 3. Interpret Results
         //if the event returned an error
         if ($response->isError()) {
             //determine route
@@ -598,12 +591,7 @@ cradle(function() {
      */
     $admin->get('/system/object/:schema1/:id1/link/:schema2/:id2', function ($request, $response) {
         //----------------------------//
-        // 1. Route Permissions
-        //only for admin
-        $this->package('global')->requireLogin('admin');
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         $schema = Schema::i($request->getStage('schema1'));
         $relation = $schema->getRelations($request->getStage('schema2'));
 
@@ -621,11 +609,11 @@ cradle(function() {
         }
 
         //----------------------------//
-        // 3. Process Request
-        $this->trigger('system-object-link', $request, $response);
+        // 2. Process Request
+        $this->trigger('system-relation-link', $request, $response);
 
         //----------------------------//
-        // 4. Interpret Results
+        // 3. Interpret Results
         //redirect
         $redirect = sprintf(
             '%s/system/object/%s/search',
@@ -682,12 +670,7 @@ cradle(function() {
      */
     $admin->get('/system/object/:schema1/:id1/unlink/:schema2/:id2', function ($request, $response) {
         //----------------------------//
-        // 1. Route Permissions
-        //only for admin
-        $this->package('global')->requireLogin('admin');
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         $schema = Schema::i($request->getStage('schema1'));
         $relation = $schema->getRelations($request->getStage('schema2'));
 
@@ -705,11 +688,11 @@ cradle(function() {
         }
 
         //----------------------------//
-        // 3. Process Request
-        $this->trigger('system-object-unlink', $request, $response);
+        // 2. Process Request
+        $this->trigger('system-relation-unlink', $request, $response);
 
         //----------------------------//
-        // 4. Interpret Results
+        // 3. Interpret Results
         //redirect
         $redirect = sprintf(
             '%s/system/object/%s/search',
@@ -765,7 +748,8 @@ cradle(function() {
      * @param Response $response
      */
     $admin->get('/system/object/:schema1/:id/export/:schema2/:type', function ($request, $response) {
-        //variable list
+        //----------------------------//
+        // 1. Prepare Data
         $id = $request->getStage('id');
         $schema1 = Schema::i($request->getStage('schema1'));
         $schema2 = $request->getStage('schema2');
@@ -803,6 +787,8 @@ cradle(function() {
             ->setStage('relation', 'data', $results)
             ->setStage('relation', 'suggestion', $suggestion);
 
+        //----------------------------//
+        // 2. Process Request
         //now let the original export take over
         $this->routeTo(
             'get',
@@ -815,6 +801,9 @@ cradle(function() {
             $request,
             $response
         );
+
+        //----------------------------//
+        // 3. Interpret Results
     });
 
     /**
@@ -825,26 +814,16 @@ cradle(function() {
      */
     $admin->post('/system/object/:schema/:id/import/:schema2', function ($request, $response) {
         //----------------------------//
-        // 1. Route Permissions
-        if (!$this->package('cradlephp/cradle-role')->hasPermissions($request, $response)) {
-            //Set JSON Content
-            return $response->setContent(json_encode([
-                'error' => true,
-                'message' => 'Unauthorized.'
-            ]));
-        }
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         $schema = Schema::i($request->getStage('schema'));
 
         //----------------------------//
-        // 3. Process Request
+        // 2. Process Request
         //get schema data
         $this->trigger('system-object-import', $request, $response);
 
         //----------------------------//
-        // 4. Interpret Results
+        // 3. Interpret Results
         //if the import event returned errors
         if ($response->isError()) {
             $errors = [];

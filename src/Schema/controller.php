@@ -1,7 +1,6 @@
 <?php //-->
 /**
- * This file is part of a Custom Project.
- * (c) 2016-2018 Acme Products Inc.
+ * This file is part of a package designed for the CradlePHP Project.
  *
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
@@ -21,12 +20,7 @@ cradle(function() {
      */
     $admin->get('/system/schema/search', function ($request, $response) {
         //----------------------------//
-        // 1. Route Permissions
-        //only for admin
-        $this->package('global')->requireLogin('admin');
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         if (!$request->hasStage()) {
             $request->setStage('filter', 'active', 1);
         }
@@ -49,7 +43,7 @@ cradle(function() {
         );
 
         //----------------------------//
-        // 3. Render Template
+        // 2. Render Template
         $class = 'page-admin-system-schema-search page-admin';
         $data['title'] = $this->package('global')->translate('System Schemas');
 
@@ -80,12 +74,7 @@ cradle(function() {
      */
     $admin->get('/system/schema/create', function ($request, $response) {
         //----------------------------//
-        // 1. Route Permissions
-        //only for admin
-        $this->package('global')->requireLogin('admin');
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         $data = ['item' => $request->getPost()];
 
         //if this is a return back from processing
@@ -116,7 +105,7 @@ cradle(function() {
         $data['csrf'] = $response->getResults('csrf');
 
         //----------------------------//
-        // 3. Render Template
+        // 2. Render Template
         //set the class name
         $class = 'page-admin-system-schema-create page-admin';
 
@@ -178,12 +167,7 @@ cradle(function() {
      */
     $admin->get('/system/schema/update/:name', function ($request, $response) {
         //----------------------------//
-        // 1. Route Permissions
-        //only for admin
-        $this->package('global')->requireLogin('admin');
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         //pass the item with only the post data
         $data = ['item' => $request->getPost()];
 
@@ -228,7 +212,7 @@ cradle(function() {
         $data['csrf'] = $response->getResults('csrf');
 
         //----------------------------//
-        // 3. Render Template
+        // 2. Render Template
         //set the class name
         $class = 'page-admin-system-schema-update page-admin';
 
@@ -291,12 +275,7 @@ cradle(function() {
      */
     $admin->post('/system/schema/create', function ($request, $response) {
         //----------------------------//
-        // 1. Route Permissions
-        //only for admin
-        $this->package('global')->requireLogin('admin');
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         //if detail has no value make it null
         if ($request->hasStage('detail') && !$request->getStage('detail')) {
             $request->setStage('detail', null);
@@ -313,11 +292,11 @@ cradle(function() {
         }
 
         //----------------------------//
-        // 3. Process Request
+        // 2. Process Request
         $this->trigger('system-schema-create', $request, $response);
 
         //----------------------------//
-        // 4. Interpret Results
+        // 3. Interpret Results
         //if the event returned an error
         if ($response->isError()) {
             //determine route
@@ -371,12 +350,7 @@ cradle(function() {
      */
     $admin->post('/system/schema/update/:name', function ($request, $response) {
         //----------------------------//
-        // 1. Route Permissions
-        //only for admin
-        $this->package('global')->requireLogin('admin');
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
 
         //if detail has no value make it null
         if ($request->hasStage('detail') && !$request->getStage('detail')) {
@@ -403,11 +377,11 @@ cradle(function() {
         }
 
         //----------------------------//
-        // 3. Process Request
+        // 2. Process Request
         $this->trigger('system-schema-update', $request, $response);
 
         //----------------------------//
-        // 4. Interpret Results
+        // 3. Interpret Results
         //if the event returned an error
         if ($response->isError()) {
             //determine route
@@ -465,19 +439,14 @@ cradle(function() {
      */
     $admin->get('/system/schema/remove/:name', function ($request, $response) {
         //----------------------------//
-        // 1. Route Permissions
-        //only for admin
-        $this->package('global')->requireLogin('admin');
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         // no data to preapre
         //----------------------------//
-        // 3. Process Request
+        // 2. Process Request
         $this->trigger('system-schema-remove', $request, $response);
 
         //----------------------------//
-        // 4. Interpret Results
+        // 3. Interpret Results
         //redirect
         $redirect = '/admin/system/schema/search';
 
@@ -522,19 +491,14 @@ cradle(function() {
      */
     $admin->get('/system/schema/restore/:name', function ($request, $response) {
         //----------------------------//
-        // 1. Route Permissions
-        //only for admin
-        $this->package('global')->requireLogin('admin');
-
-        //----------------------------//
-        // 2. Prepare Data
+        // 1. Prepare Data
         // no data to preapre
         //----------------------------//
-        // 3. Process Request
+        // 2. Process Request
         $this->trigger('system-schema-restore', $request, $response);
 
         //----------------------------//
-        // 4. Interpret Results
+        // 3. Interpret Results
         //redirect
         $redirect = '/admin/system/schema/search';
 

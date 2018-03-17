@@ -1,7 +1,6 @@
 <?php //-->
 /**
- * This file is part of a Custom Project
- * (c) 2017-2019 Acme Inc
+ * This file is part of a package designed for the CradlePHP Project.
  *
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
@@ -16,7 +15,7 @@ use Cradle\Module\System\Schema as SystemSchema;
  * SQL service test
  * Role Model Test
  *
- * @vendor   Acme
+ * @vendor   Cradle
  * @package  Role
  * @author   John Doe <john@acme.com>
  */
