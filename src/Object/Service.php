@@ -36,7 +36,7 @@ class Service implements ServiceInterface
     public static function get($name, $key = 'main')
     {
         if (in_array($name, ['sql', 'redis', 'elastic'])) {
-            $resource = $this->package('global')->service($name . '-' . $key);
+            $resource = cradle('global')->service($name . '-' . $key);
 
             if ($resource) {
                 if ($name === 'sql') {

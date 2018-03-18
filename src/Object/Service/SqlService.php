@@ -9,7 +9,7 @@
 namespace Cradle\Package\System\Object\Service;
 
 use PDO as Resource;
-use Cradle\Sql\SqlFactory;
+use Cradle\Storm\SqlFactory;
 
 use Cradle\Module\Utility\Service\SqlServiceInterface;
 use Cradle\Module\Utility\Service\AbstractSqlService;

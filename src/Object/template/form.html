@@ -36,7 +36,7 @@
 
 <div class="main-padding">
     {{#when action '===' 'update'}}
-        {{> object_form_detail}}
+        {{> form_detail}}
     {{/when}}
 
     {{#if relation.suggestion}}
@@ -173,7 +173,7 @@
                     <div class="form-group{{#has ../errors @key}} has-error{{/has}}">
                         <label class="control-label">{{label}}</label>
                         <div>
-                            {{> object_form_fields}}
+                            {{> form_fields}}
                             {{#has ../errors @key}}
                                 <span class="help-text">{{scope ../errors @key}}</span>
                             {{/has}}

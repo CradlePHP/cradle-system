@@ -7,7 +7,8 @@
  */
 namespace Cradle\Package\System;
 
-use Cradle\Package\System\Object;
+use Cradle\Package\System\Schema\Service;
+use Cradle\Module\Utility\Service\NoopService;
 
 use Cradle\Data\Registry;
 use Cradle\Helper\InstanceTrait;
@@ -33,16 +34,11 @@ class Schema extends Registry
      */
     public function __construct($name)
     {
-        if ($name instanceof \Closure) {
-            foreach (debug_backtrace() as $trace) {
-                echo $trace['file'] .' - ' . $trace['line'] . '<br />';
-            }
-        }
         $this->data = $name;
         if (!is_array($this->data)) {
-            $this->data = $this
+            $this->data = cradle()
                 ->package('global')
-                ->config('admin/schema/' . $name);
+                ->config('schema/' . $name);
         }
 
         if (!$this->data || empty($this->data)) {
