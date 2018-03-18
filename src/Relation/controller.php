@@ -317,7 +317,7 @@ return function($request, $response) {
             ->setContent($body);
 
         //render page
-        $this->trigger('render-admin-page', $request, $response);
+        $this->trigger('admin-render-page', $request, $response);
     });
 
     /**

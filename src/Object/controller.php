@@ -144,7 +144,7 @@ return function($request, $response) {
         }
 
         //render page
-        $this->trigger('render-admin-page', $request, $response);
+        $this->trigger('admin-render-page', $request, $response);
     });
 
     /**
@@ -291,7 +291,7 @@ return function($request, $response) {
         }
 
         //render page
-        $this->trigger('render-admin-page', $request, $response);
+        $this->trigger('admin-render-page', $request, $response);
     });
 
     /**
@@ -447,7 +447,7 @@ return function($request, $response) {
         }
 
         //render page
-        $this->trigger('render-admin-page', $request, $response);
+        $this->trigger('admin-render-page', $request, $response);
     });
 
     /**

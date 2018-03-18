@@ -69,11 +69,7 @@ return function($request, $response) {
             mkdir($path, 0777);
         }
 
-        file_put_contents(
-            $path . '/' . $table . '.php',
-            '<?php //-->' . "\n return " .
-            var_export($data, true) . ';'
-        );
+        $this->package('global')->config('schema/' . $table, $data);
 
         //return response format
         $response->setError(false)->setResults($data);
@@ -252,6 +248,10 @@ return function($request, $response) {
         // 4. Process Data
         $path = $this->package('global')->path('config') . '/schema/';
 
+        if (!is_dir($path)) {
+            mkdir($path, 0777);
+        }
+
         $files = scandir($path);
 
         $active = 1;
@@ -341,13 +341,7 @@ return function($request, $response) {
         //update table
         $systemSql->update($data);
 
-        $path = $this->package('global')->path('config') . '/schema';
-
-        file_put_contents(
-            $path . '/' . $table . '.php',
-            '<?php //-->' . "\n return " .
-            var_export($data, true) . ';'
-        );
+        $this->package('global')->config('schema/' . $table, $data);
 
         //return response format
         $response->setError(false)->setResults($data);
