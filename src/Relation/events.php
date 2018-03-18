@@ -21,7 +21,7 @@ cradle(function() {
      * @param Request $request
      * @param Response $response
      */
-    $cradle->on('system-relation-link', function ($request, $response) {
+    $this->on('system-relation-link', function ($request, $response) {
         //----------------------------//
         // 1. Get Data
         //get data from stage
@@ -90,7 +90,7 @@ cradle(function() {
      * @param Request $request
      * @param Response $response
      */
-    $cradle->on('system-relation-unlink', function ($request, $response) {
+    $this->on('system-relation-unlink', function ($request, $response) {
         //----------------------------//
         // 1. Get Data
         //get data from stage
@@ -159,7 +159,7 @@ cradle(function() {
      * @param Request $request
      * @param Response $response
      */
-    $cradle->on('system-relation-unlinkall', function ($request, $response) {
+    $this->on('system-relation-unlinkall', function ($request, $response) {
         //----------------------------//
         // 1. Get Data
         //get data from stage

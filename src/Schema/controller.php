@@ -10,7 +10,8 @@
  * Back End Controllers
  */
 cradle(function() {
-    $admin = $this->handler($this->config('settings', 'admin'));
+    $admin = $this->package('global')->config('settings', 'admin');
+    $admin = $this->handler($admin);
 
     /**
      * Render the Object Search Page

@@ -22,7 +22,7 @@ cradle(function() {
      * @param Request $request
      * @param Response $response
      */
-    $cradle->on('system-object-create', function ($request, $response) {
+    $this->on('system-object-create', function ($request, $response) {
         //----------------------------//
         // 1. Get Data
         $data = [];
@@ -104,7 +104,7 @@ cradle(function() {
      * @param Request $request
      * @param Response $response
      */
-    $cradle->on('system-object-detail', function ($request, $response) {
+    $this->on('system-object-detail', function ($request, $response) {
         //----------------------------//
         // 1. Get Data
         $data = [];
@@ -187,7 +187,7 @@ cradle(function() {
      * @param Request $request
      * @param Response $response
      */
-    $cradle->on('system-object-remove', function ($request, $response) {
+    $this->on('system-object-remove', function ($request, $response) {
         //----------------------------//
         // 1. Get Data
         //get the object detail
@@ -252,7 +252,7 @@ cradle(function() {
      * @param Request $request
      * @param Response $response
      */
-    $cradle->on('system-object-restore', function ($request, $response) {
+    $this->on('system-object-restore', function ($request, $response) {
         //----------------------------//
         // 1. Get Data
         //get the object detail
@@ -306,7 +306,7 @@ cradle(function() {
      * @param Request $request
      * @param Response $response
      */
-    $cradle->on('system-object-search', function ($request, $response) {
+    $this->on('system-object-search', function ($request, $response) {
         //----------------------------//
         // 1. Get Data
         $data = [];
@@ -371,7 +371,7 @@ cradle(function() {
      * @param Request $request
      * @param Response $response
      */
-    $cradle->on('system-object-update', function ($request, $response) {
+    $this->on('system-object-update', function ($request, $response) {
         //----------------------------//
         // 1. Get Data
         //get the object detail
@@ -502,7 +502,7 @@ cradle(function() {
      * @param Request $request
      * @param Response $response
      */
-    $cradle->on('system-object-import', function ($request, $response) {
+    $this->on('system-object-import', function ($request, $response) {
         //----------------------------//
         // 1. Get Data
         $data = [];
