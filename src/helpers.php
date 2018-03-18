@@ -2,7 +2,7 @@
 
 use Cradle\Module\System\Schema;
 
-cradle(function() {
+$this->preprocess(function() {
     $handlebars = $this->package('global')->handlebars();
 
     $handlebars->registerHelper('relations', function (...$args) {
