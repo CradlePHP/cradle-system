@@ -2,108 +2,112 @@
 
 use Cradle\Module\System\Schema;
 
-$handlebars->registerHelper('relations', function (...$args) {
-    //resolve the arguments
-    $options = array_pop($args);
-    $schema = array_shift($args);
-    $many = -1;
+cradle(function() {
+    $handlebars = $this->package('global')->handlebars();
 
-    if (isset($args[0])) {
-        $many = $args[0];
-    }
+    $handlebars->registerHelper('relations', function (...$args) {
+        //resolve the arguments
+        $options = array_pop($args);
+        $schema = array_shift($args);
+        $many = -1;
 
-    if (isset($args[1]) && $args[1]) {
-        $relations = Schema::i($schema)->getReverseRelations($many);
-    } else {
-        $relations = Schema::i($schema)->getRelations($many);
-    }
-
-    if (!is_numeric($many) && count($relations)) {
-        $table = $relations['table'];
-        $relations = [$table => $relations];
-    }
-
-    //pass suggestion title field for each relation to the template
-    foreach ($relations as $name => $relation) {
-        $relations[$name]['suggestion_name'] = '_' . $relation['primary2'];
-    }
-
-    if (empty($relations)) {
-        return $options['inverse']();
-    }
-
-    $each = cradle('global')->handlebars()->getHelper('each');
-
-    return $each($relations, $options);
-});
-
-$handlebars->registerHelper('suggest', function ($schema, $row) {
-    return Schema::i($schema)->getSuggestionFormat($row);
-});
-
-$handlebars->registerHelper('format', function ($schema, $row, $type, $options) {
-    $schema = Schema::i($schema);
-    $fields = $schema->getFields();
-
-    if ($type !== 'list') {
-        $type = 'detail';
-    }
-
-    $formats = [];
-    foreach ($fields as $name => $field) {
-        $format = $field[$type];
-        $format['name'] = $name;
-        $format['label'] = $field['label'];
-
-        if (!isset($row[$name])) {
-            $format['value'] = null;
-        } else {
-            $format['value'] = $row[$name];
+        if (isset($args[0])) {
+            $many = $args[0];
         }
 
-        $format['this'] = $format;
+        if (isset($args[1]) && $args[1]) {
+            $relations = Schema::i($schema)->getReverseRelations($many);
+        } else {
+            $relations = Schema::i($schema)->getRelations($many);
+        }
 
-        $formats[] = $options['fn']($format);
-    }
+        if (!is_numeric($many) && count($relations)) {
+            $table = $relations['table'];
+            $relations = [$table => $relations];
+        }
 
-    return implode('', $formats);
-});
+        //pass suggestion title field for each relation to the template
+        foreach ($relations as $name => $relation) {
+            $relations[$name]['suggestion_name'] = '_' . $relation['primary2'];
+        }
 
-$handlebars->registerHelper('schema_row', function ($schema, $row, $key) {
-    $schema = Schema::i($schema);
+        if (empty($relations)) {
+            return $options['inverse']();
+        }
 
-    switch ($key) {
-        case 'id':
-            return $row[$schema->getPrimaryFieldName()];
-        case 'active':
-            $key = $schema->getActiveFieldName();
-            if (isset($row[$key])) {
-                return $row[$key];
+        $each = cradle('global')->handlebars()->getHelper('each');
+
+        return $each($relations, $options);
+    });
+
+    $handlebars->registerHelper('suggest', function ($schema, $row) {
+        return Schema::i($schema)->getSuggestionFormat($row);
+    });
+
+    $handlebars->registerHelper('format', function ($schema, $row, $type, $options) {
+        $schema = Schema::i($schema);
+        $fields = $schema->getFields();
+
+        if ($type !== 'list') {
+            $type = 'detail';
+        }
+
+        $formats = [];
+        foreach ($fields as $name => $field) {
+            $format = $field[$type];
+            $format['name'] = $name;
+            $format['label'] = $field['label'];
+
+            if (!isset($row[$name])) {
+                $format['value'] = null;
+            } else {
+                $format['value'] = $row[$name];
             }
 
-            break;
-        case 'created':
-            $key = $schema->getCreatedFieldName();
-            if (isset($row[$key])) {
-                return $row[$key];
-            }
-            break;
-        case 'updated':
-            $key = $schema->getUpdatedFieldName();
-            if (isset($row[$key])) {
-                return $row[$key];
-            }
-            break;
-    }
+            $format['this'] = $format;
 
-    return false;
-});
+            $formats[] = $options['fn']($format);
+        }
 
-$handlebars->registerHelper('active', function ($schema, $row, $options) {
-    $schemaKey = cradle('global')->handlebars()->getHelper('schema_row');
-    if ($schemaKey($schema, $row, 'active')) {
-        return $options['fn']();
-    }
+        return implode('', $formats);
+    });
 
-    return $options['inverse']();
+    $handlebars->registerHelper('schema_row', function ($schema, $row, $key) {
+        $schema = Schema::i($schema);
+
+        switch ($key) {
+            case 'id':
+                return $row[$schema->getPrimaryFieldName()];
+            case 'active':
+                $key = $schema->getActiveFieldName();
+                if (isset($row[$key])) {
+                    return $row[$key];
+                }
+
+                break;
+            case 'created':
+                $key = $schema->getCreatedFieldName();
+                if (isset($row[$key])) {
+                    return $row[$key];
+                }
+                break;
+            case 'updated':
+                $key = $schema->getUpdatedFieldName();
+                if (isset($row[$key])) {
+                    return $row[$key];
+                }
+                break;
+        }
+
+        return false;
+    });
+
+    $handlebars->registerHelper('active', function ($schema, $row, $options) {
+        $schemaKey = cradle('global')->handlebars()->getHelper('schema_row');
+        if ($schemaKey($schema, $row, 'active')) {
+            return $options['fn']();
+        }
+
+        return $options['inverse']();
+    });
 });

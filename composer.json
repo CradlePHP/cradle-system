@@ -21,5 +21,10 @@
     },
     "require": {
         "cradlephp/framework": "~2.1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cradle\\Package\\System\\": "src/"
+        }
     }
 }
