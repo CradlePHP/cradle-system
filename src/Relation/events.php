@@ -12,9 +12,9 @@ use Cradle\Package\System\Exception;
 use Cradle\Sql\SqlException;
 
 /**
- * Basic Links
+ * Relation Events
  */
-cradle(function() {
+return function($request, $response) {
     /**
      * Links object to relation
      *
@@ -202,4 +202,4 @@ cradle(function() {
         //return response format
         $response->setError(false)->setResults($results);
     });
-});
+};

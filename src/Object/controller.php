@@ -13,9 +13,11 @@ use Cradle\Http\Request;
 use Cradle\Http\Response;
 
 /**
- * Back End Controllers
+ * Object Controllers
  */
-cradle(function() {
+return function($request, $response) {
+    //Back End Controllers
+
     $admin = $this->package('global')->config('settings', 'admin');
     $admin = $this->handler($admin);
 
@@ -1181,12 +1183,9 @@ cradle(function() {
         //set content
         $response->set('json', $rows);
     });
-});
 
-/**
- * Front End Controllers
- */
-cradle(function() {
+    //Front End Controllers
+
     /**
      * Render the System Object Search Page
      *
@@ -1425,4 +1424,4 @@ cradle(function() {
             $response
         );
     });
-});
+};

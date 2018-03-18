@@ -13,9 +13,9 @@ use Cradle\Http\Request;
 use Cradle\Http\Response;
 
 /**
- * Basic CRUD
+ * Schema Events
  */
-cradle(function() {
+return function($request, $response) {
     /**
      * System Schema Create Job
      *
@@ -352,4 +352,4 @@ cradle(function() {
         //return response format
         $response->setError(false)->setResults($data);
     });
-});
+};

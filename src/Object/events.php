@@ -13,9 +13,9 @@ use Cradle\Http\Request;
 use Cradle\Http\Response;
 
 /**
- * Basic CRUD
+ * Object Events
  */
-cradle(function() {
+return function($request, $response) {
     /**
      * System Object Create Job
      *
@@ -663,4 +663,4 @@ cradle(function() {
 
         $response->setError(false)->setResults($results);
     });
-});
+};

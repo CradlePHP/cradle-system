@@ -7,9 +7,9 @@
  */
 
 /**
- * Back End Controllers
+ * Schema Controllers
  */
-cradle(function() {
+return function($request, $response) {
     $admin = $this->package('global')->config('settings', 'admin');
     $admin = $this->handler($admin);
 
@@ -535,4 +535,4 @@ cradle(function() {
 
         $this->package('global')->redirect($redirect);
     });
-});
+};

@@ -13,9 +13,10 @@ use Cradle\Http\Request;
 use Cradle\Http\Response;
 
 /**
- * Back End Controllers
+ * Relation Controllers
  */
-cradle(function() {
+return function($request, $response) {
+    // Back End Controllers
     $admin = $this->package('global')->config('settings', 'admin');
     $admin = $this->handler($admin);
 
@@ -867,12 +868,9 @@ cradle(function() {
             'message' => $message
         ]));
     });
-});
 
-/**
- * Front End Controllers
- */
-cradle(function() {
+    // Front End Controllers
+
     /**
      * Render the System Object Search Page Filtered by Relation
      *
@@ -1138,4 +1136,4 @@ cradle(function() {
             $response
         );
     });
-});
+};
