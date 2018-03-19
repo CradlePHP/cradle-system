@@ -122,7 +122,7 @@ return function($request, $response) {
     ) {
         // get the root directory
         $type = ucwords($type);
-        $root =  sprintf('%s/src/%s/template/', __DIR__, $type);
+        $root =  sprintf('%s/%s/template/', __DIR__, $type);
 
         // check for partials
         if (!is_array($partials)) {
