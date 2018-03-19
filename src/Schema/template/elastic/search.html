@@ -1,0 +1,56 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/admin/system/schema/search">
+                <i class="fas fa-home"></i> Admin
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="fas fa-cogs"></i> {{title}}
+        </li>
+    </ol>
+</nav>
+
+<div class="main-padding">
+    <h3 class="main-title">
+        <i class="fas fa-cogs"></i> {{number total}} {{title}}
+    </h3>
+    <div class="clearfix mb-4 search-actions">
+    </div>
+
+    <form method="post">
+        <div class="table-overflow">
+        {{#if rows}}
+            <!-- START: TABLE -->
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Actions</th>
+                        <th>Schema</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each rows}}
+                        <tr data-id="{{name}}">
+                            <td class="table-actions">
+                                <a href="#" title="Edit Mapping" class="text-info"><span class="fa fa-pencil-alt"></span></a>
+                                <a href="/admin/system/schema/elastic/map/{{name}}" title="Map Elastic" class="text-success"><span class="fa fa-database"></span></a>
+                                <a href="/admin/system/schema/elastic/populate/{{name}}" title="Populate Elastic" class="text-warning"><span class="fa fa-bolt"></span></a>
+                                <a href="/admin/system/schema/elastic/flush/{{name}}" title="Flush Elastic" class="text-danger"><span class="fa fa-times"></span></a>
+                            </td>
+                            <td>
+                                {{capital name}}
+                            </td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            <!-- END: TABLE -->
+        {{else}}
+            <!-- START: NO RESULTS -->
+            <div class="well no-results">No Results Found</div>
+            <!-- END: NO RESULTS -->
+        {{/if}}
+        </table>
+    </form>
+</div>

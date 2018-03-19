@@ -49,6 +49,194 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         $this->sql = Service::get('sql');
     }
 
+    /*
+     * Create elastic map
+     *
+     * @param array $data
+    */
+    public function createMap() {
+        if(is_null($this->schema)) {
+            throw SystemException::forNoSchema();
+        }
+        
+        // translate data first to sql
+        $data = $this->schema->toSql();
+        
+        // then translate it to elastic mapping
+        $mapping = $this->schema->toElastic($data);
+        // get schema path
+        $path = cradle()->package('global')->path('config') . '/schema/elastic';
+        // if elastic dir doesn't exists
+        // create elastic folder
+        if(!is_dir($path)) {
+            mkdir($path, 0777);
+        }
+
+        // if elastic schema dir doesn't exist
+        // create elastic schema dir
+        mkdir ($path . '/' . ucwords($data['name']));
+        
+        // save mapping
+        file_put_contents(
+            $path . '/' . ucwords($data['name']) . '/elastic.php',
+            '<?php //-->' . "\n return " .
+            var_export($mapping, true) . ';'
+        );
+        
+
+    }
+
+    /*
+     * Map elastic
+     *
+     */
+    public function map() {
+        // no schema validation
+        if(is_null($this->schema)) {
+            throw SystemException::forNoSchema();
+        }
+
+        $table = $this->schema->getName();
+        $path = cradle()->package('global')->path('config') . '/schema/elastic/' . ucwords($table) . '/elastic.php';
+        
+        // if mapped file doesn't exist,
+        // do nothing
+        if (!file_exists($path)) {
+            return false;
+        }
+
+        $data = include_once($path);
+        
+        // try mapping 
+        try {
+            $this->resource->indices()->create(['index' => $table]);
+            $this->resource->indices()->putMapping([
+                'index' => $table,
+                'type' => 'main',
+                'body' => [
+                    '_source' => [
+                        'enabled' => true
+                    ],
+                    'properties' => $data[$table]
+                ]
+            ]);
+        } catch (NoNodesAvailableException $e) {
+            //because there is no reason to continue;
+            return false;
+        } catch (BadRequest400Exception $e) {
+            //already mapped
+            return false;
+        } catch (\Throwable $e) {
+            // something is not right
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Populate elastic
+     *
+     * @params array $data
+     */
+    public function populate(array $data = []) {
+        // no schema validation
+        if(is_null($this->schema)) {
+            throw SystemException::forNoSchema();
+        }
+        
+        $exists = false;
+        try {
+            // check if index exist
+            $exists = $this->resource->indices()->exists(['index' => $this->schema->getName()]);
+        } catch (\Throwable $e) {
+            // return false if something went wrong
+            return false;
+        }
+
+        // no index available for this schema
+        if (!$exists) {
+            // just return false
+            return false;
+        }
+
+        // get object services
+        $objectSql = $this->schema->object()->service('sql');
+        $objectElastic = $this->schema->object()->service('elastic');
+        $objectRedis = $this->schema->object()->service('redis');
+        
+        // primary field
+        $primary = $this->schema->getPrimaryFieldName();
+        
+        // get data from sql
+        // set range to 1 so we dont have to exhaus sql server by pulling just the total entry
+        $data = $objectSql->search(['range' => 1]);
+        // get total entry
+        $total = isset($data['total']) && is_numeric($data['total']) ? $data['total'] : 0;
+        // set current to 0 if current is not set
+        $current = isset($data['current']) && is_numeric($data['current']) ? $data['current'] : 0;
+        $range = 10; // do 10 at a time
+        for ($i = 0; $i < $total; $i++) {
+            if ($i + $current > $total) {
+                // this is the end :'(
+                break;
+            }
+
+            // if end is set
+            if (isset($data['end']) && is_numeric($data['end'])) {
+                if($current + $i > $data['end']) {
+                    // end this
+                    break;
+                }
+                
+            }
+            
+            // set request params
+            $stage = ['start' => $current, 'range' => $current + $range];
+            // get entries
+            $entries = $objectSql->search($stage);
+            $entries = $entries['rows'];
+            
+            // loop thru entries
+            foreach ($entries as $entry) {
+                $create = $objectElastic->create($entry[$primary]);
+                if (!$create) {
+                    // nothing to do
+                    return false;
+                }
+                
+            }
+
+            // increment current
+            $current = $current + $range;
+        }
+
+        // dont forget to flush redis
+        
+        $objectRedis->removeSearch();
+        return true;
+    }
+    
+    /*
+     * Populate elastic
+     *
+     *
+     */
+    public function flush() {
+        // no schema validation
+        if(is_null($this->schema)) {
+            throw SystemException::forNoSchema();
+        }
+
+        // flush elastic schema
+        try {
+            $this->resource->indices()->delete(['index' => $this->schema->getName()]);
+            return true;
+        } catch(\Throwable $e) {
+            return false;
+        }
+    }
+
     /**
      * Search in index
      *
