@@ -43,7 +43,7 @@ $this->get('/admin/system/schema/search', function ($request, $response) {
 
     $body = $this
         ->package('cradlephp/cradle-system')
-        ->template('search', $data);
+        ->template('schema', 'search', $data);
 
     //set content
     $response
