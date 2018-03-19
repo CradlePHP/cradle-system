@@ -13,337 +13,332 @@ use Cradle\Http\Request;
 use Cradle\Http\Response;
 
 /**
- * Schema Events
+ * System Schema Create Job
+ *
+ * @param Request $request
+ * @param Response $response
  */
-return function($request, $response) {
-    /**
-     * System Schema Create Job
-     *
-     * @param Request $request
-     * @param Response $response
-     */
-    $this->on('system-schema-create', function ($request, $response) {
-        //----------------------------//
-        // 1. Get Data
-        $data = [];
-        if ($request->hasStage()) {
-            $data = $request->getStage();
-        }
+$this->on('system-schema-create', function ($request, $response) {
+    //----------------------------//
+    // 1. Get Data
+    $data = [];
+    if ($request->hasStage()) {
+        $data = $request->getStage();
+    }
 
-        //----------------------------//
-        // 2. Validate Data
-        $errors = Validator::getCreateErrors($data);
+    //----------------------------//
+    // 2. Validate Data
+    $errors = Validator::getCreateErrors($data);
 
-        //if there are errors
-        if (!empty($errors)) {
-            return $response
-                ->setError(true, 'Invalid Parameters')
-                ->set('json', 'validation', $errors);
-        }
+    //if there are errors
+    if (!empty($errors)) {
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->set('json', 'validation', $errors);
+    }
 
-        //----------------------------//
-        // 3. Prepare Data
-        // filter relations
-        if (isset($data['relations'])) {
-            // filter out empty relations
-            $data['relations'] = array_filter(
-                $data['relations'],
-                function ($relation) {
-                    // make sure we have relation name
-                    return $relation['name'] !== '' ? true : false;
-                }
-            );
-        }
+    //----------------------------//
+    // 3. Prepare Data
+    // filter relations
+    if (isset($data['relations'])) {
+        // filter out empty relations
+        $data['relations'] = array_filter(
+            $data['relations'],
+            function ($relation) {
+                // make sure we have relation name
+                return $relation['name'] !== '' ? true : false;
+            }
+        );
+    }
 
-        //----------------------------//
-        // 4. Process Data
-        $schema = Schema::i($data);
-        $table = $schema->getName();
+    //----------------------------//
+    // 4. Process Data
+    $schema = Schema::i($data);
+    $table = $schema->getName();
 
-        //create table
-        $schema->service('sql')->create($data);
+    //create table
+    $schema->service('sql')->create($data);
 
-        $path = $this->package('global')->path('config') . '/schema';
+    $path = $this->package('global')->path('config') . '/schema';
 
-        if (!is_dir($path)) {
-            mkdir($path, 0777);
-        }
+    if (!is_dir($path)) {
+        mkdir($path, 0777);
+    }
 
-        $this->package('global')->config('schema/' . $table, $data);
+    $this->package('global')->config('schema/' . $table, $data);
 
-        //return response format
-        $response->setError(false)->setResults($data);
-    });
+    //return response format
+    $response->setError(false)->setResults($data);
+});
 
-    /**
-     * System Schema Detail Job
-     *
-     * @param Request $request
-     * @param Response $response
-     */
-    $this->on('system-schema-detail', function ($request, $response) {
-        //----------------------------//
-        // 1. Get Data
-        $data = [];
-        if ($request->hasStage()) {
-            $data = $request->getStage();
-        }
+/**
+ * System Schema Detail Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->on('system-schema-detail', function ($request, $response) {
+    //----------------------------//
+    // 1. Get Data
+    $data = [];
+    if ($request->hasStage()) {
+        $data = $request->getStage();
+    }
 
-        $id = null;
-        if (isset($data['schema'])) {
-            $id = $data['schema'];
-        } else if (isset($data['name'])) {
-            $id = $data['name'];
-        }
+    $id = null;
+    if (isset($data['schema'])) {
+        $id = $data['schema'];
+    } else if (isset($data['name'])) {
+        $id = $data['name'];
+    }
 
-        //----------------------------//
-        // 2. Validate Data
-        //we need an id
-        if (!$id) {
-            return $response->setError(true, 'Invalid ID');
-        }
+    //----------------------------//
+    // 2. Validate Data
+    //we need an id
+    if (!$id) {
+        return $response->setError(true, 'Invalid ID');
+    }
 
-        //----------------------------//
-        // 3. Prepare Data
-        //no preparation needed
-        //----------------------------//
-        // 4. Process Data
-        $results = $this->package('global')->config('schema/' . $id);
+    //----------------------------//
+    // 3. Prepare Data
+    //no preparation needed
+    //----------------------------//
+    // 4. Process Data
+    $results = $this->package('global')->config('schema/' . $id);
 
-        if (!$results) {
-            return $response->setError(true, 'Not Found');
-        }
+    if (!$results) {
+        return $response->setError(true, 'Not Found');
+    }
 
-        $response->setError(false)->setResults($results);
-    });
+    $response->setError(false)->setResults($results);
+});
 
-    /**
-     * System Schema Remove Job
-     *
-     * @param Request $request
-     * @param Response $response
-     */
-    $this->on('system-schema-remove', function ($request, $response) {
-        //----------------------------//
-        // 1. Get Data
-        //get the system detail
-        $this->trigger('system-schema-detail', $request, $response);
+/**
+ * System Schema Remove Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->on('system-schema-remove', function ($request, $response) {
+    //----------------------------//
+    // 1. Get Data
+    //get the system detail
+    $this->trigger('system-schema-detail', $request, $response);
 
-        //----------------------------//
-        // 2. Validate Data
-        if ($response->isError()) {
-            return;
-        }
+    //----------------------------//
+    // 2. Validate Data
+    if ($response->isError()) {
+        return;
+    }
 
-        //----------------------------//
-        // 3. Prepare Data
-        $data = $response->getResults();
+    //----------------------------//
+    // 3. Prepare Data
+    $data = $response->getResults();
 
-        //----------------------------//
-        // 4. Process Data
-        $schema = Schema::i($data);
-        $table = $schema->getName();
-        //this/these will be used a lot
-        $systemSql = $schema->service('sql');
+    //----------------------------//
+    // 4. Process Data
+    $schema = Schema::i($data);
+    $table = $schema->getName();
+    //this/these will be used a lot
+    $systemSql = $schema->service('sql');
 
-        try {
-            //remove table
-            $systemSql->remove($data);
-        } catch (\Exception $e) {
-            return $response->setError(true, $e->getMessage());
-        }
+    try {
+        //remove table
+        $systemSql->remove($data);
+    } catch (\Exception $e) {
+        return $response->setError(true, $e->getMessage());
+    }
 
-        $path = $this->package('global')->path('config')
-            . '/schema/'
-            . $table
-            . '.php';
+    $path = $this->package('global')->path('config')
+        . '/schema/'
+        . $table
+        . '.php';
 
-        if (file_exists($path)) {
-            $new = $this->package('global')->path('config')
-                . '/schema/_'
-                . $table
-                . '.php';
-
-            rename($path, $new);
-        }
-
-        $response->setError(false)->setResults($data);
-    });
-
-    /**
-     * System Schema Restore Job
-     *
-     * @param Request $request
-     * @param Response $response
-     */
-    $this->on('system-schema-restore', function ($request, $response) {
-        //----------------------------//
-        // 1. Get Data
-        $request->setStage('name', '_' . $request->getStage('name'));
-        //get the system detail
-        $this->trigger('system-schema-detail', $request, $response);
-
-        //----------------------------//
-        // 2. Validate Data
-        if ($response->isError()) {
-            return;
-        }
-
-        //----------------------------//
-        // 3. Prepare Data
-        $data = $response->getResults();
-
-        //----------------------------//
-        // 4. Process Data
-        $schema = Schema::i($data);
-        $table = $schema->getName();
-        //this/these will be used a lot
-        $systemSql = $schema->service('sql');
-
-        try {
-            //remove table
-            $systemSql->restore($data);
-        } catch (\Exception $e) {
-            return $response->setError(true, $e->getMessage());
-        }
-
-        $path = $this->package('global')->path('config')
+    if (file_exists($path)) {
+        $new = $this->package('global')->path('config')
             . '/schema/_'
             . $table
             . '.php';
 
-        if (file_exists($path)) {
-            $new = $this->package('global')->path('config')
-                . '/schema/'
-                . $table
-                . '.php';
+        rename($path, $new);
+    }
 
-            rename($path, $new);
+    $response->setError(false)->setResults($data);
+});
+
+/**
+ * System Schema Restore Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->on('system-schema-restore', function ($request, $response) {
+    //----------------------------//
+    // 1. Get Data
+    $request->setStage('name', '_' . $request->getStage('name'));
+    //get the system detail
+    $this->trigger('system-schema-detail', $request, $response);
+
+    //----------------------------//
+    // 2. Validate Data
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
+    // 3. Prepare Data
+    $data = $response->getResults();
+
+    //----------------------------//
+    // 4. Process Data
+    $schema = Schema::i($data);
+    $table = $schema->getName();
+    //this/these will be used a lot
+    $systemSql = $schema->service('sql');
+
+    try {
+        //remove table
+        $systemSql->restore($data);
+    } catch (\Exception $e) {
+        return $response->setError(true, $e->getMessage());
+    }
+
+    $path = $this->package('global')->path('config')
+        . '/schema/_'
+        . $table
+        . '.php';
+
+    if (file_exists($path)) {
+        $new = $this->package('global')->path('config')
+            . '/schema/'
+            . $table
+            . '.php';
+
+        rename($path, $new);
+    }
+
+    $response->setError(false)->setResults($data);
+});
+
+/**
+ * System Schema Search Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->on('system-schema-search', function ($request, $response) {
+    //----------------------------//
+    // 1. Get Data
+    $data = [];
+    if ($request->hasStage()) {
+        $data = $request->getStage();
+    }
+
+    //----------------------------//
+    // 2. Validate Data
+    //no validation needed
+    //----------------------------//
+    // 3. Prepare Data
+    //no preparation needed
+    //----------------------------//
+    // 4. Process Data
+    $path = $this->package('global')->path('config') . '/schema/';
+
+    if (!is_dir($path)) {
+        mkdir($path, 0777);
+    }
+
+    $files = scandir($path);
+
+    $active = 1;
+    if (isset($data['filter']['active'])) {
+        $active = $data['filter']['active'];
+    }
+
+    $results = [];
+    foreach ($files as $file) {
+        if (//if this is not a php file
+            (strpos($file, '.php') === false)
+            //or active and this is not active
+            || ($active && strpos($file, '_') === 0)
+            //or not active and active
+            || (!$active && strpos($file, '_') !== 0)
+        ) {
+            continue;
         }
 
-        $response->setError(false)->setResults($data);
-    });
+        $results[] = $this->package('global')->config('schema/' . substr($file, 0, -4));
+    }
 
-    /**
-     * System Schema Search Job
-     *
-     * @param Request $request
-     * @param Response $response
-     */
-    $this->on('system-schema-search', function ($request, $response) {
-        //----------------------------//
-        // 1. Get Data
-        $data = [];
-        if ($request->hasStage()) {
-            $data = $request->getStage();
-        }
+    //set response format
+    $response->setError(false)->setResults([
+        'rows' => $results,
+        'total' => count($results)
+    ]);
+});
 
-        //----------------------------//
-        // 2. Validate Data
-        //no validation needed
-        //----------------------------//
-        // 3. Prepare Data
-        //no preparation needed
-        //----------------------------//
-        // 4. Process Data
-        $path = $this->package('global')->path('config') . '/schema/';
+/**
+ * System Schema Update Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->on('system-schema-update', function ($request, $response) {
+    //----------------------------//
+    // 1. Get Data
+    //get the system detail
+    $this->trigger('system-schema-detail', $request, $response);
 
-        if (!is_dir($path)) {
-            mkdir($path, 0777);
-        }
+    //if there's an error
+    if ($response->isError()) {
+        return;
+    }
 
-        $files = scandir($path);
+    //get data from stage
+    $data = [];
+    if ($request->hasStage()) {
+        $data = $request->getStage();
+    }
 
-        $active = 1;
-        if (isset($data['filter']['active'])) {
-            $active = $data['filter']['active'];
-        }
+    //----------------------------//
+    // 2. Validate Data
+    $errors = Validator::getUpdateErrors($data);
 
-        $results = [];
-        foreach ($files as $file) {
-            if (//if this is not a php file
-                (strpos($file, '.php') === false)
-                //or active and this is not active
-                || ($active && strpos($file, '_') === 0)
-                //or not active and active
-                || (!$active && strpos($file, '_') !== 0)
-            ) {
-                continue;
+    //if there are errors
+    if (!empty($errors)) {
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->set('json', 'validation', $errors);
+    }
+
+    //----------------------------//
+    // 3. Prepare Data
+
+    // filter relations
+    if (isset($data['relations'])) {
+        // filter out empty relations
+        $data['relations'] = array_filter(
+            $data['relations'],
+            function ($relation) {
+                // make sure we have relation name
+                return $relation['name'] !== '' ? true : false;
             }
+        );
+    }
 
-            $results[] = $this->package('global')->config('schema/' . substr($file, 0, -4));
-        }
+    //----------------------------//
+    // 4. Process Data
 
-        //set response format
-        $response->setError(false)->setResults([
-            'rows' => $results,
-            'total' => count($results)
-        ]);
-    });
+    $schema = Schema::i($data);
+    $table = $schema->getName();
+    //this/these will be used a lot
+    $systemSql = $schema->service('sql');
 
-    /**
-     * System Schema Update Job
-     *
-     * @param Request $request
-     * @param Response $response
-     */
-    $this->on('system-schema-update', function ($request, $response) {
-        //----------------------------//
-        // 1. Get Data
-        //get the system detail
-        $this->trigger('system-schema-detail', $request, $response);
+    //update table
+    $systemSql->update($data);
 
-        //if there's an error
-        if ($response->isError()) {
-            return;
-        }
+    $this->package('global')->config('schema/' . $table, $data);
 
-        //get data from stage
-        $data = [];
-        if ($request->hasStage()) {
-            $data = $request->getStage();
-        }
-
-        //----------------------------//
-        // 2. Validate Data
-        $errors = Validator::getUpdateErrors($data);
-
-        //if there are errors
-        if (!empty($errors)) {
-            return $response
-                ->setError(true, 'Invalid Parameters')
-                ->set('json', 'validation', $errors);
-        }
-
-        //----------------------------//
-        // 3. Prepare Data
-
-        // filter relations
-        if (isset($data['relations'])) {
-            // filter out empty relations
-            $data['relations'] = array_filter(
-                $data['relations'],
-                function ($relation) {
-                    // make sure we have relation name
-                    return $relation['name'] !== '' ? true : false;
-                }
-            );
-        }
-
-        //----------------------------//
-        // 4. Process Data
-
-        $schema = Schema::i($data);
-        $table = $schema->getName();
-        //this/these will be used a lot
-        $systemSql = $schema->service('sql');
-
-        //update table
-        $systemSql->update($data);
-
-        $this->package('global')->config('schema/' . $table, $data);
-
-        //return response format
-        $response->setError(false)->setResults($data);
-    });
-};
+    //return response format
+    $response->setError(false)->setResults($data);
+});

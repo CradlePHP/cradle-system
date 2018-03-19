@@ -535,7 +535,7 @@ class Schema extends Registry
             return $suggestion;
         }
 
-        $template = $this->package('global')->handlebars()->compile($this->data['suggestion']);
+        $template = cradle('global')->handlebars()->compile($this->data['suggestion']);
 
         return $template($data);
     }

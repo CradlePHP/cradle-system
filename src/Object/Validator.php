@@ -106,7 +106,7 @@ class Validator
 
             foreach ($field['validation'] as $validation) {
                 if ($validation['method'] === 'required'
-                    && isset($data[$name])
+                    && array_key_exists($name, $data)
                     && empty($data[$name])
                 ) {
                     $errors[$name] = $validation['message'];

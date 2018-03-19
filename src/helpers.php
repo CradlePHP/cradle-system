@@ -1,6 +1,6 @@
 <?php
 
-use Cradle\Module\System\Schema;
+use Cradle\Package\System\Schema;
 
 return function($request, $response) {
     $handlebars = $this->package('global')->handlebars();
