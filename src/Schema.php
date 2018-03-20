@@ -107,7 +107,7 @@ class Schema extends Registry
     }
 
     /**
-     * Returns created field
+         * Returns created field
      *
      * @return string|false
      */
@@ -810,8 +810,8 @@ class Schema extends Registry
         
         $map = [];
         $map[$data['primary']] = ['type' => 'integer'];
-        foreach ($data['columns'] as $field => $v) {
-            switch (strtolower($v['type'])) {
+        foreach ($data['columns'] as $field => $meta) {
+            switch (strtolower($meta['type'])) {
                 case 'datetime' :
                 case 'date' :
                     $map[$field] = [
@@ -831,7 +831,7 @@ class Schema extends Registry
                     break;
                 default :
                     $map[$field] = ['type' => 'string'];
-                    if (isset($v['index']) && $v['index'] == 1) {
+                    if (isset($meta['index']) && $meta['index'] == 1) {
                         $map[$field]['fields'] = ['keyword' => [
                             'type' => 'keyword']];
                     }
@@ -845,9 +845,9 @@ class Schema extends Registry
             // set primary for relational table
             $map[$fields['name'] . '_id'] = ['type' => 'integer'];
             // loop through fields
-            foreach($fields['fields'] as $field => $v) {
+            foreach($fields['fields'] as $field => $meta) {
                 
-                switch (strtolower($v['field']['type'])) {
+                switch (strtolower($meta['field']['type'])) {
                     case 'datetime' :
                     case 'date' :
                         $map[$field] = [
@@ -867,7 +867,7 @@ class Schema extends Registry
                         break;
                     default :
                         $map[$field] = ['type' => 'string'];
-                        if (isset($v['index']) && $v['index'] == 1) {
+                        if (isset($meta['index']) && $meta['index'] == 1) {
                             $map[$field]['fields'] = ['keyword' => [
                                 'type' => 'keyword']];
                         }
