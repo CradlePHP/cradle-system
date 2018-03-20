@@ -187,7 +187,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         // set current to 0 if current is not set
         $current = 0;
         if (isset ($data['current']) && is_numeric ($data['current'])) {
-            $current = $data['current']
+            $current = $data['current'];
         }
         
         $range = 10; // do 10 at a time
