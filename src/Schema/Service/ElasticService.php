@@ -97,7 +97,8 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         }
 
         $table = $this->schema->getName();
-        $path = cradle()->package('global')->path('config') . '/schema/elastic/' . ucwords($table) . '/elastic.php';
+        $path = cradle()->package('global')->path('config')
+              . sprintf('/schema/elastic/%s/elastic.php', ucwords($table));
         
         // if mapped file doesn't exist,
         // do nothing
@@ -148,7 +149,13 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         $exists = false;
         try {
             // check if index exist
-            $exists = $this->resource->indices()->exists(['index' => $this->schema->getName()]);
+            $exists = $this->resource
+                ->indices()
+                ->exists(
+                    ['index' => $this->schema
+                        ->getName()]
+                );
+            
         } catch (\Throwable $e) {
             // return false if something went wrong
             return false;
@@ -172,9 +179,17 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         // set range to 1 so we dont have to exhaus sql server by pulling just the total entry
         $data = $objectSql->search(['range' => 1]);
         // get total entry
-        $total = isset($data['total']) && is_numeric($data['total']) ? $data['total'] : 0;
+        $total = 0;
+        if (isset ($data['total']) && is_numeric ($data['total'])) {
+            $total = $data['total'];
+        }
+        
         // set current to 0 if current is not set
-        $current = isset($data['current']) && is_numeric($data['current']) ? $data['current'] : 0;
+        $current = 0;
+        if (isset ($data['current']) && is_numeric ($data['current'])) {
+            $current = $data['current']
+        }
+        
         $range = 10; // do 10 at a time
         for ($i = 0; $i < $total; $i++) {
             if ($i + $current > $total) {
@@ -230,7 +245,14 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
 
         // flush elastic schema
         try {
-            $this->resource->indices()->delete(['index' => $this->schema->getName()]);
+            $this->resource
+                ->indices()
+                ->delete(
+                    ['index' => $this->schema
+                        ->getName()
+                    ]
+                );
+            
             return true;
         } catch(\Throwable $e) {
             return false;
@@ -337,7 +359,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
 
     /**
      * Adds System Schema
-     *
+`     *
      * @param Schema $schema
      *
      * @return SqlService

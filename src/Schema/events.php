@@ -363,7 +363,10 @@ $this->on('system-schema-create-elastic', function ($request, $response) {
     }
 
     // check if object exists
-    $objectPath = $this->package('global')->path('config') . '/schema/' . $data['name'] . '.php';
+    $objectPath = sprintf($this->package('global')
+            ->path('config') . '/schema/%s.php',
+        $data['name']);
+
     if (!file_exists($objectPath)) {
         return $response->setError(true, 'Object doesn\'t exist.');
     }
@@ -373,7 +376,10 @@ $this->on('system-schema-create-elastic', function ($request, $response) {
     //----------------------------//
     // get object data
     $data = include_once ($objectPath);
+    
+    //----------------------------//
     // 4. Process Data
+    //----------------------------//
     $schema = Schema::i($data);
     $table = $schema->getName();
 
@@ -428,8 +434,11 @@ $this->on('system-schema-search-elastic', function ($request, $response) {
             continue;
         }
 
-        if (file_exists($path . '/' . $file . '/elastic.php')) {
-            $object = $this->package('global')->config('admin/schema/' . strtolower($file) . '.php');
+        if (file_exists(sprintf($path . '/%s/elastic.php', $file))) {
+            
+            $object = $this->package('global')
+                ->config('admin/schema/%s.php', strtolower($file));
+
             $object['name'] = $object['singular'] = strtolower($file);
             $results[] = $object;
         }
@@ -464,7 +473,10 @@ $cradle->on('system-schema-map-elastic', function ($request, $response) {
     }
 
     // check if object exists
-    $objectPath = $this->package('global')->path('config') . '/schema/' . $data['name'] . '.php';
+    $objectPath = sprintf($this->package('global')
+            ->path('config') . '/schema/%s.php',
+        $data['name']);
+        
     if (!file_exists($objectPath)) {
         return $response->setError(true, 'Object doesn\'t exist.');
     }
@@ -472,9 +484,10 @@ $cradle->on('system-schema-map-elastic', function ($request, $response) {
     //----------------------------//
     // 3. Prepare Data
     //----------------------------//
-    // get object data
     
+    //----------------------------//
     // 4. Process Data
+    //----------------------------//
     $schema = Schema::i($data['name']);
     
     //map elastic
@@ -511,7 +524,10 @@ $cradle->on('system-schema-populate-elastic', function($request, $response) {
     }
 
     // check if object exists
-    $objectPath = $this->package('global')->path('config') . '/schema/' . $data['name'] . '.php';
+    $objectPath = sprintf($this->package('global')
+            ->path('config') . '/schema/%s.php',
+        $data['name']);
+        
     if (!file_exists($objectPath)) {
         return $response->setError(true, 'Object doesn\'t exist.');
     }
@@ -519,9 +535,10 @@ $cradle->on('system-schema-populate-elastic', function($request, $response) {
     //----------------------------//
     // 3. Prepare Data
     //----------------------------//
-    // get object data
     
+    //----------------------------//
     // 4. Process Data
+    //----------------------------//
     $schema = Schema::i($data['name']);
     $populate = $schema->service('elastic')->populate($data);
     // check populate result
@@ -552,7 +569,10 @@ $cradle->on('system-schema-flush-elastic', function($request, $response) {
     }
 
     // check if object exists
-    $objectPath = $this->package('global')->path('config') . '/schema/' . $data['name'] . '.php';
+    $objectPath = sprintf($this->package('global')
+            ->path('config') . '/schema/%s.php',
+        $data['name']);
+        
     if (!file_exists($objectPath)) {
         return $response->setError(true, 'Object doesn\'t exist.');
     }
@@ -560,9 +580,10 @@ $cradle->on('system-schema-flush-elastic', function($request, $response) {
     //----------------------------//
     // 3. Prepare Data
     //----------------------------//
-    // get object data
     
+    //----------------------------//
     // 4. Process Data
+    //----------------------------//
     $schema = Schema::i($data['name']);
     $flush = $schema->service('elastic')->flush();
 

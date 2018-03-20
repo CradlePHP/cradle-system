@@ -537,10 +537,10 @@ $this->get('/admin/system/schema/restore/:name', function ($request, $response) 
  */
 $this->get('/admin/system/schema/elastic/search', function ($request, $response) {
     //----------------------------//
-    // 1. Route Permissions
+    // 1. Prepare Data
+    // no data to preapre
     //----------------------------//
-
-    //trigger job
+    // 2. Process Request
     $this->trigger('system-schema-search-elastic', $request, $response);
 
     //if we only want the raw data
@@ -597,8 +597,11 @@ $this->get('/admin/system/schema/elastic/search', function ($request, $response)
  */
 $this->get('/admin/system/schema/elastic/create/:name', function ($request, $response) {
     //----------------------------//
-    // 1. Route Permissions
-    
+    // 1. Prepare Data
+    // no data to preapre
+    //----------------------------//
+    // 2. Process Request
+    //----------------------------//
     // trigger create elastic schema event
     $this->trigger('system-schema-create-elastic', $request, $response);
 
@@ -610,7 +613,10 @@ $this->get('/admin/system/schema/elastic/create/:name', function ($request, $res
     }
 
     // process is successfull
-    $this->package('global')->flash('Elastic schema for ' . $request->getStage('name') . ' generated successfully.', 'success');
+    $this->package('global')
+        ->flash(sprintf('Elastic schema for %s generated successfully.',
+            $request->getStage('name')), 'success');
+    
     $this->package('global')->redirect($nextUrl);
 });
 
@@ -622,8 +628,11 @@ $this->get('/admin/system/schema/elastic/create/:name', function ($request, $res
  */
 $this->get('/admin/system/schema/elastic/map/:name', function ($request, $response) {
     //----------------------------//
-    // 1. Route Permissions
-
+    // 1. Prepare Data
+    // no data to preapre
+    //----------------------------//
+    // 2. Process Request
+    //----------------------------//
     // redirect url
     $nextUrl = '/admin/system/schema/elastic/search';
     // trigger map elastic schema event
@@ -634,7 +643,9 @@ $this->get('/admin/system/schema/elastic/map/:name', function ($request, $respon
         $this->package('global')->redirect($nextUrl);
     }
 
-    $this->package('global')->flash(ucwords($request->getStage('name')) . ' mapped successfully', 'success');
+    $this->package('global')
+        ->flash(sprintf('%s mapped successfully', ucwords ($request->getStage('name'))), 'success');
+    
     $this->package('global')->redirect($nextUrl);
 });
 
@@ -646,8 +657,12 @@ $this->get('/admin/system/schema/elastic/map/:name', function ($request, $respon
  */
 $this->get('/admin/system/schema/elastic/populate/:name', function ($request, $response) {
     //----------------------------//
-    // 1. Route permissions
-
+    // 1. Prepare Data
+    // no data to preapre
+    //----------------------------//
+    // 2. Process Request
+    //----------------------------//
+    // trigger elastic populate
     $nextUrl = '/admin/system/schema/elastic/search';
     $this->trigger('system-schema-populate-elastic', $request, $response);
     // intercept error
@@ -656,7 +671,9 @@ $this->get('/admin/system/schema/elastic/populate/:name', function ($request, $r
         $this->package('global')->redirect($nextUrl);
     }
 
-    $this->package('global')->flash('Successully populated ' . $request->getStage('name') . '.', 'success');
+    $this->package('global')
+        ->flash(sprintf('Successully populated %s', $request->getStage('name')), 'success');
+    
     $this->package('global')->redirect($nextUrl);
 });
 
@@ -668,8 +685,11 @@ $this->get('/admin/system/schema/elastic/populate/:name', function ($request, $r
  */
 $this->get('/admin/system/schema/elastic/flush/:name', function ($request, $response) {
     //----------------------------//
-    // 1. Route permissions
-
+    // 1. Prepare Data
+    // no data to preapre
+    //----------------------------//
+    // 2. Process Request
+    // trigger elastic flush
     $nextUrl = '/admin/system/schema/elastic/search';
     $this->trigger('system-schema-flush-elastic', $request, $response);
     // intercept error
@@ -677,7 +697,9 @@ $this->get('/admin/system/schema/elastic/flush/:name', function ($request, $resp
         $this->package('global')->flash($response->getMessage(), 'error');
         $this->package('global')->redirect($nextUrl);
     }
-
-    $this->package('global')->flash('Successfully flushed ' . $request->getStage('name') . '.', 'success');
+    
+    $this->package('global')
+        ->flash(sprintf('Successfully flushed %s.', $request->getStage('name')), 'success');
+    
     $this->package('global')->redirect($nextUrl);
 });
