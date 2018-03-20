@@ -1,3 +1,4 @@
+
 <?php //-->
 /**
  * This file is part of a package designed for the CradlePHP Project.
@@ -144,7 +145,7 @@ $this->on('system-schema-remove', function ($request, $response) {
 
     try {
         //remove table
-        $systemSql->remove($data);
+        $results = $systemSql->remove($data);
     } catch (\Exception $e) {
         return $response->setError(true, $e->getMessage());
     }
@@ -163,7 +164,7 @@ $this->on('system-schema-remove', function ($request, $response) {
         rename($path, $new);
     }
 
-    $response->setError(false)->setResults($data);
+    $response->setError(false)->setResults($results);
 });
 
 /**
@@ -198,7 +199,7 @@ $this->on('system-schema-restore', function ($request, $response) {
 
     try {
         //remove table
-        $systemSql->restore($data);
+        $results = $systemSql->restore($data);
     } catch (\Exception $e) {
         return $response->setError(true, $e->getMessage());
     }
@@ -217,7 +218,7 @@ $this->on('system-schema-restore', function ($request, $response) {
         rename($path, $new);
     }
 
-    $response->setError(false)->setResults($data);
+    $response->setError(false)->setResults($results);
 });
 
 /**

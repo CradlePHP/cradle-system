@@ -18,7 +18,7 @@ use Cradle\Http\Response;
  * @package  Object
  * @author   John Doe <john@acme.com>
  */
-class Cradle_Module_System_Object_EventsTest extends TestCase
+class Cradle_Package_System_Object_EventsTest extends TestCase
 {
     /**
      * @var Request $request
@@ -51,11 +51,11 @@ class Cradle_Module_System_Object_EventsTest extends TestCase
     /**
      * system-object-create
      *
-     * @covers Cradle\Module\System\Object\Validator::getCreateErrors
-     * @covers Cradle\Module\System\Object\Validator::getOptionalErrors
-     * @covers Cradle\Module\System\Object\Service\SqlService::create
-     * @covers Cradle\Module\System\Utility\Service\AbstractElasticService::create
-     * @covers Cradle\Module\System\Utility\Service\AbstractRedisService::createDetail
+     * @covers Cradle\Package\System\Object\Validator::getCreateErrors
+     * @covers Cradle\Package\System\Object\Validator::getOptionalErrors
+     * @covers Cradle\Package\System\Object\Service\SqlService::create
+     * @covers Cradle\Module\Utility\Service\AbstractElasticService::create
+     * @covers Cradle\Module\Utility\Service\AbstractRedisService::createDetail
      */
     public function testObjectCreate()
     {
@@ -74,11 +74,11 @@ class Cradle_Module_System_Object_EventsTest extends TestCase
     /**
      * system-object-create
      *
-     * @covers Cradle\Module\System\Object\Validator::getCreateErrors
-     * @covers Cradle\Module\System\Object\Validator::getOptionalErrors
-     * @covers Cradle\Module\System\Object\Service\SqlService::create
-     * @covers Cradle\Module\System\Utility\Service\AbstractElasticService::create
-     * @covers Cradle\Module\System\Utility\Service\AbstractRedisService::createDetail
+     * @covers Cradle\Package\System\Object\Validator::getCreateErrors
+     * @covers Cradle\Package\System\Object\Validator::getOptionalErrors
+     * @covers Cradle\Package\System\Object\Service\SqlService::create
+     * @covers Cradle\Module\Utility\Service\AbstractElasticService::create
+     * @covers Cradle\Module\Utility\Service\AbstractRedisService::createDetail
      */
     public function testObjectDetail()
     {
@@ -94,10 +94,10 @@ class Cradle_Module_System_Object_EventsTest extends TestCase
     /**
      * system-object-remove
      *
-     * @covers Cradle\Module\System\Object\Service\SqlService::get
-     * @covers Cradle\Module\System\Object\Service\SqlService::update
-     * @covers Cradle\Module\System\Utility\Service\AbstractElasticService::remove
-     * @covers Cradle\Module\System\Utility\Service\AbstractRedisService::removeDetail
+     * @covers Cradle\Package\System\Object\Service\SqlService::get
+     * @covers Cradle\Package\System\Object\Service\SqlService::update
+     * @covers Cradle\Module\Utility\Service\AbstractElasticService::remove
+     * @covers Cradle\Module\Utility\Service\AbstractRedisService::removeDetail
      */
     public function testObjectRemove()
     {
@@ -113,10 +113,10 @@ class Cradle_Module_System_Object_EventsTest extends TestCase
     /**
      * system-object-restore
      *
-     * @covers Cradle\Module\System\Object\Service\SqlService::get
-     * @covers Cradle\Module\System\Object\Service\SqlService::update
-     * @covers Cradle\Module\System\Utility\Service\AbstractElasticService::remove
-     * @covers Cradle\Module\System\Utility\Service\AbstractRedisService::removeDetail
+     * @covers Cradle\Package\System\Object\Service\SqlService::get
+     * @covers Cradle\Package\System\Object\Service\SqlService::update
+     * @covers Cradle\Module\Utility\Service\AbstractElasticService::remove
+     * @covers Cradle\Module\Utility\Service\AbstractRedisService::removeDetail
      */
     public function testObjectRestore()
     {
@@ -132,9 +132,9 @@ class Cradle_Module_System_Object_EventsTest extends TestCase
     /**
      * system-object-search
      *
-     * @covers Cradle\Module\System\Object\Service\SqlService::search
-     * @covers Cradle\Module\System\Object\Service\ElasticService::search
-     * @covers Cradle\Module\System\Utility\Service\AbstractRedisService::getSearch
+     * @covers Cradle\Package\System\Object\Service\SqlService::search
+     * @covers Cradle\Package\System\Object\Service\ElasticService::search
+     * @covers Cradle\Module\Utility\Service\AbstractRedisService::getSearch
      */
     public function testObjectSearch()
     {
@@ -149,10 +149,10 @@ class Cradle_Module_System_Object_EventsTest extends TestCase
     /**
      * system-object-update
      *
-     * @covers Cradle\Module\System\Object\Service\SqlService::get
-     * @covers Cradle\Module\System\Object\Service\SqlService::update
-     * @covers Cradle\Module\System\Utility\Service\AbstractElasticService::remove
-     * @covers Cradle\Module\System\Utility\Service\AbstractRedisService::removeDetail
+     * @covers Cradle\Package\System\Object\Service\SqlService::get
+     * @covers Cradle\Package\System\Object\Service\SqlService::update
+     * @covers Cradle\Module\Utility\Service\AbstractElasticService::remove
+     * @covers Cradle\Module\Utility\Service\AbstractRedisService::removeDetail
      */
     public function testObjectUpdate()
     {

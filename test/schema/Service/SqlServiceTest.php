@@ -8,8 +8,8 @@
 
 use PHPUnit\Framework\TestCase;
 
-use Cradle\Module\System\Service;
-use Cradle\Module\System\Schema as SystemSchema;
+use Cradle\Package\System\Schema\Service;
+use Cradle\Package\System\Schema;
 
 /**
  * SQL service test
@@ -19,7 +19,7 @@ use Cradle\Module\System\Schema as SystemSchema;
  * @package  Role
  * @author   John Doe <john@acme.com>
  */
-class Cradle_Module_System_Schema_Service_SqlServiceTest extends TestCase
+class Cradle_Package_System_Schema_Service_SqlServiceTest extends TestCase
 {
     /**
      * @var SqlService $object
@@ -27,7 +27,7 @@ class Cradle_Module_System_Schema_Service_SqlServiceTest extends TestCase
     protected $object;
 
     /**
-     * @covers Cradle\Module\System\Service\SqlService::__construct
+     * @covers Cradle\Package\System\Schema\Service\SqlService::__construct
      */
     protected function setUp()
     {
@@ -35,7 +35,7 @@ class Cradle_Module_System_Schema_Service_SqlServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Module\System\Service\SqlService::create
+     * @covers Cradle\Package\System\Schema\Service\SqlService::create
      */
     public function testCreate()
     {
@@ -95,7 +95,7 @@ class Cradle_Module_System_Schema_Service_SqlServiceTest extends TestCase
             'suggestion' => ''
         ];
 
-        $schema = SystemSchema::i($data);
+        $schema = Schema::i($data);
         $this->object->setSchema($schema);
         $actual = $this->object->create($data);
 
@@ -108,7 +108,7 @@ class Cradle_Module_System_Schema_Service_SqlServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Module\System\Service\SqlService::update
+     * @covers Cradle\Package\System\Schema\Service\SqlService::update
      */
     public function testUpdate()
     {
@@ -185,7 +185,7 @@ class Cradle_Module_System_Schema_Service_SqlServiceTest extends TestCase
             'suggestion' => ''
         ];
 
-        $schema = SystemSchema::i('sample');
+        $schema = Schema::i('sample');
         $this->object->setSchema($schema);
         $actual = $this->object->update($data);
 
@@ -195,11 +195,11 @@ class Cradle_Module_System_Schema_Service_SqlServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Module\System\Service\SqlService::remove
+     * @covers Cradle\Package\System\Schema\Service\SqlService::remove
      */
     public function testRemove()
     {
-        $schema = SystemSchema::i('sample');
+        $schema = Schema::i('sample');
         $this->object->setSchema($schema);
         $actual = $this->object->remove('sample');
 
@@ -212,11 +212,11 @@ class Cradle_Module_System_Schema_Service_SqlServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Module\System\Service\SqlService::restore
+     * @covers Cradle\Package\System\Schema\Service\SqlService::restore
      */
     public function testRestore()
     {
-        $schema = SystemSchema::i('sample');
+        $schema = Schema::i('sample');
         $this->object->setSchema($schema);
         $actual = $this->object->restore('sample');
 

@@ -262,7 +262,7 @@ class SqlService
         $table = $this->schema->getName();
         $primary = $this->schema->getPrimaryFieldName();
         //please rely on SQL CASCADING ON DELETE
-        $model = $this->resource->object();
+        $model = $this->resource->model();
         $model[$primary] = $id;
         return $model->remove($table);
     }

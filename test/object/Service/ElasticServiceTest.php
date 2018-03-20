@@ -8,7 +8,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-use Cradle\Module\System\Object\Service;
+use Cradle\Package\System\Object\Service;
 
 /**
  * Elastic service test
@@ -17,7 +17,7 @@ use Cradle\Module\System\Object\Service;
  * @package  Object
  * @author   John Doe <john@acme.com>
  */
-class Cradle_Module_System_Object_Service_ElasticServiceTest extends TestCase
+class Cradle_Package_System_Object_Service_ElasticServiceTest extends TestCase
 {
     /**
      * @var ElasticService $object
@@ -25,7 +25,7 @@ class Cradle_Module_System_Object_Service_ElasticServiceTest extends TestCase
     protected $object;
 
     /**
-     * @covers Cradle\Module\System\Object\Service\ElasticService::__construct
+     * @covers Cradle\Package\System\Object\Service\ElasticService::__construct
      */
     protected function setUp()
     {
@@ -33,7 +33,7 @@ class Cradle_Module_System_Object_Service_ElasticServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Module\System\Utility\Service\AbstractElasticService::remove
+     * @covers Cradle\Module\Utility\Service\AbstractElasticService::remove
      */
     public function testRemove()
     {
@@ -52,7 +52,7 @@ class Cradle_Module_System_Object_Service_ElasticServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Module\System\Utility\Service\AbstractElasticService::create
+     * @covers Cradle\Module\Utility\Service\AbstractElasticService::create
      */
     public function testCreate()
     {
@@ -70,7 +70,7 @@ class Cradle_Module_System_Object_Service_ElasticServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Module\System\Utility\Service\AbstractElasticService::get
+     * @covers Cradle\Module\Utility\Service\AbstractElasticService::get
      */
     public function testGet()
     {
@@ -86,7 +86,7 @@ class Cradle_Module_System_Object_Service_ElasticServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Module\System\Object\Service\ElasticService::search
+     * @covers Cradle\Package\System\Object\Service\ElasticService::search
      */
     public function testSearch()
     {
@@ -104,7 +104,7 @@ class Cradle_Module_System_Object_Service_ElasticServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Module\System\Utility\Service\AbstractElasticService::update
+     * @covers Cradle\Module\Utility\Service\AbstractElasticService::update
      */
     public function testUpdate()
     {

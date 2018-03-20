@@ -8,7 +8,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-use Cradle\Module\System\Validator;
+use Cradle\Package\System\Schema\Validator;
 
 /**
  * Validator layer test
@@ -17,10 +17,10 @@ use Cradle\Module\System\Validator;
  * @package  Role
  * @author   John Doe <john@acme.com>
  */
-class Cradle_Module_System_ValidatorTest extends TestCase
+class Cradle_Package_System_ValidatorTest extends TestCase
 {
     /**
-     * @covers Cradle\Module\System\Object\Validator::getCreateErrors
+     * @covers Cradle\Package\System\Object\Validator::getCreateErrors
      */
     public function testGetCreateErrors()
     {
@@ -38,7 +38,7 @@ class Cradle_Module_System_ValidatorTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Module\System\Object\Validator::getUpdateErrors
+     * @covers Cradle\Package\System\Object\Validator::getUpdateErrors
      */
     public function testGetUpdateErrors()
     {

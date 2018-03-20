@@ -8,12 +8,12 @@
 
 use PHPUnit\Framework\TestCase;
 
-use Cradle\Module\System\Object\Service;
+use Cradle\Package\System\Object\Service;
 
-use Cradle\Module\System\Object\Service\SqlService;
-use Cradle\Module\System\Object\Service\RedisService;
-use Cradle\Module\System\Object\Service\ElasticService;
-use Cradle\Module\System\Utility\Service\NoopService;
+use Cradle\Package\System\Object\Service\SqlService;
+use Cradle\Package\System\Object\Service\RedisService;
+use Cradle\Package\System\Object\Service\ElasticService;
+use Cradle\Module\Utility\Service\NoopService;
 
 /**
  * Service layer test
@@ -22,10 +22,10 @@ use Cradle\Module\System\Utility\Service\NoopService;
  * @package  Object
  * @author   John Doe <john@acme.com>
  */
-class Cradle_Module_System_Object_ServiceTest extends TestCase
+class Cradle_Package_System_Object_ServiceTest extends TestCase
 {
     /**
-     * @covers Cradle\Module\Role\Service::get
+     * @covers Cradle\Package\Role\Service::get
      */
     public function testGet()
     {

@@ -18,7 +18,7 @@ use Cradle\Http\Response;
  * @package  Object
  * @author   John Doe <john@acme.com>
  */
-class Cradle_Module_System_Schema_EventsTest extends TestCase
+class Cradle_Package_System_Schema_EventsTest extends TestCase
 {
     /**
      * @var Request $request
@@ -51,11 +51,11 @@ class Cradle_Module_System_Schema_EventsTest extends TestCase
     /**
      * schema-create
      *
-     * @covers Cradle\Module\System\Validator::getCreateErrors
-     * @covers Cradle\Module\System\Validator::getOptionalErrors
-     * @covers Cradle\Module\System\Service\SqlService::create
-     * @covers Cradle\Module\System\Utility\Service\AbstractElasticService::create
-     * @covers Cradle\Module\System\Utility\Service\AbstractRedisService::createDetail
+     * @covers Cradle\Package\System\Schema\Validator::getCreateErrors
+     * @covers Cradle\Package\System\Schema\Validator::getOptionalErrors
+     * @covers Cradle\Package\System\Schema\Service\SqlService::create
+     * @covers Cradle\Module\Utility\Service\AbstractElasticService::create
+     * @covers Cradle\Module\Utility\Service\AbstractRedisService::createDetail
      */
     public function testSchemaCreate()
     {
@@ -119,11 +119,11 @@ class Cradle_Module_System_Schema_EventsTest extends TestCase
     /**
      * schema-update
      *
-     * @covers Cradle\Module\System\Validator::getUpdateErrors
-     * @covers Cradle\Module\System\Validator::getOptionalErrors
-     * @covers Cradle\Module\System\Service\SqlService::create
-     * @covers Cradle\Module\System\Utility\Service\AbstractElasticService::update
-     * @covers Cradle\Module\System\Utility\Service\AbstractRedisService::updateDetail
+     * @covers Cradle\Package\System\Schema\Validator::getUpdateErrors
+     * @covers Cradle\Package\System\Schema\Validator::getOptionalErrors
+     * @covers Cradle\Package\System\Schema\Service\SqlService::create
+     * @covers Cradle\Module\Utility\Service\AbstractElasticService::update
+     * @covers Cradle\Module\Utility\Service\AbstractRedisService::updateDetail
      */
     public function testSchemaUpdate()
     {
@@ -259,9 +259,9 @@ class Cradle_Module_System_Schema_EventsTest extends TestCase
     /**
      * schema-detail
      *
-     * @covers Cradle\Module\System\Service\SqlService::get
-     * @covers Cradle\Module\System\Utility\Service\AbstractElasticService::get
-     * @covers Cradle\Module\System\Utility\Service\AbstractRedisService::getDetail
+     * @covers Cradle\Package\System\Schema\Service\SqlService::get
+     * @covers Cradle\Module\Utility\Service\AbstractElasticService::get
+     * @covers Cradle\Module\Utility\Service\AbstractRedisService::getDetail
      */
     public function testSchemaDetail()
     {
@@ -275,10 +275,10 @@ class Cradle_Module_System_Schema_EventsTest extends TestCase
     /**
      * schema-create
      *
-     * @covers Cradle\Module\System\Service\SqlService::remove
-     * @covers Cradle\Module\System\Service\SqlService::get
-     * @covers Cradle\Module\System\Utility\Service\AbstractElasticService::get
-     * @covers Cradle\Module\System\Utility\Service\AbstractRedisService::getDetail
+     * @covers Cradle\Package\System\Schema\Service\SqlService::remove
+     * @covers Cradle\Package\System\Schema\Service\SqlService::get
+     * @covers Cradle\Module\Utility\Service\AbstractElasticService::get
+     * @covers Cradle\Module\Utility\Service\AbstractRedisService::getDetail
      */
     public function testSchemaRemove()
     {
@@ -286,16 +286,17 @@ class Cradle_Module_System_Schema_EventsTest extends TestCase
 
         cradle()->trigger('system-schema-remove', $this->request, $this->response);
 
-        $this->assertTrue(empty($this->response->getResults()));
+        $this->assertTrue(!empty($this->response->getResults()));
+        $this->assertEquals('RENAME TABLE `sample` TO `_sample`;', $this->response->getResults(0, 'query'));
     }
 
     /**
      * schema-create
      *
-     * @covers Cradle\Module\System\Service\SqlService::restore
-     * @covers Cradle\Module\System\Service\SqlService::get
-     * @covers Cradle\Module\System\Utility\Service\AbstractElasticService::get
-     * @covers Cradle\Module\System\Utility\Service\AbstractRedisService::getDetail
+     * @covers Cradle\Package\System\Schema\Service\SqlService::restore
+     * @covers Cradle\Package\System\Schema\Service\SqlService::get
+     * @covers Cradle\Module\Utility\Service\AbstractElasticService::get
+     * @covers Cradle\Module\Utility\Service\AbstractRedisService::getDetail
      */
     public function testSchemaRestore()
     {
@@ -303,6 +304,7 @@ class Cradle_Module_System_Schema_EventsTest extends TestCase
 
         cradle()->trigger('system-schema-restore', $this->request, $this->response);
 
-        $this->assertTrue(empty($this->response->getResults()));
+        $this->assertTrue(!empty($this->response->getResults()));
+        $this->assertEquals('RENAME TABLE `_sample` TO `sample`;', $this->response->getResults(0, 'query'));
     }
 }

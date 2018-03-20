@@ -8,9 +8,9 @@
 
 use PHPUnit\Framework\TestCase;
 
-use Cradle\Module\System\Object\Service;
+use Cradle\Package\System\Object\Service;
 
-use Cradle\Module\System\Schema as SystemSchema;
+use Cradle\Package\System\Schema as SystemSchema;
 
 /**
  * SQL service test
@@ -20,7 +20,7 @@ use Cradle\Module\System\Schema as SystemSchema;
  * @package  Role
  * @author   John Doe <john@acme.com>
  */
-class Cradle_Module_System_Object_Service_SqlServiceTest extends TestCase
+class Cradle_Package_System_Object_Service_SqlServiceTest extends TestCase
 {
     /**
      * @var SqlService $object
@@ -28,7 +28,7 @@ class Cradle_Module_System_Object_Service_SqlServiceTest extends TestCase
     protected $object;
 
     /**
-     * @covers Cradle\Module\System\Object\Service\SqlService::__construct
+     * @covers Cradle\Package\System\Object\Service\SqlService::__construct
      */
     protected function setUp()
     {
@@ -38,7 +38,7 @@ class Cradle_Module_System_Object_Service_SqlServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Module\System\Object\Service\SqlService::create
+     * @covers Cradle\Package\System\Object\Service\SqlService::create
      */
     public function testCreate()
     {
@@ -53,7 +53,7 @@ class Cradle_Module_System_Object_Service_SqlServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Module\System\Object\Service\SqlService::get
+     * @covers Cradle\Package\System\Object\Service\SqlService::get
      */
     public function testGet()
     {
@@ -63,7 +63,7 @@ class Cradle_Module_System_Object_Service_SqlServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Module\System\Object\Service\SqlService::search
+     * @covers Cradle\Package\System\Object\Service\SqlService::search
      */
     public function testSearch()
     {
@@ -75,7 +75,7 @@ class Cradle_Module_System_Object_Service_SqlServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Module\System\Object\Service\SqlService::update
+     * @covers Cradle\Package\System\Object\Service\SqlService::update
      */
     public function testUpdate()
     {
@@ -89,7 +89,7 @@ class Cradle_Module_System_Object_Service_SqlServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Module\System\Object\Service\SqlService::remove
+     * @covers Cradle\Package\System\Object\Service\SqlService::remove
      */
     public function testRemove()
     {
