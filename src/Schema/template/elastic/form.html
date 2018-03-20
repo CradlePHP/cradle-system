@@ -1,0 +1,32 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/admin/system/schema/search">
+                <i class="fas fa-home"></i> Admin
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="fas fa-cogs"></i> {{title}}
+        </li>
+    </ol>
+</nav>
+
+<div class="main-padding">
+    <h3 class="main-title">
+        <i class="fas fa-pencil"></i> Edit {{title}}
+    </h3>
+    <form method="post">
+        <div class="table-overflow">
+            <textarea
+                placeholder="Write about something"
+                data-do="code-editor"
+                data-mode="php"
+                class="ace-textarea hidden"
+                name="code"
+            >{{code}}</textarea>
+        </div>
+        <br />
+        <a href="/admin/system/schema/search" class="btn btn-default">Cancel</a>
+        <input type="submit" value="Update Schema" class="btn btn-info" />
+    </form>
+</div>
