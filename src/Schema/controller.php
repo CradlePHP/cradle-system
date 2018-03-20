@@ -703,3 +703,93 @@ $this->get('/admin/system/schema/elastic/flush/:name', function ($request, $resp
     
     $this->package('global')->redirect($nextUrl);
 });
+
+
+/**
+ * Edit elastic schema
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->get('/admin/system/schema/elastic/edit/:name', function ($request, $response) {
+    //----------------------------//
+    // 1. Prepare Data
+    $data = [];
+    
+    //----------------------------//
+    // 2. Process Request
+    //----------------------------//
+    $this->trigger('system-schema-get-elastic', $request, $response);
+    // intercept error
+    if ($response->isError()) {
+        $this->package('global')->flash($response->getMessage(), 'error');
+        $this->package('global')->redirect('/admin/system/schema/elastic/search');
+    }
+
+    $data['code'] = $response->getResults();
+    // 3. Render Template
+    $class = 'page-admin-system-schema-search page-admin';
+    $data['title'] = 'Profile Elastic Schema';
+    
+    //render the body
+    $body = $this
+        ->package('cradlephp/cradle-system')
+        ->template('schema', 'elastic/form', $data, [
+            'styles',
+            'templates',
+            'scripts',
+            'row',
+            'types',
+            'lists',
+            'details',
+            'validation',
+            'update',
+            'options_type',
+            'options_format',
+            'options_validation',
+            'options_icon'
+        ]);
+
+    //set content
+    $response
+        ->setPage('title', $data['title'])
+        ->setPage('class', $class)
+        ->setContent($body);
+    
+    //if we only want the body
+    if($request->getStage('render') === 'body') {
+        return;
+    }
+    
+    //render page
+    $this->trigger('admin-render-page', $request, $response);
+});
+
+
+/**
+ * Edit elastic schema
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->post('/admin/system/schema/elastic/edit/:name', function ($request, $response) {
+    //----------------------------//
+    // 1. Prepare Data
+    $nextUrl = '/admin/system/schema/elastic/search';
+    
+    //----------------------------//
+    // 2. Process Request
+    // trigger update elastic schema
+    $this->trigger('system-schema-update-elastic', $request, $response);
+    // intercept error
+    if ($response->isError()) {
+        $this->package('global')->flash($response->getMessage(), 'error');
+        $this->package('global')->redirect($nextUrl);
+    }
+
+    $this->package('global')
+        ->flash(sprintf('Elastic schema %s', $request->getStage('name')), 'success');
+    
+    $this->package('global')->redirect($nextUrl);
+});
+

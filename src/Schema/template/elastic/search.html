@@ -33,7 +33,7 @@
                     {{#each rows}}
                         <tr data-id="{{name}}">
                             <td class="table-actions">
-                                <a href="#" title="Edit Mapping" class="text-info"><span class="fa fa-pencil-alt"></span></a>
+                                <a href="/admin/system/schema/elastic/edit/{{name}}" title="Edit Mapping" class="text-info"><span class="fa fa-pencil-alt"></span></a>
                                 <a href="/admin/system/schema/elastic/map/{{name}}" title="Map Elastic" class="text-success"><span class="fa fa-database"></span></a>
                                 <a href="/admin/system/schema/elastic/populate/{{name}}" title="Populate Elastic" class="text-warning"><span class="fa fa-bolt"></span></a>
                                 <a href="/admin/system/schema/elastic/flush/{{name}}" title="Flush Elastic" class="text-danger"><span class="fa fa-times"></span></a>
@@ -51,6 +51,6 @@
             <div class="well no-results">No Results Found</div>
             <!-- END: NO RESULTS -->
         {{/if}}
-        </table>
+        </div>
     </form>
 </div>

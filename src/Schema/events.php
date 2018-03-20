@@ -594,3 +594,89 @@ $cradle->on('system-schema-flush-elastic', function($request, $response) {
     
     return $response->setError(false);
 });
+
+/**
+ * System Schema get elastic schema
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$cradle->on('system-schema-get-elastic', function($request, $response) { 
+    //----------------------------//
+    // 1. Get Data
+    $data = [];
+    if ($request->hasStage()) {
+        $data = $request->getStage();
+    }
+
+    // check for required fields
+    if (!isset($data['name'])) {
+        return $response->setError(true, 'Invalid parameters.');
+    }
+
+    // check if object exists
+    $objectPath = sprintf($this->package('global')
+            ->path('config') . '/schema/elastic/%s/elastic.php',
+        ucwords($data['name']));
+        
+    if (!file_exists($objectPath)) {
+        return $response->setError(true, 'Schema doesn\'t exist.');
+    }
+    
+    //----------------------------//
+    // 3. Prepare Data
+    //----------------------------//
+    
+    //----------------------------//
+    // 4. Process Data
+    //----------------------------//
+    $results = file_get_contents ($objectPath);
+
+    return $response->setError(false)->setResults($results);
+});
+
+
+/**
+ * System Schema update elastic schema
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$cradle->on('system-schema-update-elastic', function($request, $response) {
+    //----------------------------//
+    // 1. Get Data
+    $data = [];
+    if ($request->hasStage()) {
+        $data = $request->getStage();
+    }
+
+    // check for required fields
+    if (!isset($data['name'])) {
+        return $response->setError(true, 'Invalid parameters.');
+    }
+
+    // check if code is set
+    if (!isset($data['code'])) {
+        return $response->setError(true, 'Invalid parameters.');
+    }
+
+    // check if object exists
+    $objectPath = sprintf($this->package('global')
+            ->path('config') . '/schema/elastic/%s/elastic.php',
+        ucwords($data['name']));
+
+    // check if file exist
+    if (!file_exists($objectPath)) {
+        // return error if not
+        return $response->setError(true, 'Schema doesn\'t exist.');
+    }
+
+    try {
+        // save code
+        file_put_contents ($objectPath, $data['code']);
+    } catch (\Throwable $e) {
+        return $response->setError(true, $e->getMessage());
+    }
+    
+    return $response->setError(false);
+});
