@@ -76,6 +76,8 @@
                                     <a title="Restore" href="/admin/system/schema/restore/{{name}}?redirect_uri={{redirecturl}}" class="text-success restore">
                                     <i class="fas fa-external-link-alt"></i></a>
                                 {{/if}}
+                                <a class="text-info" title="Generate Elastic Schema" href="/admin/system/schema/elastic/create/{{name}}">
+                                    <i class="fas fa-file"></i></a>
                             </td>
                             <td>
                                 <a href="/admin/system/model/{{name}}/search"><i class="{{icon}}"></i> {{capital singular}}</a>
