@@ -1,6 +1,6 @@
 # Cradle System Package 
 
-Schema, Object and Relation manager.
+Schema, Model and Relation manager.
 
 ## Install
 
