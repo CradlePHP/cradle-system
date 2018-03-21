@@ -9,8 +9,8 @@ require_once __DIR__ . '/src/Schema/events.php';
 require_once __DIR__ . '/src/Schema/controller.php';
 require_once __DIR__ . '/src/Relation/events.php';
 require_once __DIR__ . '/src/Relation/controller.php';
-require_once __DIR__ . '/src/Object/events.php';
-require_once __DIR__ . '/src/Object/controller.php';
+require_once __DIR__ . '/src/Model/events.php';
+require_once __DIR__ . '/src/Model/controller.php';
 
 //bootstrap
 $this->preprocess(include __DIR__ . '/src/helpers.php');

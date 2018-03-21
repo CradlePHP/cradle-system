@@ -7,12 +7,12 @@
         </li>
         {{#if relation.suggestion}}
             <li class="breadcrumb-item">
-                <a href="/admin/system/object/{{relation.schema.name}}/search">
+                <a href="/admin/system/model/{{relation.schema.name}}/search">
                     <i class="{{relation.schema.icon}}"></i> {{relation.schema.plural}}
                 </a>
             </li>
             <li class="breadcrumb-item">
-                <a href="/admin/system/object/{{relation.schema.name}}/update/{{scope relation.data relation.schema.primary}}">
+                <a href="/admin/system/model/{{relation.schema.name}}/update/{{scope relation.data relation.schema.primary}}">
                     {{relation.suggestion}}
                 </a>
             </li>
@@ -114,7 +114,7 @@
                                     {{#when many '==' 1}}
                                         <td>
                                             <a
-                                                href="/admin/system/object/{{name}}/update/{{scope ../this primary}}"
+                                                href="/admin/system/model/{{name}}/update/{{scope ../this primary}}"
                                                 target="_blank"
                                             >
                                                 {{suggest this ../this}}

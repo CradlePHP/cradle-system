@@ -13,14 +13,14 @@
 
             return $(template);
         },
-        getObjectIndex: function() {
+        getModelIndex: function() {
             var index = this
                 .parents('div.modal-body')
                 .eq(0)
                 .attr('data-index');
 
             if(typeof index === 'undefined') {
-                index = this.parents('tr.object-field')
+                index = this.parents('tr.model-field')
                     .eq(0)
                     .attr('data-index');
             }
@@ -203,14 +203,14 @@
                 .compile({ INDEX: index })
                 .appendTo(target)
                 .doon()
-                .find('td.object-action')
+                .find('td.model-action')
                 .append(modal
                     .removeClass('modal-create')
                     .addClass('modal-update')
                 );
         }
 
-        var row = $(trigger).parents('tr.object-field').eq(0);
+        var row = $(trigger).parents('tr.model-field').eq(0);
 
         var name = $('input.field-name', modal).val();
         $('td.field-name-value', row).html(name);
@@ -355,7 +355,7 @@
                     .compile({
                         NAME: template.replace(
                             '{INDEX}',
-                            trigger.getObjectIndex()
+                            trigger.getModelIndex()
                         )
                     })
                     .doon();
@@ -535,7 +535,7 @@
 
         var group = $('#field-validation-template')
             .compile({
-                INDEX_1: $(trigger).getObjectIndex(),
+                INDEX_1: $(trigger).getModelIndex(),
                 INDEX_2: index
             })
             .doon();
@@ -568,7 +568,7 @@
                     var parameters = $('#field-input-template')
                         .compile({
                             NAME: template
-                                .replace('{INDEX}', trigger.getObjectIndex())
+                                .replace('{INDEX}', trigger.getModelIndex())
                                 .replace('{INDEX}', container.attr('data-index'))
                         })
                         .doon();
@@ -583,7 +583,7 @@
                     var parameters = $('#field-options-template')
                         .compile({
                             NAME: template
-                                .replace('{INDEX}', trigger.getObjectIndex())
+                                .replace('{INDEX}', trigger.getModelIndex())
                                 .replace('{INDEX}', container.attr('data-index'))
                         })
                         .doon();
@@ -610,7 +610,7 @@
                 var template = 'fields[{INDEX}][list][parameters]';
                 var input = $('#field-input-template')
                     .compile({
-                        NAME: template.replace('{INDEX}', trigger.getObjectIndex())
+                        NAME: template.replace('{INDEX}', trigger.getModelIndex())
                     })
                     .doon();
 
@@ -628,8 +628,8 @@
 
                 var input = $('#field-pair-template')
                     .compile({
-                        NAME_1: name1.replace('{INDEX}', trigger.getObjectIndex()),
-                        NAME_2: name2.replace('{INDEX}', trigger.getObjectIndex())
+                        NAME_1: name1.replace('{INDEX}', trigger.getModelIndex()),
+                        NAME_2: name2.replace('{INDEX}', trigger.getModelIndex())
                     })
                     .doon();
 
@@ -658,7 +658,7 @@
                 var template = 'fields[{INDEX}][detail][parameters]';
                 var input = $('#field-input-template')
                     .compile({
-                        NAME: template.replace('{INDEX}', trigger.getObjectIndex())
+                        NAME: template.replace('{INDEX}', trigger.getModelIndex())
                     })
                     .doon();
 
@@ -676,8 +676,8 @@
 
                 var input = $('#field-pair-template')
                     .compile({
-                        NAME_1: name1.replace('{INDEX}', trigger.getObjectIndex()),
-                        NAME_2: name2.replace('{INDEX}', trigger.getObjectIndex())
+                        NAME_1: name1.replace('{INDEX}', trigger.getModelIndex()),
+                        NAME_2: name2.replace('{INDEX}', trigger.getModelIndex())
                     })
                     .doon();
 
@@ -704,7 +704,7 @@
     $(window).on('move-down-click', function(e, trigger) {
         var row = $(trigger).parent().parent();
 
-        var last = row.parent().find('tr.object-field').length - 1;
+        var last = row.parent().find('tr.model-field').length - 1;
 
         if(row.attr('data-index') == last) {
             return;
@@ -761,7 +761,7 @@
             sortable: 'fields[{INDEX}][sortable]'
         };
 
-        $('tr.object-field').each(function(i) {
+        $('tr.model-field').each(function(i) {
             $(this).attr('data-index', i);
 
             $('div.modal-body', this).attr('data-index', i);

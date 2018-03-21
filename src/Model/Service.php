@@ -5,11 +5,11 @@
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
-namespace Cradle\Package\System\Object;
+namespace Cradle\Package\System\Model;
 
-use Cradle\Package\System\Object\Service\SqlService;
-use Cradle\Package\System\Object\Service\RedisService;
-use Cradle\Package\System\Object\Service\ElasticService;
+use Cradle\Package\System\Model\Service\SqlService;
+use Cradle\Package\System\Model\Service\RedisService;
+use Cradle\Package\System\Model\Service\ElasticService;
 
 use Cradle\Module\Utility\Service\NoopService;
 use Cradle\Module\Utility\ServiceInterface;

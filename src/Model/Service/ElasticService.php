@@ -6,9 +6,9 @@
  * distributed with this package.
  */
 
-namespace Cradle\Package\System\Object\Service;
+namespace Cradle\Package\System\Model\Service;
 
-use Cradle\Package\System\Object\Service;
+use Cradle\Package\System\Model\Service;
 use Cradle\Package\System\Schema;
 
 use Elasticsearch\Client as Resource;
@@ -19,7 +19,7 @@ use Cradle\Module\Utility\Service\ElasticServiceInterface;
 use Cradle\Module\Utility\Service\AbstractElasticService;
 
 /**
- * Object ElasticSearch Service
+ * Model ElasticSearch Service
  *
  * @vendor   Cradle
  * @package  System
@@ -31,7 +31,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
     /**
      * @const INDEX_NAME Index name
      */
-    const INDEX_NAME = 'object';
+    const INDEX_NAME = 'model';
 
     /**
      * @var Schema|null $schema
@@ -114,15 +114,15 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
             return false;
         }
 
-        $object = $data['schema'];
+        $model = $data['schema'];
         // check schema data
-        $path = cradle()->package('global')->path('config') . '/admin/schema/' . $object . '.php';
+        $path = cradle()->package('global')->path('config') . '/admin/schema/' . $model . '.php';
         if (!file_exists($path)) {
             return false;
         }
 
         // 4. Process Data
-        $schema = SystemSchema::i($object);
+        $schema = SystemSchema::i($model);
         
         if(is_null($schema)) {
             throw SystemException::forNoSchema();
@@ -155,7 +155,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
             $order = $data['order'];
         }
 
-        //prepare the search object
+        //prepare the search model
         $search = [];
 
         //keyword search
@@ -176,7 +176,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
 
         //generic full match filters
 
-        //object_active
+        //model_active
         $activeField = $schema->getActiveFieldName();
         if ($activeField) {
             if (!isset($filter[$activeField])) {
@@ -195,7 +195,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         
         try {
             $results = $this->resource->search([
-                'index' => $object,
+                'index' => $model,
                 'type' => static::INDEX_TYPE,
                 'body' => $search,
                 'size' => $range,

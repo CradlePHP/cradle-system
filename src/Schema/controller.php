@@ -7,7 +7,7 @@
  */
 
 /**
- * Render the Object Search Page
+ * Render the Model Search Page
  *
  * @param Request $request
  * @param Response $response
@@ -61,7 +61,7 @@ $this->get('/admin/system/schema/search', function ($request, $response) {
 });
 
 /**
- * Render the Object Create Page
+ * Render the Model Create Page
  *
  * @param Request $request
  * @param Response $response
@@ -154,7 +154,7 @@ $this->get('/admin/system/schema/create', function ($request, $response) {
 }, 'admin-render-page');
 
 /**
- * Render the Object Update Page
+ * Render the Model Update Page
  *
  * @param Request $request
  * @param Response $response
@@ -262,7 +262,7 @@ $this->get('/admin/system/schema/update/:name', function ($request, $response) {
 });
 
 /**
- * Process the Object Create Page
+ * Process the Model Create Page
  *
  * @param Request $request
  * @param Response $response
@@ -337,7 +337,7 @@ $this->post('/admin/system/schema/create', function ($request, $response) {
 });
 
 /**
- * Process the Object Update Page
+ * Process the Model Update Page
  *
  * @param Request $request
  * @param Response $response
@@ -426,7 +426,7 @@ $this->post('/admin/system/schema/update/:name', function ($request, $response) 
 });
 
 /**
- * Process the Object Remove
+ * Process the Model Remove
  *
  * @param Request $request
  * @param Response $response
@@ -478,7 +478,7 @@ $this->get('/admin/system/schema/remove/:name', function ($request, $response) {
 });
 
 /**
- * Process the Object Restore
+ * Process the Model Restore
  *
  * @param Request $request
  * @param Response $response
@@ -530,7 +530,7 @@ $this->get('/admin/system/schema/restore/:name', function ($request, $response) 
 });
 
 /**
- * Render the Object Search Page
+ * Render the Model Search Page
  *
  * @param Request $request
  * @param Response $response

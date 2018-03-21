@@ -19,7 +19,7 @@ use Cradle\Module\Utility\Service\ElasticServiceInterface;
 use Cradle\Module\Utility\Service\AbstractElasticService;
 
 /**
- * Object ElasticSearch Service
+ * Model ElasticSearch Service
  *
  * @vendor   Cradle
  * @package  System
@@ -31,7 +31,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
     /**
      * @const INDEX_NAME Index name
      */
-    const INDEX_NAME = 'object';
+    const INDEX_NAME = 'model';
 
     /**
      * @var Schema|null $schema
@@ -167,17 +167,17 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
             return false;
         }
 
-        // get object services
-        $objectSql = $this->schema->object()->service('sql');
-        $objectElastic = $this->schema->object()->service('elastic');
-        $objectRedis = $this->schema->object()->service('redis');
+        // get model services
+        $modelSql = $this->schema->model()->service('sql');
+        $modelElastic = $this->schema->model()->service('elastic');
+        $modelRedis = $this->schema->model()->service('redis');
         
         // primary field
         $primary = $this->schema->getPrimaryFieldName();
         
         // get data from sql
         // set range to 1 so we dont have to exhaus sql server by pulling just the total entry
-        $data = $objectSql->search(['range' => 1]);
+        $data = $modelSql->search(['range' => 1]);
         // get total entry
         $total = 0;
         if (isset ($data['total']) && is_numeric ($data['total'])) {
@@ -209,12 +209,12 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
             // set request params
             $stage = ['start' => $current, 'range' => $current + $range];
             // get entries
-            $entries = $objectSql->search($stage);
+            $entries = $modelSql->search($stage);
             $entries = $entries['rows'];
             
             // loop thru entries
             foreach ($entries as $entry) {
-                $create = $objectElastic->create($entry[$primary]);
+                $create = $modelElastic->create($entry[$primary]);
                 if (!$create) {
                     // nothing to do
                     return false;
@@ -228,7 +228,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
 
         // dont forget to flush redis
         
-        $objectRedis->removeSearch();
+        $modelRedis->removeSearch();
         return true;
     }
     
@@ -272,7 +272,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         $filter = [];
         $range = 50;
         $start = 0;
-        $order = ['object_id' => 'asc'];
+        $order = ['model_id' => 'asc'];
         $count = 0;
 
         //merge passed data with default data
@@ -306,7 +306,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
                 $search['query']['bool']['filter'][]['query_string'] = [
                     'query' => $keyword . '*',
                     'fields' => [
-                        'object_singular','object_plural','object_detail',
+                        'model_singular','model_plural','model_detail',
                     ],
                     'default_operator' => 'AND'
                 ];
@@ -316,9 +316,9 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
 
         //generic full match filters
 
-        //object_active
-        if (!isset($filter['object_active'])) {
-            $filter['object_active'] = 1;
+        //model_active
+        if (!isset($filter['model_active'])) {
+            $filter['model_active'] = 1;
         }
 
 

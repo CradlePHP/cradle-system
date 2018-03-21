@@ -7,23 +7,23 @@
         </li>
         {{#if relation.suggestion}}
             <li class="breadcrumb-item">
-                <a href="/admin/system/object/{{relation.schema.name}}/search">
+                <a href="/admin/system/model/{{relation.schema.name}}/search">
                     <i class="{{relation.schema.icon}}"></i> {{relation.schema.plural}}
                 </a>
             </li>
             <li class="breadcrumb-item">
-                <a href="/admin/system/object/{{relation.schema.name}}/update/{{scope relation.data relation.schema.primary}}">
+                <a href="/admin/system/model/{{relation.schema.name}}/update/{{scope relation.data relation.schema.primary}}">
                     {{relation.suggestion}}
                 </a>
             </li>
             <li class="breadcrumb-item">
-                <a href="/admin/system/object/{{schema.name}}/search/{{relation.schema.name}}/{{scope relation.data relation.schema.primary}}">
+                <a href="/admin/system/model/{{schema.name}}/search/{{relation.schema.name}}/{{scope relation.data relation.schema.primary}}">
                     <i class="fas fa-{{schema.icon}}"></i> {{schema.plural}}
                 </a>
             </li>
         {{else}}
             <li class="breadcrumb-item">
-                <a href="/admin/system/object/{{schema.name}}/search">
+                <a href="/admin/system/model/{{schema.name}}/search">
                     <i class="fas fa-{{schema.icon}}"></i> {{schema.plural}}
                 </a>
             </li>
@@ -99,7 +99,7 @@
                             data-target-label="input.suggestion-label-{{name}}"
                             data-target-value="input.suggestion-value-{{name}}"
                             {{#in ../valid_relations name}}
-                                data-url="/admin/system/object/{{name}}/search?q={QUERY}&render=false"
+                                data-url="/admin/system/model/{{name}}/search?q={QUERY}&render=false"
                             {{else}}
                                 data-url="/admin/{{name}}/search?q={QUERY}&render=false"
                             {{/in}}
@@ -155,7 +155,7 @@
                             data-target-label="input.suggestion-label-{{name}}"
                             data-target-value="input.suggestion-value-{{name}}"
                             {{#in ../valid_relations name}}
-                                data-url="/admin/system/object/{{name}}/search?q={QUERY}&render=false"
+                                data-url="/admin/system/model/{{name}}/search?q={QUERY}&render=false"
                             {{else}}
                                 data-url="/admin/{{name}}/search?q={QUERY}&render=false"
                             {{/in}}

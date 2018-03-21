@@ -28,13 +28,13 @@
                                         <tr>
                                             <td>{{../singular}}</td>
                                             <td>
-                                                <a href="/admin/system/object/{{../name}}/update/{{scope this ../primary}}">
+                                                <a href="/admin/system/model/{{../name}}/update/{{scope this ../primary}}">
                                                     {{suggest ../this this}}
                                                 </a>
                                                 &nbsp;&nbsp;
                                                 <a
                                                     class="text-pink remove"
-                                                    href="/admin/system/object/{{../../schema.name}}/{{scope ../../item ../../schema.primary}}/unlink/{{../name}}/{{scope this ../primary}}?redirect_uri={{../../redirect}}"
+                                                    href="/admin/system/model/{{../../schema.name}}/{{scope ../../item ../../schema.primary}}/unlink/{{../name}}/{{scope this ../primary}}?redirect_uri={{../../redirect}}"
                                                     title="Remove {{../singular}}"
                                                 >
                                                     <i class="fa fa-unlink"></i>
@@ -49,7 +49,7 @@
                                     <tr>
                                         <td>{{singular}}</td>
                                         <td>
-                                            <a href="/admin/system/object/{{name}}/update/{{scope ../detail primary}}">
+                                            <a href="/admin/system/model/{{name}}/update/{{scope ../detail primary}}">
                                                 {{suggest this ../detail}}
                                             </a>
                                         </td>
@@ -60,7 +60,7 @@
                                 <tr>
                                     <td>{{singular}}</td>
                                     <td>
-                                        <a href="/admin/system/object/{{../schema.name}}/{{scope ../detail ../schema.primary}}/search/{{name}}">
+                                        <a href="/admin/system/model/{{../schema.name}}/{{scope ../detail ../schema.primary}}/search/{{name}}">
                                             {{_ 'View All %s' plural}}
                                         </a>
                                     </td>
@@ -70,7 +70,7 @@
                                 <tr>
                                     <td>{{singular}}</td>
                                     <td>
-                                        <a href="/admin/system/object/{{../schema.name}}/{{scope ../detail ../schema.primary}}/search/{{name}}">
+                                        <a href="/admin/system/model/{{../schema.name}}/{{scope ../detail ../schema.primary}}/search/{{name}}">
                                             {{_ 'View All %s' plural}}
                                         </a>
                                     </td>

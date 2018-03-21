@@ -35,7 +35,7 @@
                     data-target-label="input.suggestion-label-{{name}}"
                     data-target-value="input.suggestion-value-{{name}}"
                     {{#in ../valid_relations name}}
-                        data-url="/admin/system/object/{{name}}/search?q={QUERY}&render=false"
+                        data-url="/admin/system/model/{{name}}/search?q={QUERY}&render=false"
                     {{else}}
                         data-url="/admin/{{name}}/search?q={QUERY}&render=false"
                     {{/in}}

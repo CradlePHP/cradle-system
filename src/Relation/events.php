@@ -12,7 +12,7 @@ use Cradle\Package\System\Exception;
 use Cradle\Sql\SqlException;
 
 /**
- * Links object to relation
+ * Links model to relation
  *
  * @param Request $request
  * @param Response $response
@@ -56,12 +56,12 @@ $this->on('system-relation-link', function ($request, $response) {
     //----------------------------//
     // 3. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->object()->service('sql');
-    $objectRedis = $schema->object()->service('redis');
-    $objectElastic = $schema->object()->service('elastic');
+    $modelSql = $schema->model()->service('sql');
+    $modelRedis = $schema->model()->service('redis');
+    $modelElastic = $schema->model()->service('elastic');
 
     try {
-        $results = $objectSql->link(
+        $results = $modelSql->link(
             $relation['name'],
             $primary1,
             $primary2
@@ -71,17 +71,17 @@ $this->on('system-relation-link', function ($request, $response) {
     }
 
     //index post
-    $objectElastic->update($primary1);
+    $modelElastic->update($primary1);
 
     //invalidate cache
-    $objectRedis->removeSearch();
+    $modelRedis->removeSearch();
 
     //return response format
     $response->setError(false)->setResults($results);
 });
 
 /**
- * Uninks object to relation
+ * Uninks model to relation
  *
  * @param Request $request
  * @param Response $response
@@ -125,12 +125,12 @@ $this->on('system-relation-unlink', function ($request, $response) {
     //----------------------------//
     // 3. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->object()->service('sql');
-    $objectRedis = $schema->object()->service('redis');
-    $objectElastic = $schema->object()->service('elastic');
+    $modelSql = $schema->model()->service('sql');
+    $modelRedis = $schema->model()->service('redis');
+    $modelElastic = $schema->model()->service('elastic');
 
     try {
-        $results = $objectSql->unlink(
+        $results = $modelSql->unlink(
             $relation['name'],
             $primary1,
             $primary2
@@ -140,17 +140,17 @@ $this->on('system-relation-unlink', function ($request, $response) {
     }
 
     //index post
-    $objectElastic->update($primary1);
+    $modelElastic->update($primary1);
 
     //invalidate cache
-    $objectRedis->removeSearch();
+    $modelRedis->removeSearch();
 
     //return response format
     $response->setError(false)->setResults($results);
 });
 
 /**
- * Unlinks all object from relation
+ * Unlinks all model from relation
  *
  * @param Request $request
  * @param Response $response
@@ -180,20 +180,20 @@ $this->on('system-relation-unlinkall', function ($request, $response) {
     //----------------------------//
     // 3. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->object()->service('sql');
-    $objectRedis = $schema->object()->service('redis');
-    $objectElastic = $schema->object()->service('elastic');
+    $modelSql = $schema->model()->service('sql');
+    $modelRedis = $schema->model()->service('redis');
+    $modelElastic = $schema->model()->service('elastic');
 
-    $results = $objectSql->unlinkAll(
+    $results = $modelSql->unlinkAll(
         $data['schema2'],
         $data[$primary]
     );
 
     //index post
-    $objectElastic->update($data[$primary]);
+    $modelElastic->update($data[$primary]);
 
     //invalidate cache
-    $objectRedis->removeSearch();
+    $modelRedis->removeSearch();
 
     //return response format
     $response->setError(false)->setResults($results);

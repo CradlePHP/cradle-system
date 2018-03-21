@@ -18,7 +18,7 @@ use Cradle\Package\System\Schema;
 use Cradle\Package\System\Exception;
 
 /**
- * Object SQL Service
+ * Model SQL Service
  *
  * @vendor   Cradle
  * @package  System
@@ -60,7 +60,7 @@ class SqlService
         //queries to run
         $queries = [];
 
-        //translate object data to sql data
+        //translate model data to sql data
         if (is_null($this->schema)) {
             throw Exception::forNoSchema();
         }
@@ -172,7 +172,7 @@ class SqlService
     public function remove($restorable = true)
     {
 
-        //translate object data to sql data
+        //translate model data to sql data
         if (is_null($this->schema)) {
             throw Exception::forNoSchema();
         }
@@ -229,7 +229,7 @@ class SqlService
      */
     public function restore()
     {
-        //translate object data to sql data
+        //translate model data to sql data
         if (is_null($this->schema)) {
             throw Exception::forNoSchema();
         }
@@ -292,7 +292,7 @@ class SqlService
      */
     public function update()
     {
-        //translate object data to sql data
+        //translate model data to sql data
         if (is_null($this->schema)) {
             throw Exception::forNoSchema();
         }

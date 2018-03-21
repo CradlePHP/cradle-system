@@ -15,12 +15,12 @@ use Cradle\Http\Response;
 //Back End Controllers
 
 /**
- * Render the System Object Search Page
+ * Render the System Model Search Page
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/object/:schema/search', function ($request, $response) {
+$this->get('/admin/system/model/:schema/search', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     //get schema data
@@ -60,7 +60,7 @@ $this->get('/admin/system/object/:schema/search', function ($request, $response)
     }
 
     //trigger job
-    $this->trigger('system-object-search', $request, $response);
+    $this->trigger('system-model-search', $request, $response);
 
     //if we only want the raw data
     if ($request->getStage('render') === 'false') {
@@ -111,12 +111,12 @@ $this->get('/admin/system/object/:schema/search', function ($request, $response)
     //----------------------------//
     // 2. Render Template
     //set the class name
-    $class = 'page-admin-system-object-search page-admin';
+    $class = 'page-admin-system-model-search page-admin';
 
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
-        ->template('object', 'search', $data, [
+        ->template('model', 'search', $data, [
             'search_head',
             'search_form',
             'search_filters',
@@ -141,12 +141,12 @@ $this->get('/admin/system/object/:schema/search', function ($request, $response)
 });
 
 /**
- * Render the System Object Create Page
+ * Render the System Model Create Page
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/object/:schema/create', function ($request, $response) {
+$this->get('/admin/system/model/:schema/create', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     //get schema data
@@ -175,7 +175,7 @@ $this->get('/admin/system/object/:schema/create', function ($request, $response)
         );
 
         //get the original table row
-        $this->trigger('system-object-detail', $request, $response);
+        $this->trigger('system-model-detail', $request, $response);
 
         //can we update ?
         if ($response->isError()) {
@@ -251,7 +251,7 @@ $this->get('/admin/system/object/:schema/create', function ($request, $response)
     //----------------------------//
     // 2. Render Template
     //set the class name
-    $class = 'page-admin-system-object-create page-admin';
+    $class = 'page-admin-system-model-create page-admin';
 
     //set the action
     $data['action'] = 'create';
@@ -265,7 +265,7 @@ $this->get('/admin/system/object/:schema/create', function ($request, $response)
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
-        ->template('object', 'form', $data, [
+        ->template('model', 'form', $data, [
             'form_fields',
             'form_detail',
             'form_format'
@@ -287,12 +287,12 @@ $this->get('/admin/system/object/:schema/create', function ($request, $response)
 });
 
 /**
- * Render the System Object Update Page
+ * Render the System Model Update Page
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/object/:schema/update/:id', function ($request, $response) {
+$this->get('/admin/system/model/:schema/update/:id', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     //get schema data
@@ -319,13 +319,13 @@ $this->get('/admin/system/object/:schema/update/:id', function ($request, $respo
     );
 
     //get the original table row
-    $this->trigger('system-object-detail', $request, $response);
+    $this->trigger('system-model-detail', $request, $response);
 
     //can we update ?
     if ($response->isError()) {
         //redirect
         $redirect = sprintf(
-            '/admin/system/object/%s/search',
+            '/admin/system/model/%s/search',
             $request->getStage('schema')
         );
 
@@ -406,7 +406,7 @@ $this->get('/admin/system/object/:schema/update/:id', function ($request, $respo
     //----------------------------//
     // 2. Render Template
     //set the class name
-    $class = 'page-admin-system-object-update page-admin';
+    $class = 'page-admin-system-model-update page-admin';
 
     //set the action
     $data['action'] = 'update';
@@ -420,7 +420,7 @@ $this->get('/admin/system/object/:schema/update/:id', function ($request, $respo
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
-        ->template('object', 'form', $data, [
+        ->template('model', 'form', $data, [
             'form_fields',
             'form_detail',
             'form_format'
@@ -442,12 +442,12 @@ $this->get('/admin/system/object/:schema/update/:id', function ($request, $respo
 });
 
 /**
- * Process the System Object Search Actions
+ * Process the System Model Search Actions
  *
  * @param Request $request
  * @param Response $response
  */
-$this->post('/admin/system/object/:schema/search', function ($request, $response) {
+$this->post('/admin/system/model/:schema/search', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     //get schema data
@@ -455,7 +455,7 @@ $this->post('/admin/system/object/:schema/search', function ($request, $response
 
     //determine route
     $route = sprintf(
-        '/admin/system/object/%s/search',
+        '/admin/system/model/%s/search',
         $request->getStage('schema')
     );
 
@@ -483,10 +483,10 @@ $this->post('/admin/system/object/:schema/search', function ($request, $response
         //case for actions
         switch ($action) {
             case 'remove':
-                $this->trigger('system-object-remove', $request, $response);
+                $this->trigger('system-model-remove', $request, $response);
                 break;
             case 'restore':
-                $this->trigger('system-object-restore', $request, $response);
+                $this->trigger('system-model-restore', $request, $response);
                 break;
             default:
                 //set an error
@@ -515,7 +515,7 @@ $this->post('/admin/system/object/:schema/search', function ($request, $response
     // 3. Interpret Results
     //redirect
     $redirect = sprintf(
-        '/admin/system/object/%s/search',
+        '/admin/system/model/%s/search',
         $schema->getName()
     );
 
@@ -551,12 +551,12 @@ $this->post('/admin/system/object/:schema/search', function ($request, $response
 });
 
 /**
- * Process the System Object Create Page
+ * Process the System Model Create Page
  *
  * @param Request $request
  * @param Response $response
  */
-$this->post('/admin/system/object/:schema/create', function ($request, $response) {
+$this->post('/admin/system/model/:schema/create', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     //get schema data
@@ -602,7 +602,7 @@ $this->post('/admin/system/object/:schema/create', function ($request, $response
 
     //----------------------------//
     // 2. Process Request
-    $this->trigger('system-object-create', $request, $response);
+    $this->trigger('system-model-create', $request, $response);
 
     //----------------------------//
     // 3. Interpret Results
@@ -610,7 +610,7 @@ $this->post('/admin/system/object/:schema/create', function ($request, $response
     if ($response->isError()) {
         //determine route
         $route = sprintf(
-            '/admin/system/object/%s/create',
+            '/admin/system/model/%s/create',
             $request->getStage('schema')
         );
 
@@ -637,7 +637,7 @@ $this->post('/admin/system/object/:schema/create', function ($request, $response
 
     //redirect
     $redirect = sprintf(
-        '/admin/system/object/%s/search',
+        '/admin/system/model/%s/search',
         $schema->getName()
     );
 
@@ -663,12 +663,12 @@ $this->post('/admin/system/object/:schema/create', function ($request, $response
 });
 
 /**
- * Process the System Object Update Page
+ * Process the System Model Update Page
  *
  * @param Request $request
  * @param Response $response
  */
-$this->post('/admin/system/object/:schema/update/:id', function ($request, $response) {
+$this->post('/admin/system/model/:schema/update/:id', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     //get schema data
@@ -720,7 +720,7 @@ $this->post('/admin/system/object/:schema/update/:id', function ($request, $resp
 
     //----------------------------//
     // 2. Process Request
-    $this->trigger('system-object-update', $request, $response);
+    $this->trigger('system-model-update', $request, $response);
 
     //----------------------------//
     // 3. Interpret Results
@@ -728,7 +728,7 @@ $this->post('/admin/system/object/:schema/update/:id', function ($request, $resp
     if ($response->isError()) {
         //determine route
         $route = sprintf(
-            '/admin/system/object/%s/update/%s',
+            '/admin/system/model/%s/update/%s',
             $request->getStage('schema'),
             $request->getStage('id')
         );
@@ -757,7 +757,7 @@ $this->post('/admin/system/object/:schema/update/:id', function ($request, $resp
 
     //redirect
     $redirect = sprintf(
-        '/admin/system/object/%s/search',
+        '/admin/system/model/%s/search',
         $schema->getName()
     );
 
@@ -783,12 +783,12 @@ $this->post('/admin/system/object/:schema/update/:id', function ($request, $resp
 });
 
 /**
- * Process the System Object Remove
+ * Process the System Model Remove
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/object/:schema/remove/:id', function ($request, $response) {
+$this->get('/admin/system/model/:schema/remove/:id', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     //get schema data
@@ -802,7 +802,7 @@ $this->get('/admin/system/object/:schema/remove/:id', function ($request, $respo
 
     //----------------------------//
     // 2. Process Request
-    $this->trigger('system-object-remove', $request, $response);
+    $this->trigger('system-model-remove', $request, $response);
 
     //----------------------------//
     // 3. Interpret Results
@@ -821,7 +821,7 @@ $this->get('/admin/system/object/:schema/remove/:id', function ($request, $respo
 
     //redirect
     $redirect = sprintf(
-        '/admin/system/object/%s/search',
+        '/admin/system/model/%s/search',
         $schema->getName()
     );
 
@@ -849,12 +849,12 @@ $this->get('/admin/system/object/:schema/remove/:id', function ($request, $respo
 });
 
 /**
- * Process the System Object Restore
+ * Process the System Model Restore
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/object/:schema/restore/:id', function ($request, $response) {
+$this->get('/admin/system/model/:schema/restore/:id', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     //get schema data
@@ -868,7 +868,7 @@ $this->get('/admin/system/object/:schema/restore/:id', function ($request, $resp
 
     //----------------------------//
     // 2. Process Request
-    $this->trigger('system-object-restore', $request, $response);
+    $this->trigger('system-model-restore', $request, $response);
 
     //----------------------------//
     // 3. Interpret Results
@@ -887,7 +887,7 @@ $this->get('/admin/system/object/:schema/restore/:id', function ($request, $resp
 
     //redirect
     $redirect = sprintf(
-        '/admin/system/object/%s/search',
+        '/admin/system/model/%s/search',
         $schema->getName()
     );
 
@@ -920,7 +920,7 @@ $this->get('/admin/system/object/:schema/restore/:id', function ($request, $resp
  * @param Request $request
  * @param Response $response
  */
-$this->post('/admin/system/object/:schema/import', function ($request, $response) {
+$this->post('/admin/system/model/:schema/import', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     $schema = Schema::i($request->getStage('schema'));
@@ -928,7 +928,7 @@ $this->post('/admin/system/object/:schema/import', function ($request, $response
     //----------------------------//
     // 2. Process Request
     //get schema data
-    $this->trigger('system-object-import', $request, $response);
+    $this->trigger('system-model-import', $request, $response);
 
     //----------------------------//
     // 3. Interpret Results
@@ -981,7 +981,7 @@ $this->post('/admin/system/object/:schema/import', function ($request, $response
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/object/:schema/export/:type', function ($request, $response) {
+$this->get('/admin/system/model/:schema/export/:type', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     //get schema data
@@ -1025,7 +1025,7 @@ $this->get('/admin/system/object/:schema/export/:type', function ($request, $res
 
     //----------------------------//
     // 2. Process Request
-    $this->trigger('system-object-search', $request, $response);
+    $this->trigger('system-model-search', $request, $response);
 
     //----------------------------//
     // 3. Interpret Results
@@ -1170,12 +1170,12 @@ $this->get('/admin/system/object/:schema/export/:type', function ($request, $res
 //Front End Controllers
 
 /**
- * Render the System Object Search Page
+ * Render the System Model Search Page
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/system/object/:schema/search', function ($request, $response) {
+$this->get('/system/model/:schema/search', function ($request, $response) {
     //----------------------------//
     // get json data only
     $request->setStage('render', 'false');
@@ -1184,7 +1184,7 @@ $this->get('/system/object/:schema/search', function ($request, $response) {
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/search',
+            '/admin/system/model/%s/search',
             $request->getStage('schema')
         ),
         $request,
@@ -1193,12 +1193,12 @@ $this->get('/system/object/:schema/search', function ($request, $response) {
 });
 
 /**
- * Render the System Object Create Page
+ * Render the System Model Create Page
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/system/object/:schema/create', function ($request, $response) {
+$this->get('/system/model/:schema/create', function ($request, $response) {
     //----------------------------//
     // get json data only
     $request->setStage('render', 'false');
@@ -1207,7 +1207,7 @@ $this->get('/system/object/:schema/create', function ($request, $response) {
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/create',
+            '/admin/system/model/%s/create',
             $request->getStage('schema')
         ),
         $request,
@@ -1216,12 +1216,12 @@ $this->get('/system/object/:schema/create', function ($request, $response) {
 });
 
 /**
- * Render the System Object Update Page
+ * Render the System Model Update Page
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/system/object/:schema/update/:id', function ($request, $response) {
+$this->get('/system/model/:schema/update/:id', function ($request, $response) {
     //----------------------------//
     // get json response data only
     $request->setStage('render', 'false');
@@ -1230,7 +1230,7 @@ $this->get('/system/object/:schema/update/:id', function ($request, $response) {
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/update/%s',
+            '/admin/system/model/%s/update/%s',
             $request->getStage('schema'),
             $request->getStage('id')
         ),
@@ -1240,12 +1240,12 @@ $this->get('/system/object/:schema/update/:id', function ($request, $response) {
 });
 
 /**
- * Process the System Object Search Actions
+ * Process the System Model Search Actions
  *
  * @param Request $request
  * @param Response $response
  */
-$this->post('/system/object/:schema/search', function ($request, $response) {
+$this->post('/system/model/:schema/search', function ($request, $response) {
     //----------------------------//
     // get json response data only
     $request->setStage('redirect_uri', 'false');
@@ -1254,7 +1254,7 @@ $this->post('/system/object/:schema/search', function ($request, $response) {
     $this->routeTo(
         'post',
         sprintf(
-            '/admin/system/object/%s/search',
+            '/admin/system/model/%s/search',
             $request->getStage('schema')
         ),
         $request,
@@ -1263,12 +1263,12 @@ $this->post('/system/object/:schema/search', function ($request, $response) {
 });
 
 /**
- * Process the System Object Create Page
+ * Process the System Model Create Page
  *
  * @param Request $request
  * @param Response $response
  */
-$this->post('/system/object/:schema/create', function ($request, $response) {
+$this->post('/system/model/:schema/create', function ($request, $response) {
     //----------------------------//
     // get json response data only
     $request->setStage('redirect_uri', 'false');
@@ -1277,7 +1277,7 @@ $this->post('/system/object/:schema/create', function ($request, $response) {
     $this->routeTo(
         'post',
         sprintf(
-            '/admin/system/object/%s/create',
+            '/admin/system/model/%s/create',
             $request->getStage('schema')
         ),
         $request,
@@ -1286,12 +1286,12 @@ $this->post('/system/object/:schema/create', function ($request, $response) {
 });
 
 /**
- * Process the System Object Update Page
+ * Process the System Model Update Page
  *
  * @param Request $request
  * @param Response $response
  */
-$this->post('/system/object/:schema/update/:id', function ($request, $response) {
+$this->post('/system/model/:schema/update/:id', function ($request, $response) {
     //----------------------------//
     // get json response data only
     $request->setStage('redirect_uri', 'false');
@@ -1300,7 +1300,7 @@ $this->post('/system/object/:schema/update/:id', function ($request, $response) 
     $this->routeTo(
         'post',
         sprintf(
-            '/admin/system/object/%s/update/%s',
+            '/admin/system/model/%s/update/%s',
             $request->getStage('schema'),
             $request->getStage('id')
         ),
@@ -1310,12 +1310,12 @@ $this->post('/system/object/:schema/update/:id', function ($request, $response) 
 });
 
 /**
- * Process the System Object Remove
+ * Process the System Model Remove
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/system/object/:schema/remove/:id', function ($request, $response) {
+$this->get('/system/model/:schema/remove/:id', function ($request, $response) {
     //----------------------------//
     // get json response data only
     $request->setStage('redirect_uri', 'false');
@@ -1324,7 +1324,7 @@ $this->get('/system/object/:schema/remove/:id', function ($request, $response) {
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/remove/%s',
+            '/admin/system/model/%s/remove/%s',
             $request->getStage('schema'),
             $request->getStage('id')
         ),
@@ -1334,12 +1334,12 @@ $this->get('/system/object/:schema/remove/:id', function ($request, $response) {
 });
 
 /**
- * Process the System Object Restore
+ * Process the System Model Restore
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/system/object/:schema/restore/:id', function ($request, $response) {
+$this->get('/system/model/:schema/restore/:id', function ($request, $response) {
     //----------------------------//
     // get json response data only
     $request->setStage('redirect_uri', 'false');
@@ -1348,7 +1348,7 @@ $this->get('/system/object/:schema/restore/:id', function ($request, $response) 
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/restore/%s',
+            '/admin/system/model/%s/restore/%s',
             $request->getStage('schema'),
             $request->getStage('id')
         ),
@@ -1363,13 +1363,13 @@ $this->get('/system/object/:schema/restore/:id', function ($request, $response) 
  * @param Request $request
  * @param Response $response
  */
-$this->post('/system/object/:schema/import', function ($request, $response) {
+$this->post('/system/model/:schema/import', function ($request, $response) {
     //----------------------------//
     //trigger original import route
     $this->routeTo(
         'post',
         sprintf(
-            '/admin/system/object/%s/import',
+            '/admin/system/model/%s/import',
             $request->getStage('schema')
         ),
         $request,
@@ -1383,13 +1383,13 @@ $this->post('/system/object/:schema/import', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->get('/system/object/:schema/export/:type', function ($request, $response) {
+$this->get('/system/model/:schema/export/:type', function ($request, $response) {
     //----------------------------//
     //trigger original export route
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/export/%s',
+            '/admin/system/model/%s/export/%s',
             $request->getStage('schema'),
             $request->getStage('type')
         ),

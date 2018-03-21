@@ -8,9 +8,9 @@
 namespace Cradle\Package\System;
 
 use Cradle\Package\System\Schema;
-use Cradle\Package\System\Object\Service;
-use Cradle\Package\System\Object\Validator;
-use Cradle\Package\System\Object\Formatter;
+use Cradle\Package\System\Model\Service;
+use Cradle\Package\System\Model\Validator;
+use Cradle\Package\System\Model\Formatter;
 
 use Cradle\Module\Utility\Service\NoopService;
 
@@ -24,7 +24,7 @@ use Cradle\Helper\InstanceTrait;
  * @author   Christan Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
-class Object
+class Model
 {
     use InstanceTrait;
 

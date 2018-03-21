@@ -6,7 +6,7 @@
  * distributed with this package.
  */
 
-namespace Cradle\Package\System\Object\Service;
+namespace Cradle\Package\System\Model\Service;
 
 use PDO as Resource;
 use Cradle\Storm\SqlFactory;
@@ -18,7 +18,7 @@ use Cradle\Package\System\Schema;
 use Cradle\Package\System\Exception as SystemException;
 
 /**
- * Object SQL Service
+ * Model SQL Service
  *
  * @vendor   Cradle
  * @package  System
@@ -93,7 +93,7 @@ class SqlService
      *
      * @return bool
      */
-    public function exists($object, $key, $value)
+    public function exists($key, $value)
     {
         if (is_null($this->schema)) {
             throw SystemException::forNoSchema();
@@ -238,7 +238,7 @@ class SqlService
 
         $relation = $relations[$table];
 
-        $model = $this->resource->object();
+        $model = $this->resource->model();
         $model[$relation['primary1']] = $primary1;
         $model[$relation['primary2']] = $primary2;
 
@@ -532,7 +532,7 @@ class SqlService
 
         $relation = $relations[$table];
 
-        $model = $this->resource->object();
+        $model = $this->resource->model();
         $model[$relation['primary1']] = $primary1;
         $model[$relation['primary2']] = $primary2;
 

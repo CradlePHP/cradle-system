@@ -17,7 +17,7 @@ use Cradle\Module\Utility\Service\RedisServiceInterface;
 use Cradle\Module\Utility\Service\AbstractRedisService;
 
 /**
- * Object Redis Service
+ * Model Redis Service
  *
  * @vendor   Cradle
  * @package  System
@@ -29,12 +29,12 @@ class RedisService extends AbstractRedisService implements RedisServiceInterface
     /**
      * @const CACHE_SEARCH Cache search key
      */
-    const CACHE_SEARCH = 'core-object-search';
+    const CACHE_SEARCH = 'core-model-search';
 
     /**
      * @const CACHE_DETAIL Cache detail key
      */
-    const CACHE_DETAIL = 'core-object-detail';
+    const CACHE_DETAIL = 'core-model-detail';
 
     /**
      * @var Schema|null $schema

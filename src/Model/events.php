@@ -13,12 +13,12 @@ use Cradle\Http\Request;
 use Cradle\Http\Response;
 
 /**
- * System Object Create Job
+ * System Model Create Job
  *
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-object-create', function ($request, $response) {
+$this->on('system-model-create', function ($request, $response) {
     //----------------------------//
     // 1. Get Data
     $data = [];
@@ -35,7 +35,7 @@ $this->on('system-object-create', function ($request, $response) {
     //----------------------------//
     // 2. Validate Data
     $errors = $schema
-        ->object()
+        ->model()
         ->validator()
         ->getCreateErrors($data);
 
@@ -49,7 +49,7 @@ $this->on('system-object-create', function ($request, $response) {
     //----------------------------//
     // 3. Prepare Data
     $data = $schema
-        ->object()
+        ->model()
         ->formatter()
         ->formatData(
             $data,
@@ -60,11 +60,11 @@ $this->on('system-object-create', function ($request, $response) {
     //----------------------------//
     // 4. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->object()->service('sql');
-    $objectRedis = $schema->object()->service('redis');
-    $objectElastic = $schema->object()->service('elastic');
+    $modelSql = $schema->model()->service('sql');
+    $modelRedis = $schema->model()->service('redis');
+    $modelElastic = $schema->model()->service('elastic');
     //save object to database
-    $results = $objectSql->create($data);
+    $results = $modelSql->create($data);
 
     //get the primary value
     $primary = $results[$schema->getPrimaryFieldName()];
@@ -76,7 +76,7 @@ $this->on('system-object-create', function ($request, $response) {
         if (isset($data[$relation['primary2']])
             && is_numeric($data[$relation['primary2']])
         ) {
-            $objectSql->link(
+            $modelSql->link(
                 $relation['name'],
                 $primary,
                 $data[$relation['primary2']]
@@ -85,22 +85,22 @@ $this->on('system-object-create', function ($request, $response) {
     }
 
     //index object
-    $objectElastic->create($primary);
+    $modelElastic->create($primary);
 
     //invalidate cache
-    $objectRedis->removeSearch();
+    $modelRedis->removeSearch();
 
     //return response format
     $response->setError(false)->setResults($results);
 });
 
 /**
- * System Object Detail Job
+ * System Model Detail Job
  *
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-object-detail', function ($request, $response) {
+$this->on('system-model-detail', function ($request, $response) {
     //----------------------------//
     // 1. Get Data
     $data = [];
@@ -138,16 +138,16 @@ $this->on('system-object-detail', function ($request, $response) {
     //----------------------------//
     // 4. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->object()->service('sql');
-    $objectRedis = $schema->object()->service('redis');
-    $objectElastic = $schema->object()->service('elastic');
+    $modelSql = $schema->model()->service('sql');
+    $modelRedis = $schema->model()->service('redis');
+    $modelElastic = $schema->model()->service('elastic');
 
     $results = null;
 
     //if no flag
     if (!$request->hasGet('nocache')) {
         //get it from cache
-        $results = $objectRedis->getDetail($key . '-' . $id);
+        $results = $modelRedis->getDetail($key . '-' . $id);
     }
 
     //if no results
@@ -155,18 +155,18 @@ $this->on('system-object-detail', function ($request, $response) {
         //if no flag
         if (!$request->hasGet('noindex')) {
             //get it from index
-            $results = $objectElastic->get($key, $id);
+            $results = $modelElastic->get($key, $id);
         }
 
         //if no results
         if (!$results) {
             //get it from database
-            $results = $objectSql->get($key, $id);
+            $results = $modelSql->get($key, $id);
         }
 
         if ($results) {
             //cache it from database or index
-            $objectRedis->createDetail($key . '-' . $id, $results);
+            $modelRedis->createDetail($key . '-' . $id, $results);
         }
     }
 
@@ -178,16 +178,16 @@ $this->on('system-object-detail', function ($request, $response) {
 });
 
 /**
- * System Object Remove Job
+ * System Model Remove Job
  *
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-object-remove', function ($request, $response) {
+$this->on('system-model-remove', function ($request, $response) {
     //----------------------------//
     // 1. Get Data
     //get the object detail
-    $this->trigger('system-object-detail', $request, $response);
+    $this->trigger('system-model-detail', $request, $response);
 
     //----------------------------//
     // 2. Validate Data
@@ -211,9 +211,9 @@ $this->on('system-object-remove', function ($request, $response) {
     //----------------------------//
     // 4. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->object()->service('sql');
-    $objectRedis = $schema->object()->service('redis');
-    $objectElastic = $schema->object()->service('elastic');
+    $modelSql = $schema->model()->service('sql');
+    $modelRedis = $schema->model()->service('redis');
+    $modelElastic = $schema->model()->service('elastic');
 
     //save to database
     if ($active) {
@@ -221,38 +221,38 @@ $this->on('system-object-remove', function ($request, $response) {
         $payload[$primary] = $data[$primary];
         $payload[$active] = 0;
 
-        $results = $objectSql->update($payload);
+        $results = $modelSql->update($payload);
     } else {
-        $results = $objectSql->remove($data[$primary]);
+        $results = $modelSql->remove($data[$primary]);
     }
 
     //remove from index
-    $objectElastic->remove($data[$primary]);
+    $modelElastic->remove($data[$primary]);
 
     //invalidate cache
     $slugs = $schema->getSlugableFieldNames($primary);
     foreach ($slugs as $slug) {
         if (isset($data[$slug])) {
-            $objectRedis->removeDetail($data[$slug]);
+            $modelRedis->removeDetail($data[$slug]);
         }
     }
 
-    $objectRedis->removeSearch();
+    $modelRedis->removeSearch();
 
     $response->setError(false)->setResults($results);
 });
 
 /**
- * System Object Restore Job
+ * System Model Restore Job
  *
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-object-restore', function ($request, $response) {
+$this->on('system-model-restore', function ($request, $response) {
     //----------------------------//
     // 1. Get Data
     //get the object detail
-    $this->trigger('system-object-detail', $request, $response);
+    $this->trigger('system-model-detail', $request, $response);
 
     //----------------------------//
     // 2. Validate Data
@@ -276,33 +276,33 @@ $this->on('system-object-restore', function ($request, $response) {
     //----------------------------//
     // 4. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->object()->service('sql');
-    $objectRedis = $schema->object()->service('redis');
-    $objectElastic = $schema->object()->service('elastic');
+    $modelSql = $schema->model()->service('sql');
+    $modelRedis = $schema->model()->service('redis');
+    $modelElastic = $schema->model()->service('elastic');
 
     //save to database
     $payload = [];
     $payload[$primary] = $data[$primary];
     $payload[$active] = 1;
 
-    $results = $objectSql->update($payload);
+    $results = $modelSql->update($payload);
 
     //create index
-    $objectElastic->create($data[$primary]);
+    $modelElastic->create($data[$primary]);
 
     //invalidate cache
-    $objectRedis->removeSearch();
+    $modelRedis->removeSearch();
 
     $response->setError(false)->setResults($results);
 });
 
 /**
- * System Object Search Job
+ * System Model Search Job
  *
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-object-search', function ($request, $response) {
+$this->on('system-model-search', function ($request, $response) {
     //----------------------------//
     // 1. Get Data
     $data = [];
@@ -325,16 +325,16 @@ $this->on('system-object-search', function ($request, $response) {
     //----------------------------//
     // 4. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->object()->service('sql');
-    $objectRedis = $schema->object()->service('redis');
-    $objectElastic = $schema->object()->service('elastic');
+    $modelSql = $schema->model()->service('sql');
+    $modelRedis = $schema->model()->service('redis');
+    $modelElastic = $schema->model()->service('elastic');
 
     $results = false;
 
     //if no flag
     if (!$request->hasGet('nocache')) {
         //get it from cache
-        $results = $objectRedis->getSearch($data);
+        $results = $modelRedis->getSearch($data);
     }
 
     //if no results
@@ -342,18 +342,18 @@ $this->on('system-object-search', function ($request, $response) {
         //if no flag
         if (!$request->hasGet('noindex')) {
             //get it from index
-            $results = $objectElastic->search($data);
+            $results = $modelElastic->search($data);
         }
 
         //if no results
         if (!$results) {
             //get it from database
-            $results = $objectSql->search($data);
+            $results = $modelSql->search($data);
         }
 
         if ($results) {
             //cache it from database or index
-            $objectRedis->createSearch($data, $results);
+            $modelRedis->createSearch($data, $results);
         }
     }
 
@@ -362,16 +362,16 @@ $this->on('system-object-search', function ($request, $response) {
 });
 
 /**
- * System Object Update Job
+ * System Model Update Job
  *
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-object-update', function ($request, $response) {
+$this->on('system-model-update', function ($request, $response) {
     //----------------------------//
     // 1. Get Data
     //get the object detail
-    $this->trigger('system-object-detail', $request, $response);
+    $this->trigger('system-model-detail', $request, $response);
 
     //if there's an error
     if ($response->isError()) {
@@ -393,7 +393,7 @@ $this->on('system-object-update', function ($request, $response) {
     //----------------------------//
     // 2. Validate Data
     $errors = $schema
-        ->object()
+        ->model()
         ->validator()
         ->getUpdateErrors($data);
 
@@ -407,7 +407,7 @@ $this->on('system-object-update', function ($request, $response) {
     //----------------------------//
     // 3. Prepare Data
     $data = $schema
-        ->object()
+        ->model()
         ->formatter()
         ->formatData(
             $data,
@@ -418,12 +418,12 @@ $this->on('system-object-update', function ($request, $response) {
     //----------------------------//
     // 4. Process Data
     //this/these will be used a lot
-    $objectSql = $schema->object()->service('sql');
-    $objectRedis = $schema->object()->service('redis');
-    $objectElastic = $schema->object()->service('elastic');
+    $modelSql = $schema->model()->service('sql');
+    $modelRedis = $schema->model()->service('redis');
+    $modelElastic = $schema->model()->service('elastic');
 
     //save object to database
-    $results = $objectSql->update($data);
+    $results = $modelSql->update($data);
 
     //get the primary value
     $primary = $schema->getPrimaryFieldName();
@@ -446,7 +446,7 @@ $this->on('system-object-update', function ($request, $response) {
             )
         ) {
             //remove last id
-            $objectSql->unlink(
+            $modelSql->unlink(
                 $relation['name'],
                 $primary,
                 $lastId
@@ -460,14 +460,14 @@ $this->on('system-object-update', function ($request, $response) {
             && $lastId != $data[$relation['primary2']]
         ) {
             //remove last id
-            $objectSql->unlink(
+            $modelSql->unlink(
                 $relation['name'],
                 $results[$primary],
                 $lastId
             );
 
             //link current id
-            $objectSql->link(
+            $modelSql->link(
                 $relation['name'],
                 $results[$primary],
                 $data[$relation['primary2']]
@@ -476,29 +476,29 @@ $this->on('system-object-update', function ($request, $response) {
     }
 
     //index object
-    $objectElastic->update($results[$primary]);
+    $modelElastic->update($results[$primary]);
 
     //invalidate cache
     $slugs = $schema->getSlugableFieldNames($primary);
     foreach ($slugs as $slug) {
         if (isset($data[$slug])) {
-            $objectRedis->removeDetail($data[$slug]);
+            $modelRedis->removeDetail($data[$slug]);
         }
     }
 
-    $objectRedis->removeSearch();
+    $modelRedis->removeSearch();
 
     //return response format
     $response->setError(false)->setResults($results);
 });
 
 /**
- * System Object Item Import Job
+ * System Model Item Import Job
  *
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-object-import', function ($request, $response) {
+$this->on('system-model-import', function ($request, $response) {
     //----------------------------//
     // 1. Get Data
     $data = [];
@@ -545,7 +545,7 @@ $this->on('system-object-import', function ($request, $response) {
 
     foreach ($data['rows'] as $i => $row) {
         $error = $schema
-            ->object()
+            ->model()
             ->validator()
             ->getCreateErrors($row);
 
@@ -580,11 +580,11 @@ $this->on('system-object-import', function ($request, $response) {
 
         $rowResponse = Response::i()->load();
 
-        $this->trigger('system-object-detail', $rowRequest, $rowResponse);
+        $this->trigger('system-model-detail', $rowRequest, $rowResponse);
 
         if ($rowResponse->hasResults()) {
             // trigger single object update event
-            $this->trigger('system-object-update', $rowRequest, $rowResponse);
+            $this->trigger('system-model-update', $rowRequest, $rowResponse);
 
             // check response if there is an error
             if ($rowResponse->isError()) {
@@ -608,7 +608,7 @@ $this->on('system-object-import', function ($request, $response) {
         }
 
         // trigger single object update event
-        $this->trigger('system-object-create', $rowRequest, $rowResponse);
+        $this->trigger('system-model-create', $rowRequest, $rowResponse);
 
         // check response if there is an error
         if ($rowResponse->isError()) {

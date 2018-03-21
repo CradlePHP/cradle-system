@@ -363,20 +363,20 @@ $this->on('system-schema-create-elastic', function ($request, $response) {
         return $response->setError(true, 'Invalid parameters.');
     }
 
-    // check if object exists
-    $objectPath = sprintf($this->package('global')
+    // check if model exists
+    $modelPath = sprintf($this->package('global')
             ->path('config') . '/schema/%s.php',
         $data['name']);
 
-    if (!file_exists($objectPath)) {
-        return $response->setError(true, 'Object doesn\'t exist.');
+    if (!file_exists($modelPath)) {
+        return $response->setError(true, 'Model doesn\'t exist.');
     }
     
     //----------------------------//
     // 3. Prepare Data
     //----------------------------//
-    // get object data
-    $data = include_once ($objectPath);
+    // get model data
+    $data = include_once ($modelPath);
     
     //----------------------------//
     // 4. Process Data
@@ -437,11 +437,11 @@ $this->on('system-schema-search-elastic', function ($request, $response) {
 
         if (file_exists(sprintf($path . '/%s/elastic.php', $file))) {
             
-            $object = $this->package('global')
+            $model = $this->package('global')
                 ->config('admin/schema/%s.php', strtolower($file));
 
-            $object['name'] = $object['singular'] = strtolower($file);
-            $results[] = $object;
+            $model['name'] = $model['singular'] = strtolower($file);
+            $results[] = $model;
         }
         
     }
@@ -473,13 +473,13 @@ $cradle->on('system-schema-map-elastic', function ($request, $response) {
         return $response->setError(true, 'Invalid parameters.');
     }
 
-    // check if object exists
-    $objectPath = sprintf($this->package('global')
+    // check if model exists
+    $modelPath = sprintf($this->package('global')
             ->path('config') . '/schema/%s.php',
         $data['name']);
         
-    if (!file_exists($objectPath)) {
-        return $response->setError(true, 'Object doesn\'t exist.');
+    if (!file_exists($modelPath)) {
+        return $response->setError(true, 'Model doesn\'t exist.');
     }
 
     //----------------------------//
@@ -524,13 +524,13 @@ $cradle->on('system-schema-populate-elastic', function($request, $response) {
         return $response->setError(true, 'Invalid parameters.');
     }
 
-    // check if object exists
-    $objectPath = sprintf($this->package('global')
+    // check if model exists
+    $modelPath = sprintf($this->package('global')
             ->path('config') . '/schema/%s.php',
         $data['name']);
         
-    if (!file_exists($objectPath)) {
-        return $response->setError(true, 'Object doesn\'t exist.');
+    if (!file_exists($modelPath)) {
+        return $response->setError(true, 'Model doesn\'t exist.');
     }
 
     //----------------------------//
@@ -569,13 +569,13 @@ $cradle->on('system-schema-flush-elastic', function($request, $response) {
         return $response->setError(true, 'Invalid parameters.');
     }
 
-    // check if object exists
-    $objectPath = sprintf($this->package('global')
+    // check if model exists
+    $modelPath = sprintf($this->package('global')
             ->path('config') . '/schema/%s.php',
         $data['name']);
         
-    if (!file_exists($objectPath)) {
-        return $response->setError(true, 'Object doesn\'t exist.');
+    if (!file_exists($modelPath)) {
+        return $response->setError(true, 'Model doesn\'t exist.');
     }
     
     //----------------------------//
@@ -615,12 +615,12 @@ $cradle->on('system-schema-get-elastic', function($request, $response) {
         return $response->setError(true, 'Invalid parameters.');
     }
 
-    // check if object exists
-    $objectPath = sprintf($this->package('global')
+    // check if model exists
+    $modelPath = sprintf($this->package('global')
             ->path('config') . '/schema/elastic/%s/elastic.php',
         ucwords($data['name']));
         
-    if (!file_exists($objectPath)) {
+    if (!file_exists($modelPath)) {
         return $response->setError(true, 'Schema doesn\'t exist.');
     }
     
@@ -631,7 +631,7 @@ $cradle->on('system-schema-get-elastic', function($request, $response) {
     //----------------------------//
     // 4. Process Data
     //----------------------------//
-    $results = file_get_contents ($objectPath);
+    $results = file_get_contents ($modelPath);
 
     return $response->setError(false)->setResults($results);
 });
@@ -661,20 +661,20 @@ $cradle->on('system-schema-update-elastic', function($request, $response) {
         return $response->setError(true, 'Invalid parameters.');
     }
 
-    // check if object exists
-    $objectPath = sprintf($this->package('global')
+    // check if model exists
+    $modelPath = sprintf($this->package('global')
             ->path('config') . '/schema/elastic/%s/elastic.php',
         ucwords($data['name']));
 
     // check if file exist
-    if (!file_exists($objectPath)) {
+    if (!file_exists($modelPath)) {
         // return error if not
         return $response->setError(true, 'Schema doesn\'t exist.');
     }
 
     try {
         // save code
-        file_put_contents ($objectPath, $data['code']);
+        file_put_contents ($modelPath, $data['code']);
     } catch (\Throwable $e) {
         return $response->setError(true, $e->getMessage());
     }

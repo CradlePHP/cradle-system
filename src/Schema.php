@@ -17,7 +17,7 @@ use Cradle\Http\Request;
 use Cradle\Http\Response;
 
 /**
- * Object Schema Manager. This was made
+ * Model Schema Manager. This was made
  * take advantage of pass-by-ref
  *
  * @vendor   Cradle
@@ -637,13 +637,13 @@ class Schema extends Registry
     }
 
     /**
-     * Returns an Object
+     * Returns an Model
      *
-     * @return Object
+     * @return Model
      */
-    public function object()
+    public function model()
     {
-        return Object::i($this);
+        return Model::i($this);
     }
 
     /**

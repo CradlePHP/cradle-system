@@ -15,12 +15,12 @@ use Cradle\Http\Response;
 // Back End Controllers
 
 /**
- * Render the System Object Search Page Filtered by Relation
+ * Render the System Model Search Page Filtered by Relation
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/object/:schema1/:id/search/:schema2', function ($request, $response) {
+$this->get('/admin/system/model/:schema1/:id/search/:schema2', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     $schema = Schema::i($request->getStage('schema1'));
@@ -35,7 +35,7 @@ $this->get('/admin/system/object/:schema1/:id/search/:schema2', function ($reque
 
     if (empty($relation) || $relation['many'] < 2) {
         $redirect = sprintf(
-            '/admin/system/object/%s/search',
+            '/admin/system/model/%s/search',
             $request->getStage('schema1')
         );
 
@@ -74,7 +74,7 @@ $this->get('/admin/system/object/:schema1/:id/search/:schema2', function ($reque
         ->setStage($schema1->getPrimaryFieldName(), $id);
 
     //now get the actual table row
-    $this->trigger('system-object-detail', $detailRequest, $detailResponse);
+    $this->trigger('system-model-detail', $detailRequest, $detailResponse);
 
     //get the table row
     $results = $detailResponse->getResults();
@@ -94,7 +94,7 @@ $this->get('/admin/system/object/:schema1/:id/search/:schema2', function ($reque
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/search',
+            '/admin/system/model/%s/search',
             $schema2
         ),
         $request,
@@ -103,12 +103,12 @@ $this->get('/admin/system/object/:schema1/:id/search/:schema2', function ($reque
 });
 
 /**
- * Render the System Object Search Page Filtered by Relation
+ * Render the System Model Search Page Filtered by Relation
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/object/:schema1/:id/create/:schema2', function ($request, $response) {
+$this->get('/admin/system/model/:schema1/:id/create/:schema2', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     $id = $request->getStage('id');
@@ -134,7 +134,7 @@ $this->get('/admin/system/object/:schema1/:id/create/:schema2', function ($reque
         ->setStage($schema1->getPrimaryFieldName(), $id);
 
     //now get the actual table row
-    $this->trigger('system-object-detail', $detailRequest, $detailResponse);
+    $this->trigger('system-model-detail', $detailRequest, $detailResponse);
 
     //get the table row
     $results = $detailResponse->getResults();
@@ -154,7 +154,7 @@ $this->get('/admin/system/object/:schema1/:id/create/:schema2', function ($reque
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/create',
+            '/admin/system/model/%s/create',
             $schema2
         ),
         $request,
@@ -163,12 +163,12 @@ $this->get('/admin/system/object/:schema1/:id/create/:schema2', function ($reque
 });
 
 /**
- * Render the System Object Link Page
+ * Render the System Model Link Page
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/object/:schema1/:id/link/:schema2', function ($request, $response) {
+$this->get('/admin/system/model/:schema1/:id/link/:schema2', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     //get schema data
@@ -191,7 +191,7 @@ $this->get('/admin/system/object/:schema1/:id/link/:schema2', function ($request
     //this next set will use redirect, so we need to find it out now
     //redirect
     $redirect = sprintf(
-        '/admin/system/object/%s/%s/search/%s',
+        '/admin/system/model/%s/%s/search/%s',
         $request->getStage('schema1'),
         $request->getStage('id'),
         $request->getStage('schema2')
@@ -245,7 +245,7 @@ $this->get('/admin/system/object/:schema1/:id/link/:schema2', function ($request
     );
 
     //get the original table row
-    $this->trigger('system-object-detail', $request, $response);
+    $this->trigger('system-model-detail', $request, $response);
 
     //can we update ?
     if ($response->isError()) {
@@ -311,12 +311,12 @@ $this->get('/admin/system/object/:schema1/:id/link/:schema2', function ($request
 });
 
 /**
- * Process the System Object Search Page Filtered by Relation
+ * Process the System Model Search Page Filtered by Relation
  *
  * @param Request $request
  * @param Response $response
  */
-$this->post('/admin/system/object/:schema1/:id/search/:schema2', function ($request, $response) {
+$this->post('/admin/system/model/:schema1/:id/search/:schema2', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     $id = $request->getStage('id');
@@ -325,7 +325,7 @@ $this->post('/admin/system/object/:schema1/:id/search/:schema2', function ($requ
 
     //setup the redirect now, kasi we will change it later
     $redirect = sprintf(
-        '/admin/system/object/%s/%s/search/%s',
+        '/admin/system/model/%s/%s/search/%s',
         $schema1->getName(),
         $id,
         $schema2->getName()
@@ -348,7 +348,7 @@ $this->post('/admin/system/object/:schema1/:id/search/:schema2', function ($requ
     $this->routeTo(
         'post',
         sprintf(
-            '/admin/system/object/%s/search',
+            '/admin/system/model/%s/search',
             $schema2->getName()
         ),
         $request,
@@ -360,12 +360,12 @@ $this->post('/admin/system/object/:schema1/:id/search/:schema2', function ($requ
 });
 
 /**
- * Process the System Object Create Page Filtered by Relation
+ * Process the System Model Create Page Filtered by Relation
  *
  * @param Request $request
  * @param Response $response
  */
-$this->post('/admin/system/object/:schema1/:id/create/:schema2', function ($request, $response) {
+$this->post('/admin/system/model/:schema1/:id/create/:schema2', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     $id = $request->getStage('id');
@@ -374,7 +374,7 @@ $this->post('/admin/system/object/:schema1/:id/create/:schema2', function ($requ
 
     //setup the redirect now, kasi we will change it later
     $redirect = sprintf(
-        '/admin/system/object/%s/%s/search/%s',
+        '/admin/system/model/%s/%s/search/%s',
         $schema1->getName(),
         $id,
         $schema2->getName()
@@ -388,7 +388,7 @@ $this->post('/admin/system/object/:schema1/:id/create/:schema2', function ($requ
 
     // setup the route
     $route = sprintf(
-        '/admin/system/object/%s/%s/create/%s',
+        '/admin/system/model/%s/%s/create/%s',
         $schema1->getName(),
         $id,
         $schema2->getName()
@@ -411,7 +411,7 @@ $this->post('/admin/system/object/:schema1/:id/create/:schema2', function ($requ
     $this->routeTo(
         'post',
         sprintf(
-            '/admin/system/object/%s/create',
+            '/admin/system/model/%s/create',
             $schema2->getName()
         ),
         $request,
@@ -461,12 +461,12 @@ $this->post('/admin/system/object/:schema1/:id/create/:schema2', function ($requ
 });
 
 /**
- * Link object to object
+ * Link model to model
  *
  * @param Request $request
  * @param Response $response
  */
-$this->post('/admin/system/object/:schema1/:id/link/:schema2', function ($request, $response) {
+$this->post('/admin/system/model/:schema1/:id/link/:schema2', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     $schema = Schema::i($request->getStage('schema1'));
@@ -487,7 +487,7 @@ $this->post('/admin/system/object/:schema1/:id/link/:schema2', function ($reques
 
     //redirect
     $redirect = sprintf(
-        '/admin/system/object/%s/search/%s/%s',
+        '/admin/system/model/%s/search/%s/%s',
         $request->getStage('schema2'),
         $request->getStage('schema1'),
         $request->getStage('id')
@@ -507,7 +507,7 @@ $this->post('/admin/system/object/:schema1/:id/link/:schema2', function ($reques
     //----------------------------//
     // 2. Process Request
     $route = sprintf(
-        '/admin/system/object/%s/%s/link/%s/%s',
+        '/admin/system/model/%s/%s/link/%s/%s',
         $request->getStage('schema1'),
         $request->getStage('id1'),
         $request->getStage('schema2'),
@@ -522,7 +522,7 @@ $this->post('/admin/system/object/:schema1/:id/link/:schema2', function ($reques
     if ($response->isError()) {
         //determine route
         $route = sprintf(
-            '/admin/system/object/%s/%s/link/%s',
+            '/admin/system/model/%s/%s/link/%s',
             $request->getStage('schema1'),
             $request->getStage('id'),
             $request->getStage('schema2')
@@ -568,12 +568,12 @@ $this->post('/admin/system/object/:schema1/:id/link/:schema2', function ($reques
 });
 
 /**
- * Link object from object
+ * Link model from model
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/object/:schema1/:id1/link/:schema2/:id2', function ($request, $response) {
+$this->get('/admin/system/model/:schema1/:id1/link/:schema2/:id2', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     $schema = Schema::i($request->getStage('schema1'));
@@ -600,7 +600,7 @@ $this->get('/admin/system/object/:schema1/:id1/link/:schema2/:id2', function ($r
     // 3. Interpret Results
     //redirect
     $redirect = sprintf(
-        '/admin/system/object/%s/search',
+        '/admin/system/model/%s/search',
         $schema->getName()
     );
 
@@ -646,12 +646,12 @@ $this->get('/admin/system/object/:schema1/:id1/link/:schema2/:id2', function ($r
 });
 
 /**
- * Unlink object from object
+ * Unlink model from model
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/object/:schema1/:id1/unlink/:schema2/:id2', function ($request, $response) {
+$this->get('/admin/system/model/:schema1/:id1/unlink/:schema2/:id2', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     $schema = Schema::i($request->getStage('schema1'));
@@ -678,7 +678,7 @@ $this->get('/admin/system/object/:schema1/:id1/unlink/:schema2/:id2', function (
     // 3. Interpret Results
     //redirect
     $redirect = sprintf(
-        '/admin/system/object/%s/search',
+        '/admin/system/model/%s/search',
         $schema->getName()
     );
 
@@ -724,12 +724,12 @@ $this->get('/admin/system/object/:schema1/:id1/unlink/:schema2/:id2', function (
 });
 
 /**
- * Process Object Exporting Filtered by Relation
+ * Process model Exporting Filtered by Relation
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/object/:schema1/:id/export/:schema2/:type', function ($request, $response) {
+$this->get('/admin/system/model/:schema1/:id/export/:schema2/:type', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     $id = $request->getStage('id');
@@ -755,7 +755,7 @@ $this->get('/admin/system/object/:schema1/:id/export/:schema2/:type', function (
         ->setStage($schema1->getPrimaryFieldName(), $id);
 
     //now get the actual table row
-    $this->trigger('system-object-detail', $detailRequest, $detailResponse);
+    $this->trigger('system-model-detail', $detailRequest, $detailResponse);
 
     //get the table row
     $results = $detailResponse->getResults();
@@ -775,7 +775,7 @@ $this->get('/admin/system/object/:schema1/:id/export/:schema2/:type', function (
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/export/%s',
+            '/admin/system/model/%s/export/%s',
             $schema2,
             $request->getStage('type')
         ),
@@ -788,12 +788,12 @@ $this->get('/admin/system/object/:schema1/:id/export/:schema2/:type', function (
 });
 
 /**
- * Process Ajax Object Import
+ * Process Ajax model Import
  *
  * @param Request $request
  * @param Response $response
  */
-$this->post('/admin/system/object/:schema/:id/import/:schema2', function ($request, $response) {
+$this->post('/admin/system/model/:schema/:id/import/:schema2', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     $schema = Schema::i($request->getStage('schema'));
@@ -801,7 +801,7 @@ $this->post('/admin/system/object/:schema/:id/import/:schema2', function ($reque
     //----------------------------//
     // 2. Process Request
     //get schema data
-    $this->trigger('system-object-import', $request, $response);
+    $this->trigger('system-model-import', $request, $response);
 
     //----------------------------//
     // 3. Interpret Results
@@ -851,12 +851,12 @@ $this->post('/admin/system/object/:schema/:id/import/:schema2', function ($reque
 // Front End Controllers
 
 /**
- * Render the System Object Search Page Filtered by Relation
+ * Render the System Model Search Page Filtered by Relation
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/system/object/:schema1/:id/search/:schema2', function ($request, $response) {
+$this->get('/system/model/:schema1/:id/search/:schema2', function ($request, $response) {
     //----------------------------//
     // get json data only
     $request->setStage('render', 'false');
@@ -865,7 +865,7 @@ $this->get('/system/object/:schema1/:id/search/:schema2', function ($request, $r
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/%s/search/%s',
+            '/admin/system/model/%s/%s/search/%s',
             $request->getStage('schema1'),
             $request->getStage('id'),
             $request->getStage('schema2')
@@ -876,12 +876,12 @@ $this->get('/system/object/:schema1/:id/search/:schema2', function ($request, $r
 });
 
 /**
- * Render the System Object Search Page Filtered by Relation
+ * Render the System Model Search Page Filtered by Relation
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/system/object/:schema1/:id/create/:schema2', function ($request, $response) {
+$this->get('/system/model/:schema1/:id/create/:schema2', function ($request, $response) {
     //----------------------------//
     // get json data only
     $request->setStage('render', 'false');
@@ -890,7 +890,7 @@ $this->get('/system/object/:schema1/:id/create/:schema2', function ($request, $r
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/%s/create/%s',
+            '/admin/system/model/%s/%s/create/%s',
             $request->getStage('schema1'),
             $request->getStage('id'),
             $request->getStage('schema2')
@@ -901,12 +901,12 @@ $this->get('/system/object/:schema1/:id/create/:schema2', function ($request, $r
 });
 
 /**
- * Render the System Object Link Page
+ * Render the System Model Link Page
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/system/object/:schema1/:id/link/:schema2', function ($request, $response) {
+$this->get('/system/model/:schema1/:id/link/:schema2', function ($request, $response) {
     //----------------------------//
     // get json data only
     // $request->setStage('render', 'false');
@@ -915,7 +915,7 @@ $this->get('/system/object/:schema1/:id/link/:schema2', function ($request, $res
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/%s/link/%s',
+            '/admin/system/model/%s/%s/link/%s',
             $request->getStage('schema1'),
             $request->getStage('id'),
             $request->getStage('schema2')
@@ -926,12 +926,12 @@ $this->get('/system/object/:schema1/:id/link/:schema2', function ($request, $res
 });
 
 /**
- * Process the System Object Search Page Filtered by Relation
+ * Process the System Model Search Page Filtered by Relation
  *
  * @param Request $request
  * @param Response $response
  */
-$this->post('/system/object/:schema1/:id/search/:schema2', function ($request, $response) {
+$this->post('/system/model/:schema1/:id/search/:schema2', function ($request, $response) {
     //----------------------------//
     // get json data only
     $request->setStage('redirect_uri', 'false');
@@ -940,7 +940,7 @@ $this->post('/system/object/:schema1/:id/search/:schema2', function ($request, $
     $this->routeTo(
         'post',
         sprintf(
-            '/admin/system/object/%s/%s/search/%s',
+            '/admin/system/model/%s/%s/search/%s',
             $request->getStage('schema1'),
             $request->getStage('id'),
             $request->getStage('schema2')
@@ -951,12 +951,12 @@ $this->post('/system/object/:schema1/:id/search/:schema2', function ($request, $
 });
 
 /**
- * Process the System Object Create Page Filtered by Relation
+ * Process the System Model Create Page Filtered by Relation
  *
  * @param Request $request
  * @param Response $response
  */
-$this->post('/system/object/:schema1/:id/create/:schema2', function ($request, $response) {
+$this->post('/system/model/:schema1/:id/create/:schema2', function ($request, $response) {
     //----------------------------//
     // get json data only
     $request->setStage('redirect_uri', 'false');
@@ -965,7 +965,7 @@ $this->post('/system/object/:schema1/:id/create/:schema2', function ($request, $
     $this->routeTo(
         'post',
         sprintf(
-            '/admin/system/object/%s/%s/create/%s',
+            '/admin/system/model/%s/%s/create/%s',
             $request->getStage('schema1'),
             $request->getStage('id'),
             $request->getStage('schema2')
@@ -976,12 +976,12 @@ $this->post('/system/object/:schema1/:id/create/:schema2', function ($request, $
 });
 
 /**
- * Link object to object
+ * Link model to model
  *
  * @param Request $request
  * @param Response $response
  */
-$this->post('/system/object/:schema1/:id/link/:schema2', function ($request, $response) {
+$this->post('/system/model/:schema1/:id/link/:schema2', function ($request, $response) {
     //----------------------------//
     // get json data only
     $request->setStage('redirect_uri', 'false');
@@ -990,7 +990,7 @@ $this->post('/system/object/:schema1/:id/link/:schema2', function ($request, $re
     $this->routeTo(
         'post',
         sprintf(
-            '/admin/system/object/%s/%s/link/%s',
+            '/admin/system/model/%s/%s/link/%s',
             $request->getStage('schema1'),
             $request->getStage('id'),
             $request->getStage('schema2')
@@ -1001,12 +1001,12 @@ $this->post('/system/object/:schema1/:id/link/:schema2', function ($request, $re
 });
 
 /**
- * Link object from object
+ * Link model from model
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/system/object/:schema1/:id1/link/:schema2/:id2', function ($request, $response) {
+$this->get('/system/model/:schema1/:id1/link/:schema2/:id2', function ($request, $response) {
     //----------------------------//
     // get json data only
     $request->setStage('redirect_uri', 'false');
@@ -1015,7 +1015,7 @@ $this->get('/system/object/:schema1/:id1/link/:schema2/:id2', function ($request
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/%s/link/%s/%s',
+            '/admin/system/model/%s/%s/link/%s/%s',
             $request->getStage('schema1'),
             $request->getStage('id1'),
             $request->getStage('schema2'),
@@ -1027,12 +1027,12 @@ $this->get('/system/object/:schema1/:id1/link/:schema2/:id2', function ($request
 });
 
 /**
- * Unlink object from object
+ * Unlink model from model
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/system/object/:schema1/:id1/unlink/:schema2/:id2', function ($request, $response) {
+$this->get('/system/model/:schema1/:id1/unlink/:schema2/:id2', function ($request, $response) {
     //----------------------------//
     // get json data only
     $request->setStage('redirect_uri', 'false');
@@ -1041,7 +1041,7 @@ $this->get('/system/object/:schema1/:id1/unlink/:schema2/:id2', function ($reque
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/%s/unlink/%s/%s',
+            '/admin/system/model/%s/%s/unlink/%s/%s',
             $request->getStage('schema1'),
             $request->getStage('id1'),
             $request->getStage('schema2'),
@@ -1053,15 +1053,15 @@ $this->get('/system/object/:schema1/:id1/unlink/:schema2/:id2', function ($reque
 });
 
 /**
- * Process Object Exporting Filtered by Relation
+ * Process model Exporting Filtered by Relation
  *
  * @param Request $request
  * @param Response $response
  */
-$this->get('/system/object/:schema1/:id/export/:schema2/:type', function ($request, $response) {
+$this->get('/system/model/:schema1/:id/export/:schema2/:type', function ($request, $response) {
     //----------------------------//
     $route = sprintf(
-        '/admin/system/object/%s/%s/export/%s/%s',
+        '/admin/system/model/%s/%s/export/%s/%s',
         $request->getStage('schema1'),
         $request->getStage('id'),
         $request->getStage('schema2'),
@@ -1072,7 +1072,7 @@ $this->get('/system/object/:schema1/:id/export/:schema2/:type', function ($reque
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/%s/export/%s/%s',
+            '/admin/system/model/%s/%s/export/%s/%s',
             $request->getStage('schema1'),
             $request->getStage('id'),
             $request->getStage('schema2'),
@@ -1084,18 +1084,18 @@ $this->get('/system/object/:schema1/:id/export/:schema2/:type', function ($reque
 });
 
 /**
- * Process Ajax Object Import
+ * Process Ajax model Import
  *
  * @param Request $request
  * @param Response $response
  */
-$this->post('/system/object/:schema/:id/import/:schema2', function ($request, $response) {
+$this->post('/system/model/:schema/:id/import/:schema2', function ($request, $response) {
     //----------------------------//
     //now let the original search take over
     $this->routeTo(
         'get',
         sprintf(
-            '/admin/system/object/%s/%s/import/%s',
+            '/admin/system/model/%s/%s/import/%s',
             $request->getStage('schema1'),
             $request->getStage('id'),
             $request->getStage('schema2')
