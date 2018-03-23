@@ -414,7 +414,7 @@ class Schema extends Registry
         $response = Response::i()->load();
         $request = Request::i()->load();
 
-        $this->trigger('system-schema-search', $request, $response);
+        cradle()->trigger('system-schema-search', $request, $response);
         $rows = $response->getResults('rows');
 
         if (empty($rows)) {
