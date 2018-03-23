@@ -49,11 +49,11 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         $this->sql = Service::get('sql');
     }
 
-    /*
-     * Create elastic map
-     *
-     * @param array $data
-    */
+    /**
+     * Create an elastic map
+     * 
+     * @return void
+     */
     public function createMap() {
         if(is_null($this->schema)) {
             throw SystemException::forNoSchema();
@@ -82,13 +82,12 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
             '<?php //-->' . "\n return " .
             var_export($mapping, true) . ';'
         );
-        
-
     }
 
-    /*
-     * Map elastic
-     *
+    /**
+     * Map Elastic Schema
+     * 
+     * @return bool
      */
     public function map() {
         // no schema validation
@@ -138,7 +137,8 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
     /**
      * Populate elastic
      *
-     * @params array $data
+     * @param array $data
+     * @return bool
      */
     public function populate(array $data = []) {
         // no schema validation
@@ -232,10 +232,10 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         return true;
     }
     
-    /*
-     * Populate elastic
-     *
-     *
+    /**
+     * Flush Elastic Index
+     * 
+     * @return bool
      */
     public function flush() {
         // no schema validation
@@ -263,7 +263,6 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
      * Search in index
      *
      * @param array $data
-     *
      * @return array
      */
     public function search(array $data = [])
@@ -359,9 +358,8 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
 
     /**
      * Adds System Schema
-`     *
-     * @param Schema $schema
      *
+     * @param Schema $schema
      * @return SqlService
      */
     public function setSchema(Schema $schema)

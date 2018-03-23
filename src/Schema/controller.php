@@ -14,6 +14,10 @@
  */
 $this->get('/admin/system/schema/search', function ($request, $response) {
     //----------------------------//
+    // Route Permissions
+    $this->package('global')->requireLogin('admin');
+
+    //----------------------------//
     // 1. Prepare Data
     if (!$request->hasStage()) {
         $request->setStage('filter', 'active', 1);
@@ -67,6 +71,10 @@ $this->get('/admin/system/schema/search', function ($request, $response) {
  * @param Response $response
  */
 $this->get('/admin/system/schema/create', function ($request, $response) {
+    //----------------------------//
+    // Route Permissions
+    $this->package('global')->requireLogin('admin');
+
     //----------------------------//
     // 1. Prepare Data
     $data = ['item' => $request->getPost()];
@@ -160,6 +168,10 @@ $this->get('/admin/system/schema/create', function ($request, $response) {
  * @param Response $response
  */
 $this->get('/admin/system/schema/update/:name', function ($request, $response) {
+    //----------------------------//
+    // Route Permissions
+    $this->package('global')->requireLogin('admin');
+
     //----------------------------//
     // 1. Prepare Data
     //pass the item with only the post data
@@ -269,6 +281,10 @@ $this->get('/admin/system/schema/update/:name', function ($request, $response) {
  */
 $this->post('/admin/system/schema/create', function ($request, $response) {
     //----------------------------//
+    // Route Permissions
+    $this->package('global')->requireLogin('admin');
+
+    //----------------------------//
     // 1. Prepare Data
     //if detail has no value make it null
     if ($request->hasStage('detail') && !$request->getStage('detail')) {
@@ -343,6 +359,10 @@ $this->post('/admin/system/schema/create', function ($request, $response) {
  * @param Response $response
  */
 $this->post('/admin/system/schema/update/:name', function ($request, $response) {
+    //----------------------------//
+    // Route Permissions
+    $this->package('global')->requireLogin('admin');
+
     //----------------------------//
     // 1. Prepare Data
 
@@ -433,6 +453,10 @@ $this->post('/admin/system/schema/update/:name', function ($request, $response) 
  */
 $this->get('/admin/system/schema/remove/:name', function ($request, $response) {
     //----------------------------//
+    // Route Permissions
+    $this->package('global')->requireLogin('admin');
+
+    //----------------------------//
     // 1. Prepare Data
     // no data to preapre
     //----------------------------//
@@ -485,6 +509,10 @@ $this->get('/admin/system/schema/remove/:name', function ($request, $response) {
  */
 $this->get('/admin/system/schema/restore/:name', function ($request, $response) {
     //----------------------------//
+    // Route Permissions
+    $this->package('global')->requireLogin('admin');
+
+    //----------------------------//
     // 1. Prepare Data
     // no data to preapre
     //----------------------------//
@@ -536,6 +564,10 @@ $this->get('/admin/system/schema/restore/:name', function ($request, $response) 
  * @param Response $response
  */
 $this->get('/admin/system/schema/elastic/search', function ($request, $response) {
+    //----------------------------//
+    // Route Permissions
+    $this->package('global')->requireLogin('admin');
+
     //----------------------------//
     // 1. Prepare Data
     // no data to preapre
@@ -597,6 +629,10 @@ $this->get('/admin/system/schema/elastic/search', function ($request, $response)
  */
 $this->get('/admin/system/schema/elastic/create/:name', function ($request, $response) {
     //----------------------------//
+    // Route Permissions
+    $this->package('global')->requireLogin('admin');
+
+    //----------------------------//
     // 1. Prepare Data
     // no data to preapre
     //----------------------------//
@@ -628,6 +664,10 @@ $this->get('/admin/system/schema/elastic/create/:name', function ($request, $res
  */
 $this->get('/admin/system/schema/elastic/map/:name', function ($request, $response) {
     //----------------------------//
+    // Route Permissions
+    $this->package('global')->requireLogin('admin');
+
+    //----------------------------//
     // 1. Prepare Data
     // no data to preapre
     //----------------------------//
@@ -657,6 +697,10 @@ $this->get('/admin/system/schema/elastic/map/:name', function ($request, $respon
  */
 $this->get('/admin/system/schema/elastic/populate/:name', function ($request, $response) {
     //----------------------------//
+    // Route Permissions
+    $this->package('global')->requireLogin('admin');
+
+    //----------------------------//
     // 1. Prepare Data
     // no data to preapre
     //----------------------------//
@@ -685,6 +729,10 @@ $this->get('/admin/system/schema/elastic/populate/:name', function ($request, $r
  */
 $this->get('/admin/system/schema/elastic/flush/:name', function ($request, $response) {
     //----------------------------//
+    // Route Permissions
+    $this->package('global')->requireLogin('admin');
+
+    //----------------------------//
     // 1. Prepare Data
     // no data to preapre
     //----------------------------//
@@ -712,6 +760,10 @@ $this->get('/admin/system/schema/elastic/flush/:name', function ($request, $resp
  * @param Response $response
  */
 $this->get('/admin/system/schema/elastic/edit/:name', function ($request, $response) {
+    //----------------------------//
+    // Route Permissions
+    $this->package('global')->requireLogin('admin');
+
     //----------------------------//
     // 1. Prepare Data
     $data = [];
@@ -773,6 +825,10 @@ $this->get('/admin/system/schema/elastic/edit/:name', function ($request, $respo
  * @param Response $response
  */
 $this->post('/admin/system/schema/elastic/edit/:name', function ($request, $response) {
+    //----------------------------//
+    // Route Permissions
+    $this->package('global')->requireLogin('admin');
+
     //----------------------------//
     // 1. Prepare Data
     $nextUrl = '/admin/system/schema/elastic/search';
