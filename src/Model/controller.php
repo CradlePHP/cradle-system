@@ -22,10 +22,6 @@ use Cradle\Http\Response;
  */
 $this->get('/admin/system/model/:schema/search', function ($request, $response) {
     //----------------------------//
-    // Route Permissions
-    $this->package('global')->requireLogin('admin');
-
-    //----------------------------//
     // 1. Prepare Data
     //get schema data
     $schema = Schema::i($request->getStage('schema'));
@@ -151,10 +147,6 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
  * @param Response $response
  */
 $this->get('/admin/system/model/:schema/create', function ($request, $response) {
-    //----------------------------//
-    // Route Permissions
-    $this->package('global')->requireLogin('admin');
-
     //----------------------------//
     // 1. Prepare Data
     //get schema data
@@ -301,10 +293,6 @@ $this->get('/admin/system/model/:schema/create', function ($request, $response) 
  * @param Response $response
  */
 $this->get('/admin/system/model/:schema/update/:id', function ($request, $response) {
-    //----------------------------//
-    // Route Permissions
-    $this->package('global')->requireLogin('admin');
-
     //----------------------------//
     // 1. Prepare Data
     //get schema data
@@ -461,10 +449,6 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
  */
 $this->post('/admin/system/model/:schema/search', function ($request, $response) {
     //----------------------------//
-    // Route Permissions
-    $this->package('global')->requireLogin('admin');
-
-    //----------------------------//
     // 1. Prepare Data
     //get schema data
     $schema = Schema::i($request->getStage('schema'));
@@ -573,10 +557,6 @@ $this->post('/admin/system/model/:schema/search', function ($request, $response)
  * @param Response $response
  */
 $this->post('/admin/system/model/:schema/create', function ($request, $response) {
-    //----------------------------//
-    // Route Permissions
-    $this->package('global')->requireLogin('admin');
-
     //----------------------------//
     // 1. Prepare Data
     //get schema data
@@ -689,10 +669,6 @@ $this->post('/admin/system/model/:schema/create', function ($request, $response)
  * @param Response $response
  */
 $this->post('/admin/system/model/:schema/update/:id', function ($request, $response) {
-    //----------------------------//
-    // Route Permissions
-    $this->package('global')->requireLogin('admin');
-
     //----------------------------//
     // 1. Prepare Data
     //get schema data
@@ -814,10 +790,6 @@ $this->post('/admin/system/model/:schema/update/:id', function ($request, $respo
  */
 $this->get('/admin/system/model/:schema/remove/:id', function ($request, $response) {
     //----------------------------//
-    // Route Permissions
-    $this->package('global')->requireLogin('admin');
-
-    //----------------------------//
     // 1. Prepare Data
     //get schema data
     $schema = Schema::i($request->getStage('schema'));
@@ -883,10 +855,6 @@ $this->get('/admin/system/model/:schema/remove/:id', function ($request, $respon
  * @param Response $response
  */
 $this->get('/admin/system/model/:schema/restore/:id', function ($request, $response) {
-    //----------------------------//
-    // Route Permissions
-    $this->package('global')->requireLogin('admin');
-
     //----------------------------//
     // 1. Prepare Data
     //get schema data
@@ -954,10 +922,6 @@ $this->get('/admin/system/model/:schema/restore/:id', function ($request, $respo
  */
 $this->post('/admin/system/model/:schema/import', function ($request, $response) {
     //----------------------------//
-    // Route Permissions
-    $this->package('global')->requireLogin('admin');
-
-    //----------------------------//
     // 1. Prepare Data
     $schema = Schema::i($request->getStage('schema'));
 
@@ -1018,10 +982,6 @@ $this->post('/admin/system/model/:schema/import', function ($request, $response)
  * @param Response $response
  */
 $this->get('/admin/system/model/:schema/export/:type', function ($request, $response) {
-    //----------------------------//
-    // Route Permissions
-    $this->package('global')->requireLogin('admin');
-
     //----------------------------//
     // 1. Prepare Data
     //get schema data
