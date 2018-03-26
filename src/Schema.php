@@ -107,7 +107,7 @@ class Schema extends Registry
     }
 
     /**
-         * Returns created field
+     * Returns created field
      *
      * @return string|false
      */
