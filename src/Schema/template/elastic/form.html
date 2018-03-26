@@ -18,7 +18,7 @@
     <form method="post">
         <div class="table-overflow">
             <textarea
-                placeholder="Write about something"
+                placeholder="{{_ 'Write about something"'}}
                 data-do="code-editor"
                 data-mode="php"
                 class="ace-textarea hidden"
@@ -26,7 +26,7 @@
             >{{code}}</textarea>
         </div>
         <br />
-        <a href="/admin/system/schema/elastic/search" class="btn btn-default">Cancel</a>
-        <input type="submit" value="Update Schema" class="btn btn-info" />
+        <a href="/admin/system/schema/elastic/search" class="btn btn-default">{{_ 'Cancel'}}</a>
+        <input type="submit" value="{{_ 'Update Schema'}}" class="btn btn-info" />
     </form>
 </div>

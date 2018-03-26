@@ -3,10 +3,10 @@
         <div class="float-left mr-2">
             <div class="input-group">
                 <select class="form-control" name="bulk-action">
-                    <option value="remove">Remove</option>
-                    <option value="restore">Restore</option>
+                    <option value="remove">{{_ 'Remove'}}</option>
+                    <option value="restore">{{_ 'Restore'}}</option>
                 </select>
-                <button class="btn btn-secondary">Apply</button>
+                <button class="btn btn-secondary">{{_ 'Apply'}}</button>
             </div>
         </div>
     {{/if}}
@@ -26,10 +26,10 @@
     {{#if schema.active}}
         <div class="btn-group" role="group" aria-label="...">
             <a class="btn btn-primary" href="?filter[{{schema.active}}]=1">
-                Active
+                {{_ 'Active'}}
             </a>
             <a class="btn btn-danger" href="?filter[{{schema.active}}]=0">
-                Inactive
+                {{_ 'Inactive'}}
             </a>
         </div>
     {{/if}}
@@ -46,11 +46,11 @@
             {{/if}}
             href="javascript:void(0)"
         >
-            <i class="fas fa-upload"></i> Import
+            <i class="fas fa-upload"></i> {{_ 'Import'}}
         </a>
         {{#if relation.suggestion}}
             <a class="btn btn-purple" href="/admin/system/model/{{relation.schema.name}}/{{scope relation.data relation.schema.primary}}/export/{{schema.name}}/csv?{{query}}" target="_blank">
-                <i class="fas fa-download"></i> Export
+                <i class="fas fa-download"></i> {{_ 'Export'}}
             </a>
 
             <a class="btn btn-yellow" href="/admin/system/model/{{relation.schema.name}}/{{scope relation.data relation.schema.primary}}/link/{{schema.name}}?redirect_uri={{redirecturl}}">
@@ -62,7 +62,7 @@
             </a>
         {{else}}
             <a class="btn btn-purple" href="export/csv?{{query}}" target="_blank">
-                <i class="fas fa-download"></i> Export
+                <i class="fas fa-download"></i> {{_ 'Export'}}
             </a>
             <a class="btn btn-success" href="/admin/system/model/{{schema.name}}/create?redirect_uri={{redirecturl}}">
                 <i class="fas fa-plus"></i> {{_ 'Create %s' schema.singular}}

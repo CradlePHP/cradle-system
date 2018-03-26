@@ -3,7 +3,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Create Field</h5>
+                    <h5 class="modal-title">{{_ 'Create Field'}}</h5>
                     <button
                         class="close"
                         data-do="modal-cancel"
@@ -15,18 +15,18 @@
                 </div>
                 <div class="modal-body" data-index="{INDEX}">
                     <div class="form-group form-group-label">
-                        <label class="control-label">Label</label>
+                        <label class="control-label">{{_ 'Label'}}</label>
                         <div>
                             <input
                                 class="field-label form-control"
-                                placeholder="Field Title"
+                                placeholder="{{_ 'Field Title'}}"
                                 name="fields[{INDEX}][label]"
                                 type="text"
                             />
                         </div>
                     </div>
                     <div class="form-group form-group-name">
-                        <label class="control-label">Keyword</label>
+                        <label class="control-label">{{_ 'Keyword'}}</label>
                         <div>
                             <input
                                 class="field-name form-control"
@@ -35,13 +35,13 @@
                                 data-upper="0"
                                 data-space="_"
                                 name="fields[{INDEX}][name]"
-                                placeholder="Enter a unique keyword"
+                                placeholder="{{_ 'Enter a unique keyword'}}"
                                 type="text"
                             />
                         </div>
                     </div>
                     <div class="form-group form-group-type">
-                        <label class="control-label">Type</label>
+                        <label class="control-label">{{_ 'Type'}}</label>
                         <div>
                             <select
                                 class="field-type form-control"
@@ -54,7 +54,7 @@
                         </div>
                     </div>
                     <div class="form-group form-group-validation">
-                        <label class="control-label">Validation</label>
+                        <label class="control-label">{{_ 'Validation'}}</label>
                         <div>
                             <button
                                 class="btn btn-info"
@@ -62,12 +62,12 @@
                                 data-on="click"
                                 type="button"
                             >
-                                Add Validation
+                                {{_ 'Add Validation'}}
                             </button>
                         </div>
                     </div>
                     <div class="form-group form-group-list">
-                        <label class="control-label">List Format</label>
+                        <label class="control-label">{{_ 'List Format'}}</label>
                         <div>
                             <select
                                 class="field-list form-control"
@@ -80,7 +80,7 @@
                         </div>
                     </div>
                     <div class="form-group form-group-detail">
-                        <label class="control-label">Detail Format</label>
+                        <label class="control-label">{{_ 'Detail Format'}}</label>
                         <div>
                             <select
                                 class="field-detail form-control"
@@ -94,11 +94,11 @@
                     </div>
 
                     <div class="form-group form-group-default">
-                        <label class="control-label">Default</label>
+                        <label class="control-label">{{_ 'Default'}}</label>
                         <div>
                             <input
                                 class="field-default form-control"
-                                placeholder="Default Value"
+                                placeholder="{{_ 'Default Value'}}"
                                 name="fields[{INDEX}][default]"
                                 type="text"
                             />
@@ -114,7 +114,7 @@
                                     type="checkbox"
                                     value="1"
                                 />
-                                <span>Searchable</span>
+                                <span>{{_ 'Searchable'}}</span>
                             </label>
                             <br />
                             <label class="checkbox checkbox-2">
@@ -124,7 +124,7 @@
                                     type="checkbox"
                                     value="1"
                                 />
-                                <span>Filterable</span>
+                                <span>{{_ 'Filterable'}}</span>
                             </label>
                             <br />
                             <label class="checkbox checkbox-2">
@@ -134,7 +134,7 @@
                                     type="checkbox"
                                     value="1"
                                 />
-                                <span>Sortable</span>
+                                <span>{{_ 'Sortable'}}</span>
                             </label>
                         </div>
                     </div>
@@ -146,7 +146,7 @@
                         data-on="click"
                         type="button"
                     >
-                        Cancel
+                        {{_ 'Cancel'}}
                     </button>
                     <button
                         class="btn btn-primary"
@@ -154,7 +154,7 @@
                         data-on="click"
                         type="button"
                     >
-                        Done
+                        {{_ 'Done'}}
                     </button>
                 </div>
             </div>
@@ -239,7 +239,7 @@
         <input
             name="fields[{INDEX_1}][validation][{INDEX_2}][message]"
             class="form-control validation-message"
-            placeholder="Error Message"
+            placeholder="{{_ 'Error Message'}}"
             type="text"
         />
     </div>
@@ -279,7 +279,7 @@
             class="attribute-add btn btn-info"
             type="button"
         >
-            Add Attribute
+            {{_ 'Add Attribute'}}
         </button>
     </div>
 </script>
@@ -292,12 +292,12 @@
     >
         <input
             class="form-control attribute-key"
-            placeholder="Attribute"
+            placeholder="{{_ 'Attribute'}}"
             type="text"
         />
         <input
             class="form-control attribute-value"
-            placeholder="Value"
+            placeholder="{{_ 'Value'}}"
             type="text"
         />
         <a
@@ -321,7 +321,7 @@
             class="btn btn-info option-add"
             type="button"
         >
-            Add Option
+            {{_ 'Add Option'}}
         </button>
     </div>
 </script>
@@ -331,7 +331,7 @@
         <input
             class="form-control option-value"
             name="{NAME}"
-            placeholder="Value"
+            placeholder="{{_ 'Value'}}"
             type="text"
         />
         <span class="input-group-btn">
@@ -357,7 +357,7 @@
             class="keyval-add btn btn-info"
             type="button"
         >
-            Add Option
+            {{_ 'Add Option'}}
         </button>
     </div>
 </script>
@@ -367,13 +367,13 @@
         <input
             class="form-control keyval-key"
             name="{NAME_1}"
-            placeholder="Key"
+            placeholder="{{_ 'Key'}}"
             type="text"
         />
         <input
             class="form-control keyval-value"
             name="{NAME_2}"
-            placeholder="Value"
+            placeholder="{{_ 'Value'}}"
             type="text"
         />
         <a
@@ -418,7 +418,7 @@
         <input
             class="form-control relation-name"
             name="{NAME_2}"
-            placeholder="Enter Schema Keyword"
+            placeholder="{{_ 'Enter Schema Keyword'}}"
             type="text"
         />
     </div>

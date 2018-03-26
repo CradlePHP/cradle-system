@@ -25,18 +25,18 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Actions</th>
-                        <th>Schema</th>
+                        <th>{{_ 'Actions'}}</th>
+                        <th>{{_ 'Schema'}}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {{#each rows}}
                         <tr data-id="{{name}}">
                             <td class="table-actions">
-                                <a href="/admin/system/schema/elastic/edit/{{name}}" title="Edit Mapping" class="text-info"><span class="fa fa-pencil-alt"></span></a>
-                                <a href="/admin/system/schema/elastic/map/{{name}}" title="Map Elastic" class="text-success"><span class="fa fa-database"></span></a>
-                                <a href="/admin/system/schema/elastic/populate/{{name}}" title="Populate Elastic" class="text-warning"><span class="fa fa-bolt"></span></a>
-                                <a href="/admin/system/schema/elastic/flush/{{name}}" title="Flush Elastic" class="text-danger"><span class="fa fa-times"></span></a>
+                                <a href="/admin/system/schema/elastic/edit/{{name}}" title="{{_ 'Edit Mapping'}}" class="text-info"><span class="fa fa-pencil-alt"></span></a>
+                                <a href="/admin/system/schema/elastic/map/{{name}}" title="{{_ 'Map Elastic'}}" class="text-success"><span class="fa fa-database"></span></a>
+                                <a href="/admin/system/schema/elastic/populate/{{name}}" title="{{_ 'Populate Elastic'}}" class="text-warning"><span class="fa fa-bolt"></span></a>
+                                <a href="/admin/system/schema/elastic/flush/{{name}}" title="{{_ 'Flush Elastic'}}" class="text-danger"><span class="fa fa-times"></span></a>
                             </td>
                             <td>
                                 {{capital name}}
@@ -48,7 +48,7 @@
             <!-- END: TABLE -->
         {{else}}
             <!-- START: NO RESULTS -->
-            <div class="well no-results">No Results Found</div>
+            <div class="well no-results">{{_ 'No Results Found.'}}</div>
             <!-- END: NO RESULTS -->
         {{/if}}
         </div>

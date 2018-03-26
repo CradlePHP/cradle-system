@@ -2,7 +2,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Edit Field</h5>
+                <h5 class="modal-title">{{_ 'Edit Field'}}</h5>
                 <button
                     class="close"
                     data-do="modal-cancel"
@@ -14,7 +14,7 @@
             </div>
             <div class="modal-body">
                 <div class="form-group form-group-label">
-                    <label class="control-label">Label</label>
+                    <label class="control-label">{{_ 'Label'}}</label>
                     <div>
                         <input
                             class="field-label form-control"
@@ -26,7 +26,7 @@
                     </div>
                 </div>
                 <div class="form-group form-group-name">
-                    <label class="control-label">Keyword</label>
+                    <label class="control-label">{{_ 'Keyword'}}</label>
                     <div>
                         <input
                             class="field-name form-control"
@@ -35,20 +35,20 @@
                             data-upper="0"
                             data-space="_"
                             name="fields[{{@index}}][name]"
-                            placeholder="Enter a unique keyword"
+                            placeholder="{{_ 'Enter a unique keyword'}}"
                             type="text"
                             value="{{name}}"
                         />
                     </div>
                 </div>
                 <div class="form-group form-group-type">
-                    <label class="control-label">Type</label>
+                    <label class="control-label">{{_ 'Type'}}</label>
                     <div>
                         {{> types}}
                     </div>
                 </div>
                 <div class="form-group form-group-validation">
-                    <label class="control-label">Validation</label>
+                    <label class="control-label">{{_ 'Validation'}}</label>
                     <div>
                         {{#each validation}}
                             {{> validation}}
@@ -64,24 +64,24 @@
                     </div>
                 </div>
                 <div class="form-group form-group-list">
-                    <label class="control-label">List Format</label>
+                    <label class="control-label">{{_ 'List Format'}}</label>
                     <div>
                         {{> lists}}
                     </div>
                 </div>
                 <div class="form-group form-group-detail">
-                    <label class="control-label">Detail Format</label>
+                    <label class="control-label">{{_ 'Detail Format'}}</label>
                     <div>
                         {{> details}}
                     </div>
                 </div>
 
                 <div class="form-group form-group-default">
-                    <label class="control-label">Default</label>
+                    <label class="control-label">{{_ 'Default'}}</label>
                     <div>
                         <input
                             class="field-default form-control"
-                            placeholder="Default Value"
+                            placeholder="{{_ 'Default Value'}}"
                             name="fields[{{@index}}][default]"
                             type="text"
                             value="{{default}}"
@@ -99,7 +99,7 @@
                                 value="1"
                                 {{#if searchable}} checked{{/if}}
                             />
-                            <span>Searchable</span>
+                            <span>{{_ 'Searchable'}}</span>
                         </label>
                         <br />
                         <label class="checkbox checkbox-2">
@@ -110,7 +110,7 @@
                                 value="1"
                                 {{#if filterable}} checked{{/if}}
                             />
-                            <span>Filterable</span>
+                            <span>{{_ 'Filterable'}}</span>
                         </label>
                         <br />
                         <label class="checkbox checkbox-2">
@@ -121,7 +121,7 @@
                                 value="1"
                                 {{#if sortable}} checked{{/if}}
                             />
-                            <span>Sortable</span>
+                            <span>{{_ 'Sortable'}}</span>
                         </label>
                     </div>
                 </div>
@@ -141,7 +141,7 @@
                     data-on="click"
                     type="button"
                 >
-                    Cancel
+                    {{_ 'Cancel'}}
                 </button>
                 <button
                     class="btn btn-primary"
@@ -149,7 +149,7 @@
                     data-on="click"
                     type="button"
                 >
-                    Done
+                    {{_ 'Done'}}
                 </button>
             </div>
         </div>

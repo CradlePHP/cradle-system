@@ -14,14 +14,14 @@
                 <input
                     class="form-control keyval-key"
                     name="fields[{{../@index}}][field][options][{{@index}}][key]"
-                    placeholder="Key"
+                    placeholder="{{_ 'Key'}}"
                     type="text"
                     value="{{./key}}"
                 />
                 <input
                     class="form-control keyval-value"
                     name="fields[{{../@index}}][field][options][{{@index}}][value]"
-                    placeholder="Value"
+                    placeholder="{{_ 'Value'}}"
                     type="text"
                     value="{{value}}"
                 />
@@ -43,7 +43,7 @@
             class="keyval-add btn btn-info"
             type="button"
         >
-            Add Option
+            {{_ 'Add Option'}}
         </button>
     </div>
 {{/if}}
@@ -58,14 +58,14 @@
             >
                 <input
                     class="form-control attribute-key"
-                    placeholder="Attribute"
+                    placeholder="{{_ 'Attribute'}}"
                     type="text"
                     value="{{@key}}"
                 />
                 <input
                     class="form-control attribute-value"
                     name="fields[{{../@index}}][field][attributes][{{@key}}]"
-                    placeholder="Value"
+                    placeholder="{{_ 'Value'}}"
                     type="text"
                     value="{{this}}"
                 />
@@ -87,7 +87,7 @@
             class="attribute-add btn btn-info"
             type="button"
         >
-            Add Attribute
+            {{_ 'Add Attribute'}}
         </button>
     </div>
 {{/if}}

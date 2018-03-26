@@ -5,7 +5,7 @@
         data-toggle="collapse"
         data-target="#filter-options"
     >
-        <span>more</span> <i class="fas fa-caret-down"></i>
+        <span>{{_ 'more'}}</span> <i class="fas fa-caret-down"></i>
     </a>
 </div>
 
@@ -18,7 +18,7 @@
                     autocomplete="off"
                     class="form-control suggestion-label-{{name}}"
                     name="{{suggestion_name}}"
-                    placeholder="Enter {{singular}}"
+                    placeholder="{{_ 'Enter %s' singular}}"
                     type="text"
                     value="{{scope ../item suggestion_name}}"
                 />

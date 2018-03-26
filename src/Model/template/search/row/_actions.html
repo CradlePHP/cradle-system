@@ -5,7 +5,7 @@
     {{else}}
         href="/admin/system/model/{{../schema.name}}/create?copy={{scope this ../schema.primary}}&redirect_uri={{redirecturl}}"
     {{/if}}
-    title="Copy {{../schema.singular}}"
+    title="{{_ 'Copy %s' ../schema.singular}}"
 >
     <i class="fa fa-copy"></i>
 </a>
@@ -14,7 +14,7 @@
     <a
         class="text-grey"
         href="/admin/system/model/{{../schema.name}}/update/{{scope this ../schema.primary}}?redirect_uri={{redirecturl}}"
-        title="Edit {{../schema.singular}}"
+        title="{{_ 'Edit %s' ../schema.singular}}"
     >
         <i class="fa fa-edit"></i>
     </a>
@@ -22,7 +22,7 @@
     {{#relations ../schema.name 3 'reverse'}}
         <a
             class="text-info"
-            title="View {{source.plural}}"
+            title="{{_ 'View %s' source.plural}}"
             href="/admin/system/model/{{name}}/{{scope ../this primary}}/search/{{source.name}}"
         >
             <i class="{{source.icon}}"></i>
@@ -32,7 +32,7 @@
             {{#in '2,3' many}}
                 <a
                     class="text-info"
-                    title="View {{plural}}"
+                    title="{{_ 'View %s' plural}}"
                     href="/admin/system/model/{{source.name}}/{{scope ../this source.primary}}/search/{{name}}"
                 >
                     <i class="{{icon}}"></i>
@@ -45,7 +45,7 @@
         <a
             class="text-pink remove"
             href="/admin/system/model/{{../relation.schema.name}}/{{scope ../relation.data ../relation.schema.primary}}/unlink/{{../schema.name}}/{{scope this ../schema.primary}}?redirect_uri={{redirecturl}}"
-            title="Unlink {{../schema.singular}}"
+            title="{{_ 'Unlink %s' ../schema.singular}}"
         >
             <i class="fa fa-unlink"></i>
         </a>
@@ -54,7 +54,7 @@
     <a
         class="text-danger remove"
         href="/admin/system/model/{{../schema.name}}/remove/{{scope this ../schema.primary}}?redirect_uri={{redirecturl}}"
-        title="Remove {{../schema.singular}}"
+        title="{{_ 'Remove %s' ../schema.singular}}"
     >
         <i class="fa fa-times"></i>
     </a>
@@ -62,7 +62,7 @@
     <a
         class="text-success restore"
         href="/admin/system/model/{{../schema.name}}/restore/{{scope this ../schema.primary}}?redirect_uri={{redirecturl}}"
-        title="Restore {{../schema.singular}}"
+        title="{{_ 'Restore %s' ../schema.singular}}"
     >
         <i class="fas fa-external-link-alt"></i>
     </a>

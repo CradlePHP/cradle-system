@@ -29,7 +29,7 @@
                         <input
                             class="form-control option-value"
                             name="fields[{{../../@index}}][validation][{{../@index}}][parameters][{{@index}}]"
-                            placeholder="Value"
+                            placeholder="{{_ 'Value'}}"
                             type="text"
                             value="{{this}}"
                         />
@@ -71,7 +71,7 @@
     <input
         name="fields[{{../@index}}][validation][{{@index}}][message]"
         class="form-control validation-message"
-        placeholder="Error Message"
+        placeholder="{{_ 'Error Message'}}"
         type="text"
         value="{{message}}"
     />

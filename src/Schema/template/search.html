@@ -25,16 +25,16 @@
     <div class="clearfix mb-4 search-actions">
         <div class="btn-group" role="group" aria-label="...">
             <a class="btn btn-primary" href="?filter[active]=1">
-                Active
+                {{_ 'Active'}}
             </a>
             <a class="btn btn-danger" href="?filter[active]=0">
-                Inactive
+                {{_ 'Inactive'}}
             </a>
         </div>
 
         <div class="float-right">
             <a class="btn btn-success" href="/admin/system/schema/create?redirect_uri={{redirecturl}}">
-                <i class="fas fa-plus"></i> Create Schema
+                <i class="fas fa-plus"></i> {{_ 'Create Schema'}}
             </a>
         </div>
     </div>
@@ -46,9 +46,9 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Actions</th>
-                        <th>Schema</th>
-                        <th>Relations</th>
+                        <th>{{_ 'Actions'}}</th>
+                        <th>{{_ 'Schema'}}</th>
+                        <th>{{_ 'Relations'}}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -58,7 +58,7 @@
                                 <a
                                     class="text-purple"
                                     href="/admin/system/schema/create?copy={{name}}&redirect_uri={{redirecturl}}"
-                                    title="Copy {{../schema.singular}}"
+                                    title="{{_ 'Copy %s' ../schema.singular}}"
                                 >
                                     <i class="fa fa-copy"></i>
                                 </a>
@@ -69,14 +69,14 @@
                                     {{#if disable}}
                                         <i class="fas fa-lock fa-fw"></i>
                                     {{else}}
-                                        <a class="text-danger" title="Remove" href="/admin/system/schema/remove/{{name}}?redirect={{redirecturl}}"
+                                        <a class="text-danger" title="{{_ 'Remove'}}" href="/admin/system/schema/remove/{{name}}?redirect={{redirecturl}}"
                                         class="text-danger remove"><i class="fas fa-times"></i></a>
                                     {{/if}}
                                 {{else}}
-                                    <a title="Restore" href="/admin/system/schema/restore/{{name}}?redirect_uri={{redirecturl}}" class="text-success restore">
+                                    <a title="{{_ 'Restore'}}" href="/admin/system/schema/restore/{{name}}?redirect_uri={{redirecturl}}" class="text-success restore">
                                     <i class="fas fa-external-link-alt"></i></a>
                                 {{/if}}
-                                <a class="text-info" title="Generate Elastic Schema" href="/admin/system/schema/elastic/create/{{name}}">
+                                <a class="text-info" title="{{_ 'Generate Elastic Schema'}}" href="/admin/system/schema/elastic/create/{{name}}">
                                     <i class="fas fa-file"></i></a>
                             </td>
                             <td>
@@ -115,7 +115,7 @@
             <!-- END: TABLE -->
         {{else}}
             <!-- START: NO RESULTS -->
-            <div class="well no-results">No Results Found</div>
+            <div class="well no-results">{{_ 'No Results Found.'}}</div>
             <!-- END: NO RESULTS -->
         {{/if}}
         </table>

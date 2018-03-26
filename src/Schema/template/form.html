@@ -7,7 +7,7 @@
         </li>
         <li class="breadcrumb-item">
             <a href="/admin/system/schema/search">
-                <i class="fas fa-database"></i> System Schemas
+                <i class="fas fa-database"></i> {{_ 'System Schemas'}}
             </a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
@@ -26,12 +26,12 @@
     <form class="box" enctype="multipart/form-data" method="post">
         <div class="box-body box-padding">
             <div class="form-group">
-                <label class="control-label">Singular</label>
+                <label class="control-label">{{_ 'Singular'}}</label>
                 <div>
                     <input
                         class="form-control schema-singular {{#if errors.singular}}is-invalid{{/if}}"
                         name="singular"
-                        placeholder="Enter the Singular Name"
+                        placeholder="{{_ 'Enter the Singular Name'}}"
                         value="{{item.singular}}"
                         type="text"
                     />
@@ -45,13 +45,13 @@
             </div>
 
             <div class="form-group">
-                <label class="control-label">Plural</label>
+                <label class="control-label">{{_ 'Plural'}}</label>
                 <div>
                     <input
                         class="form-control schema-plural {{#if errors.plural}}is-invalid{{/if}}"
                         name="plural"
                         value="{{item.plural}}"
-                        placeholder="Enter the Plural Name"
+                        placeholder="{{_ 'Enter the Plural Name'}}"
                         type="text"
                     />
 
@@ -64,7 +64,7 @@
             </div>
 
             <div class="form-group">
-                <label class="control-label">Keyword</label>
+                <label class="control-label">{{_ 'Keyword'}}</label>
                 <div>
                     {{#if item.disable}}
                         <input
@@ -83,7 +83,7 @@
                             data-space="_"
                             name="name"
                             value="{{item.name}}"
-                            placeholder="Enter a unique keyword"
+                            placeholder="{{_ 'Enter a unique keyword'}}"
                             type="text"
                         />
 
@@ -97,7 +97,7 @@
             </div>
 
             <div class="form-group">
-                <label class="control-label">Icon</label>
+                <label class="control-label">{{_ 'Icon'}}</label>
                 <div>
 
                     <div class="input-group">
@@ -129,12 +129,12 @@
             </div>
 
             <div class="form-group">
-                <label class="control-label">Detail</label>
+                <label class="control-label">{{_ 'Detail'}}</label>
                 <div>
                     <textarea
                         class="form-control schema-detail {{#if errors.detail}}is-invalid{{/if}}"
                         name="detail"
-                        placeholder="What does this schema do?"
+                        placeholder="{{_ 'What does this schema do?'}}"
                         rows="10"
                     >{{{item.detail}}}</textarea>
 
@@ -147,23 +147,23 @@
             </div>
 
             <div class="form-group">
-                <label class="control-label">Fields</label>
+                <label class="control-label">{{_ 'Fields'}}</label>
                 <div>
                     <div id="schema-fields" class="schema-fields" data-name="fields">
                         <div class="table-overflow">
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Action</th>
-                                        <th>Keyword</th>
-                                        <th>Label</th>
-                                        <th>Field</th>
-                                        <th>List Format</th>
-                                        <th>Detail Format</th>
-                                        <th>Default</th>
-                                        <th>Searchable</th>
-                                        <th>Filterable</th>
-                                        <th>Sortable</th>
+                                        <th>{{_ 'Action'}}</th>
+                                        <th>{{_ 'Keyword'}}</th>
+                                        <th>{{_ 'Label'}}</th>
+                                        <th>{{_ 'Field'}}</th>
+                                        <th>{{_ 'List Format'}}</th>
+                                        <th>{{_ 'Detail Format'}}</th>
+                                        <th>{{_ 'Default'}}</th>
+                                        <th>{{_ 'Searchable'}}</th>
+                                        <th>{{_ 'Filterable'}}</th>
+                                        <th>{{_ 'Sortable'}}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -186,14 +186,14 @@
                             data-target="#schema-fields tbody"
                             type="button"
                         >
-                            Add Field
+                            {{_ 'Add Field'}}
                         </button>
                     </div>
                 </div>
             </div>
 
             <div class="form-group{{#if errors.relations}} has-error{{/if}}">
-                <label class="control-label">Relations</label>
+                <label class="control-label">{{_ 'Relations'}}</label>
                 <div>
                     {{#each item.relations}}
                         <div class="relation-row" data-index="{{@index}}">
@@ -280,7 +280,7 @@
                                 <input
                                     class="form-control relation-name"
                                     name="relations[{{@index}}][name]"
-                                    placeholder="Enter Schema Keyword"
+                                    placeholder="{{_ 'Enter Schema Keyword'}}"
                                     type="text"
                                     value="{{name}}"
                                 />
@@ -301,13 +301,13 @@
                         data-on="click"
                         type="button"
                     >
-                        Add Relation
+                        {{_ 'Add Relation'}}
                     </button>
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="control-label">Suggestion Format</label>
+                <label class="control-label">{{_ 'Suggestion Format'}}</label>
                 <div>
                     <input
                         class="form-control schema-suggestion {{#if errors.plural}}is-invalid{{/if}}"
@@ -329,7 +329,7 @@
                 {{#if disable}}
                     <input type="hidden" name="disable" value="1" />
                 {{/if}}
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">{{_ 'Submit'}}</button>
             </div>
         </div>
     </form>
