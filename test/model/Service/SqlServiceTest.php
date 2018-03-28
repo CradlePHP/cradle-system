@@ -8,66 +8,66 @@
 
 use PHPUnit\Framework\TestCase;
 
-use Cradle\Package\System\Object\Service;
+use Cradle\Package\System\Model\Service;
 
 use Cradle\Package\System\Schema as SystemSchema;
 
 /**
  * SQL service test
- * Role Model Test
+ * System Model Test
  *
  * @vendor   Cradle
  * @package  Role
  * @author   John Doe <john@acme.com>
  */
-class Cradle_Package_System_Object_Service_SqlServiceTest extends TestCase
+class Cradle_Package_System_Model_Service_SqlServiceTest extends TestCase
 {
     /**
-     * @var SqlService $object
+     * @var SqlService $model
      */
-    protected $object;
+    protected $model;
 
     /**
-     * @covers Cradle\Package\System\Object\Service\SqlService::__construct
+     * @covers Cradle\Package\System\Model\Service\SqlService::__construct
      */
     protected function setUp()
     {
-        $this->object = Service::get('sql');
+        $this->model = Service::get('sql');
 
-        $this->object->setSchema(SystemSchema::i('sample'));
+        $this->model->setSchema(SystemSchema::i('sample'));
     }
 
     /**
-     * @covers Cradle\Package\System\Object\Service\SqlService::create
+     * @covers Cradle\Package\System\Model\Service\SqlService::create
      */
     public function testCreate()
     {
-        $actual = $this->object->create([
-            'sample_name' => 'Testdd',
+        $actual = $this->model->create([
+            'sample_name' => 'Test',
             'sample_active' => 1,
         ]);
 
-        $id = $this->object->getResource()->getLastInsertedId();
+        $id = $this->model->getResource()->getLastInsertedId();
 
         $this->assertEquals($id, $actual['sample_id']);
     }
 
     /**
-     * @covers Cradle\Package\System\Object\Service\SqlService::get
+     * @covers Cradle\Package\System\Model\Service\SqlService::get
      */
     public function testGet()
     {
-        $actual = $this->object->get('sample_id', 1);
+        $actual = $this->model->get('sample_id', 1);
 
         $this->assertEquals(1, $actual['sample_id']);
     }
 
     /**
-     * @covers Cradle\Package\System\Object\Service\SqlService::search
+     * @covers Cradle\Package\System\Model\Service\SqlService::search
      */
     public function testSearch()
     {
-        $actual = $this->object->search();
+        $actual = $this->model->search();
 
         $this->assertArrayHasKey('rows', $actual);
         $this->assertArrayHasKey('total', $actual);
@@ -75,12 +75,12 @@ class Cradle_Package_System_Object_Service_SqlServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Package\System\Object\Service\SqlService::update
+     * @covers Cradle\Package\System\model\Service\SqlService::update
      */
     public function testUpdate()
     {
-        $id = $this->object->getResource()->getLastInsertedId();
-        $actual = $this->object->update([
+        $id = $this->model->getResource()->getLastInsertedId();
+        $actual = $this->model->update([
             'sample_id' => $id,
             'sample_name' => 'Edited Name',
         ]);
@@ -89,12 +89,12 @@ class Cradle_Package_System_Object_Service_SqlServiceTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Package\System\Object\Service\SqlService::remove
+     * @covers Cradle\Package\System\model\Service\SqlService::remove
      */
     public function testRemove()
     {
-        $id = $this->object->getResource()->getLastInsertedId();
-        $actual = $this->object->remove($id);
+        $id = $this->model->getResource()->getLastInsertedId();
+        $actual = $this->model->remove($id);
 
         $this->assertTrue(!empty($actual));
         $this->assertEquals($id, $actual['sample_id']);

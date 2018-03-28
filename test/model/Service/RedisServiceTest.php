@@ -8,28 +8,30 @@
 
 use PHPUnit\Framework\TestCase;
 
-use Cradle\Package\System\Object\Service;
+use Cradle\Package\System\Model\Service;
+
+use Cradle\Package\System\Schema as SystemSchema;
 
 /**
  * Redis service test
  *
  * @vendor   Cradle
- * @package  Role
+ * @package  System Model
  * @author   John Doe <john@acme.com>
  */
-class Cradle_Package_Role_Service_RedisServiceTest extends TestCase
+class Cradle_Package_System_Model_Service_RedisServiceTest extends TestCase
 {
     /**
-     * @var RedisService $object
+     * @var RedisService $model
      */
-    protected $object;
+    protected $model;
 
     /**
-     * @covers Cradle\Package\Role\Service\RedisService::__construct
+     * @covers Cradle\Package\System\Model\Service\RedisService::__construct
      */
     protected function setUp()
     {
-        $this->object = Service::get('redis');
+        $this->model = Service::get('redis');
     }
 
     /**
@@ -37,7 +39,7 @@ class Cradle_Package_Role_Service_RedisServiceTest extends TestCase
      */
     public function testCreateDetail()
     {
-        $actual = $this->object->createDetail(1, 1);
+        $actual = $this->model->createDetail(1, 1, 'sample');
 
         //if it's false, it's not enabled
         if($actual === false) {
@@ -52,7 +54,7 @@ class Cradle_Package_Role_Service_RedisServiceTest extends TestCase
      */
     public function testCreateSearch()
     {
-        $actual = $this->object->createSearch([]);
+        $actual = $this->model->createSearch([], 'sample');
 
         //if it's false, it's not enabled
         if($actual === false) {
@@ -67,14 +69,14 @@ class Cradle_Package_Role_Service_RedisServiceTest extends TestCase
      */
     public function testGetDetail()
     {
-        $actual = $this->object->getDetail(1);
+        $actual = $this->model->getDetail(1);
 
         //if it's false, it's not enabled
         if($actual === false) {
             return;
         }
 
-        $this->assertEquals(1, $actual['role_id']);
+        $this->assertEquals(1, $actual['sample_id']);
     }
 
     /**
@@ -82,7 +84,7 @@ class Cradle_Package_Role_Service_RedisServiceTest extends TestCase
      */
     public function testHasDetail()
     {
-        $actual = $this->object->hasDetail(1);
+        $actual = $this->model->hasDetail(1);
 
         //if it's false, it's not enabled
         if($actual === false) {
@@ -97,7 +99,7 @@ class Cradle_Package_Role_Service_RedisServiceTest extends TestCase
      */
     public function testGetSearch()
     {
-        $actual = $this->object->getSearch([]);
+        $actual = $this->model->getSearch([]);
 
         //if it's false, it's not enabled
         if($actual === false) {
@@ -106,7 +108,7 @@ class Cradle_Package_Role_Service_RedisServiceTest extends TestCase
 
         $this->assertArrayHasKey('rows', $actual);
         $this->assertArrayHasKey('total', $actual);
-        $this->assertEquals(1, $actual['rows'][0]['role_id']);
+        $this->assertEquals(1, $actual['rows'][0]['sample_id']);
     }
 
     /**
@@ -114,7 +116,7 @@ class Cradle_Package_Role_Service_RedisServiceTest extends TestCase
      */
     public function testHasSearch()
     {
-        $actual = $this->object->hasSearch([]);
+        $actual = $this->model->hasSearch([]);
 
         //if it's false, it's not enabled
         if($actual === false) {
@@ -129,7 +131,7 @@ class Cradle_Package_Role_Service_RedisServiceTest extends TestCase
      */
     public function testRemoveDetail()
     {
-        $actual = $this->object->removeDetail(1);
+        $actual = $this->model->removeDetail(1);
 
         //if it's false, it's not enabled
         if($actual === false) {
@@ -144,7 +146,7 @@ class Cradle_Package_Role_Service_RedisServiceTest extends TestCase
      */
     public function testRemoveSearch()
     {
-        $actual = $this->object->removeSearch([]);
+        $actual = $this->model->removeSearch([]);
 
         //if it's false, it's not enabled
         if($actual === false) {

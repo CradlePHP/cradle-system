@@ -15,10 +15,10 @@ use Cradle\Http\Response;
  * Event test
  *
  * @vendor   Cradle
- * @package  Object
+ * @package  Model
  * @author   John Doe <john@acme.com>
  */
-class Cradle_Package_System_Object_EventsTest extends TestCase
+class Cradle_Package_System_Model_EventsTest extends TestCase
 {
     /**
      * @var Request $request
@@ -49,22 +49,22 @@ class Cradle_Package_System_Object_EventsTest extends TestCase
     }
 
     /**
-     * system-object-create
+     * system-model-create
      *
-     * @covers Cradle\Package\System\Object\Validator::getCreateErrors
-     * @covers Cradle\Package\System\Object\Validator::getOptionalErrors
-     * @covers Cradle\Package\System\Object\Service\SqlService::create
+     * @covers Cradle\Package\System\Model\Validator::getCreateErrors
+     * @covers Cradle\Package\System\Model\Validator::getOptionalErrors
+     * @covers Cradle\Package\System\Model\Service\SqlService::create
      * @covers Cradle\Module\Utility\Service\AbstractElasticService::create
      * @covers Cradle\Module\Utility\Service\AbstractRedisService::createDetail
      */
-    public function testObjectCreate()
+    public function testModelCreate()
     {
         $this->request->setStage([
             'schema' => 'sample',
             'sample_name' => 'sample'
         ]);
 
-        cradle()->trigger('system-object-create', $this->request, $this->response);
+        cradle()->trigger('system-model-create', $this->request, $this->response);
 
         $this->assertEquals('sample', $this->response->getResults('sample_name'));
         self::$id = $this->response->getResults('sample_id');
@@ -72,89 +72,89 @@ class Cradle_Package_System_Object_EventsTest extends TestCase
     }
 
     /**
-     * system-object-create
+     * system-model-create
      *
-     * @covers Cradle\Package\System\Object\Validator::getCreateErrors
-     * @covers Cradle\Package\System\Object\Validator::getOptionalErrors
-     * @covers Cradle\Package\System\Object\Service\SqlService::create
+     * @covers Cradle\Package\System\Model\Validator::getCreateErrors
+     * @covers Cradle\Package\System\Model\Validator::getOptionalErrors
+     * @covers Cradle\Package\System\Model\Service\SqlService::create
      * @covers Cradle\Module\Utility\Service\AbstractElasticService::create
      * @covers Cradle\Module\Utility\Service\AbstractRedisService::createDetail
      */
-    public function testObjectDetail()
+    public function testModelDetail()
     {
         $this->request->setStage([
             'schema' => 'sample',
             'sample_id' => '1'
         ]);
 
-        cradle()->trigger('system-object-detail', $this->request, $this->response);
+        cradle()->trigger('system-model-detail', $this->request, $this->response);
         $this->assertEquals(1, $this->response->getResults('sample_id'));
     }
 
     /**
-     * system-object-remove
+     * system-model-remove
      *
-     * @covers Cradle\Package\System\Object\Service\SqlService::get
-     * @covers Cradle\Package\System\Object\Service\SqlService::update
+     * @covers Cradle\Package\System\Model\Service\SqlService::get
+     * @covers Cradle\Package\System\Model\Service\SqlService::update
      * @covers Cradle\Module\Utility\Service\AbstractElasticService::remove
      * @covers Cradle\Module\Utility\Service\AbstractRedisService::removeDetail
      */
-    public function testObjectRemove()
+    public function testModelRemove()
     {
         $this->request->setStage([
             'schema' => 'sample',
             'sample_id' => self::$id
         ]);
 
-        cradle()->trigger('system-object-remove', $this->request, $this->response);
+        cradle()->trigger('system-model-remove', $this->request, $this->response);
         $this->assertEquals(self::$id, $this->response->getResults('sample_id'));
     }
 
     /**
-     * system-object-restore
+     * system-model-restore
      *
-     * @covers Cradle\Package\System\Object\Service\SqlService::get
-     * @covers Cradle\Package\System\Object\Service\SqlService::update
+     * @covers Cradle\Package\System\Model\Service\SqlService::get
+     * @covers Cradle\Package\System\Model\Service\SqlService::update
      * @covers Cradle\Module\Utility\Service\AbstractElasticService::remove
      * @covers Cradle\Module\Utility\Service\AbstractRedisService::removeDetail
      */
-    public function testObjectRestore()
+    public function testModelRestore()
     {
         $this->request->setStage([
             'schema' => 'sample',
             'sample_id' => self::$id
         ]);
 
-        cradle()->trigger('system-object-restore', $this->request, $this->response);
+        cradle()->trigger('system-model-restore', $this->request, $this->response);
         $this->assertEquals(self::$id, $this->response->getResults('sample_id'));
     }
 
     /**
-     * system-object-search
+     * system-model-search
      *
-     * @covers Cradle\Package\System\Object\Service\SqlService::search
-     * @covers Cradle\Package\System\Object\Service\ElasticService::search
+     * @covers Cradle\Package\System\Model\Service\SqlService::search
+     * @covers Cradle\Package\System\Model\Service\ElasticService::search
      * @covers Cradle\Module\Utility\Service\AbstractRedisService::getSearch
      */
-    public function testObjectSearch()
+    public function testModelSearch()
     {
         $this->request->setStage([
             'schema' => 'sample'
         ]);
 
-        cradle()->trigger('system-object-search', $this->request, $this->response);
+        cradle()->trigger('system-model-search', $this->request, $this->response);
         $this->assertEquals(1, $this->response->getResults('rows', 0, 'sample_id'));
     }
 
     /**
-     * system-object-update
+     * system-model-update
      *
-     * @covers Cradle\Package\System\Object\Service\SqlService::get
-     * @covers Cradle\Package\System\Object\Service\SqlService::update
+     * @covers Cradle\Package\System\Model\Service\SqlService::get
+     * @covers Cradle\Package\System\Model\Service\SqlService::update
      * @covers Cradle\Module\Utility\Service\AbstractElasticService::remove
      * @covers Cradle\Module\Utility\Service\AbstractRedisService::removeDetail
      */
-    public function testObjectUpdate()
+    public function testModelUpdate()
     {
         $this->request->setStage([
             'schema' => 'sample',
@@ -162,7 +162,7 @@ class Cradle_Package_System_Object_EventsTest extends TestCase
             'sample_name' => 'New Sample Name'
         ]);
 
-        cradle()->trigger('system-object-update', $this->request, $this->response);
+        cradle()->trigger('system-model-update', $this->request, $this->response);
         $this->assertEquals('New Sample Name', $this->response->getResults('sample_name'));
         $this->assertEquals(self::$id, $this->response->getResults('sample_id'));
     }

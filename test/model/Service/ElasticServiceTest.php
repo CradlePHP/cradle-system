@@ -8,28 +8,28 @@
 
 use PHPUnit\Framework\TestCase;
 
-use Cradle\Package\System\Object\Service;
+use Cradle\Package\System\Model\Service;
 
 /**
  * Elastic service test
  *
  * @vendor   Cradle
- * @package  Object
+ * @package  model
  * @author   John Doe <john@acme.com>
  */
-class Cradle_Package_System_Object_Service_ElasticServiceTest extends TestCase
+class Cradle_Package_System_Model_Service_ElasticServiceTest extends TestCase
 {
     /**
-     * @var ElasticService $object
+     * @var ElasticService $model
      */
-    protected $object;
+    protected $model;
 
     /**
-     * @covers Cradle\Package\System\Object\Service\ElasticService::__construct
+     * @covers Cradle\Package\System\Model\Service\ElasticService::__construct
      */
     protected function setUp()
     {
-        $this->object = Service::get('elastic');
+        $this->model = Service::get('elastic');
     }
 
     /**
@@ -37,7 +37,7 @@ class Cradle_Package_System_Object_Service_ElasticServiceTest extends TestCase
      */
     public function testRemove()
     {
-        $actual = $this->object->remove(1);
+        $actual = $this->model->remove(1);
 
         //if it's false, it's not enabled
         if($actual === false) {
@@ -45,7 +45,7 @@ class Cradle_Package_System_Object_Service_ElasticServiceTest extends TestCase
             return;
         }
 
-        $this->assertEquals('role', $actual['_index']);
+        $this->assertEquals('sample', $actual['_index']);
         $this->assertEquals('main', $actual['_type']);
         $this->assertEquals(1, $actual['_id']);
         $this->assertEquals('deleted', $actual['result']);
@@ -56,7 +56,7 @@ class Cradle_Package_System_Object_Service_ElasticServiceTest extends TestCase
      */
     public function testCreate()
     {
-        $actual = $this->object->create(1);
+        $actual = $this->model->create(1);
 
         //if it's false, it's not enabled
         if($actual === false) {
@@ -64,7 +64,7 @@ class Cradle_Package_System_Object_Service_ElasticServiceTest extends TestCase
             return;
         }
 
-        $this->assertEquals('role', $actual['_index']);
+        $this->assertEquals('sample', $actual['_index']);
         $this->assertEquals('main', $actual['_type']);
         $this->assertEquals(1, $actual['_id']);
     }
@@ -74,7 +74,7 @@ class Cradle_Package_System_Object_Service_ElasticServiceTest extends TestCase
      */
     public function testGet()
     {
-        $actual = $this->object->get(1);
+        $actual = $this->model->get(1);
 
         //if it's false, it's not enabled
         if($actual === false) {
@@ -82,15 +82,15 @@ class Cradle_Package_System_Object_Service_ElasticServiceTest extends TestCase
             return;
         }
 
-        $this->assertEquals(1, $actual['role_id']);
+        $this->assertEquals(1, $actual['sample_id']);
     }
 
     /**
-     * @covers Cradle\Package\System\Object\Service\ElasticService::search
+     * @covers Cradle\Package\System\model\Service\ElasticService::search
      */
     public function testSearch()
     {
-        $actual = $this->object->search();
+        $actual = $this->model->search();
 
         //if it's false, it's not enabled
         if($actual === false) {
@@ -100,7 +100,7 @@ class Cradle_Package_System_Object_Service_ElasticServiceTest extends TestCase
 
         $this->assertArrayHasKey('rows', $actual);
         $this->assertArrayHasKey('total', $actual);
-        $this->assertEquals(1, $actual['rows'][0]['role_id']);
+        $this->assertEquals(1, $actual['rows'][0]['sample_id']);
     }
 
     /**
@@ -108,9 +108,9 @@ class Cradle_Package_System_Object_Service_ElasticServiceTest extends TestCase
      */
     public function testUpdate()
     {
-        $this->object->create(1);
+        $this->model->create(1);
 
-        $actual = $this->object->update(1);
+        $actual = $this->model->update(1);
 
         //if it's false, it's not enabled
         if($actual === false) {
@@ -119,7 +119,7 @@ class Cradle_Package_System_Object_Service_ElasticServiceTest extends TestCase
         }
 
         // now, test it
-        $this->assertEquals('role', $actual['_index']);
+        $this->assertEquals('sample', $actual['_index']);
         $this->assertEquals('main', $actual['_type']);
         $this->assertEquals(1, $actual['_id']);
         $this->assertEquals('noop', $actual['result']);

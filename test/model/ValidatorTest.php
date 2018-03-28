@@ -8,7 +8,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-use Cradle\Package\System\Object\Validator;
+use Cradle\Package\System\Model\Validator;
 
 use Cradle\Package\System\Schema;
 
@@ -19,17 +19,17 @@ use Cradle\Package\System\Schema;
  * @package  Role
  * @author   John Doe <john@acme.com>
  */
-class Cradle_Package_System_Object_ValidatorTest extends TestCase
+class Cradle_Package_System_Model_ValidatorTest extends TestCase
 {
     /**
-     * @covers Cradle\Package\System\Object\Validator::getCreateErrors
+     * @covers Cradle\Package\System\Model\Validator::getCreateErrors
      */
     public function testGetCreateErrors()
     {
         $schema = Schema::i('sample');
 
         $actual = $schema
-            ->object()
+            ->model()
             ->validator()
             ->getCreateErrors([]);
 
@@ -37,14 +37,14 @@ class Cradle_Package_System_Object_ValidatorTest extends TestCase
     }
 
     /**
-     * @covers Cradle\Package\System\Object\Validator::getUpdateErrors
+     * @covers Cradle\Package\System\Model\Validator::getUpdateErrors
      */
     public function testGetUpdateErrors()
     {
         $schema = Schema::i('sample');
 
         $actual = $schema
-            ->object()
+            ->model()
             ->validator()
             ->getUpdateErrors([]);
 
