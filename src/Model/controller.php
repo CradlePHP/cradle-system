@@ -1167,6 +1167,101 @@ $this->get('/admin/system/model/:schema/export/:type', function ($request, $resp
     $response->set('json', $rows);
 });
 
+/**
+ * Render the System Model Search Page
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->get('/admin/system/model/:schema/calendar', function ($request, $response) {
+    //----------------------------//
+    // 1. Prepare Data
+    //get schema data
+    $model = $request->getStage('schema');
+
+    //if this is a return back from processing
+    //this form and it's because of an error
+    if ($response->isError()) {
+        //pass the error messages to the template
+        $response->setFlash($response->getMessage(), 'error');
+    }
+
+    //set redirect
+    $request->setStage(
+        'redirect_uri',
+        sprintf('/admin/system/model/%s/search', $model));
+    //----------------------------//
+    // 2. Validate
+    // check if there's a schema
+    $schema = $this->package('global')->config(sprintf('schema/%s', $model));
+
+    if (!$schema) {
+        // redirect
+        $error = $this
+            ->package('global')
+            ->translate('There is no schema for this.');
+        cradle('global')->flash($error, 'error');
+        cradle('global')->redirect('/admin/system/schema/search');
+    }
+
+    foreach ($schema['fields'] as $key => $field) {
+        $schema['fields'][$field['name']] = $field;
+        unset($schema['fields'][$key]);
+    }
+
+    $dates = ['date', 'datetime', 'created', 'updated', 'time', 'week', 'month'];
+
+    // check if fields are date fields
+    if ($request->getStage('show')) {
+        $show = $request->getStage('show');
+
+        $fields = explode(',', $show);
+        foreach ($fields as $index => $column) {
+            if (!isset($schema['fields'][$column]) ||
+                !in_array($schema['fields'][$column]['field']['type'], $dates)) {
+                cradle('global')->flash($column.' is not a date field', 'error');
+                $show = [];
+                continue;
+            }
+
+            $fields[$index] = $model.'_'.$column;
+        }
+
+        $show = $fields;
+    }
+
+    if (!$show) {
+        $show = [sprintf('%s_created', $model)];
+    }
+
+    //----------------------------//
+    // 3. Render Template
+    $data = $request->getStage();
+    $data = array_merge(
+        $data,
+        [
+            'title' => $this->package('global')
+                ->translate($schema['singular']. ' Calendar'),
+            'package' => $schema['plural'],
+            'model' => $model,
+            'icon'  => $schema['icon'],
+            'show' => $show,
+        ]);
+
+    $class = sprintf('page-admin-%s-calendar page-admin', $model);
+    $body = $this->package('cradlephp/cradle-system')
+        ->template('model', 'calendar', $data, ['scripts']);
+
+    //Set Content
+    $response
+        ->setPage('title', $data['title'])
+        ->setPage('class', $class)
+        ->setContent($body);
+
+    //Render blank page
+    $this->trigger('admin-render-page', $request, $response);
+});
+
 //Front End Controllers
 
 /**
