@@ -738,20 +738,16 @@ class Schema extends Registry
                         $decimals = max($decimals, strlen($numbers[1]));
                     }
 
-                    //if integers is still 0
-                    if (!$integers) {
-                        //make it 10
-                        $integers = 10;
-                    }
-
                     //if decimals is still 0
                     if (!$decimals) {
                         //make it 10
                         $decimals = 10;
                     }
 
+                    $length = $integers + $decimals;
+
                     //finalize the length
-                    $format['length'] = $integers . ',' . $decimals;
+                    $format['length'] = $length . ',' . $decimals;
                 }
             }
 
@@ -796,7 +792,7 @@ class Schema extends Registry
 
         return $data;
     }
-    
+
     /**
      * Transforms to elastic data
      *
@@ -807,7 +803,7 @@ class Schema extends Registry
         if (!isset($data['name'])) {
             return;
         }
-        
+
         $map = [];
         $map[$data['primary']] = ['type' => 'integer'];
         foreach ($data['columns'] as $field => $meta) {
@@ -817,10 +813,10 @@ class Schema extends Registry
                     $map[$field] = [
                         'type'=> 'date',
                         'format' => 'yyyy-MM-dd HH:mm:ss'];
-                    
+
                     break;
                 case 'int' :
-                case 'smallint': 
+                case 'smallint':
                     $map[$field] = ['type' => 'integer'];
                     break;
                 case 'float' :
@@ -835,10 +831,10 @@ class Schema extends Registry
                         $map[$field]['fields'] = ['keyword' => [
                             'type' => 'keyword']];
                     }
-                    
+
                     break;
             }
-            
+
         }
 
         foreach ($data['relations'] as $table => $fields) {
@@ -846,17 +842,17 @@ class Schema extends Registry
             $map[$fields['name'] . '_id'] = ['type' => 'integer'];
             // loop through fields
             foreach($fields['fields'] as $field => $meta) {
-                
+
                 switch (strtolower($meta['field']['type'])) {
                     case 'datetime' :
                     case 'date' :
                         $map[$field] = [
                             'type'=> 'date',
                             'format' => 'yyyy-MM-dd HH:mm:ss'];
-                        
+
                         break;
                     case 'int' :
-                    case 'smallint': 
+                    case 'smallint':
                         $map[$field] = ['type' => 'integer'];
                         break;
                     case 'float' :
@@ -871,13 +867,13 @@ class Schema extends Registry
                             $map[$field]['fields'] = ['keyword' => [
                                 'type' => 'keyword']];
                         }
-                        
+
                         break;
                 }
             }
-            
+
         }
-        
+
         return [$data['name'] => $map];
     }
 
