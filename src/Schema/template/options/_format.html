@@ -96,8 +96,8 @@
     </option>
     <option
         data-fieldset="pair"
-        data-placeholder-1="Label or {value}"
-        data-placeholder-2="ie. /node/{node_id}"
+        data-placeholder-1="ie. /node/{\{node_id}}"
+        data-placeholder-2="Label or {\{value}}"
         value="link"
         {{#when format '===' 'link'}}selected{{/when}}
     >
@@ -114,7 +114,7 @@
     </option>
     <option
         data-fieldset="input"
-        data-placeholder="Label or {value}"
+        data-placeholder="Label or {\{value}}"
         value="email"
         {{#when format '===' 'email'}}selected{{/when}}
     >
@@ -122,7 +122,7 @@
     </option>
     <option
         data-fieldset="input"
-        data-placeholder="Label or {value}"
+        data-placeholder="Label or {\{value}}"
         value="phone"
         {{#when format '===' 'phone'}}selected{{/when}}
     >
