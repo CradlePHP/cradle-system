@@ -170,7 +170,6 @@
         autocomplete="{{name}}"
         class="form-control"
         name="{{@key}}"
-        step="0.00001"
         type="number"
         value="{{scope ../item @key}}"
         {{#each field.attributes}}
@@ -719,40 +718,39 @@
             {{@key}}="{{this}}"
         {{/each}}
     >
-        {{#each item.{NAME}}}
-            <div class="meta">
-                <input
-                    class="meta-input key"
-                    placeholder="{{_ 'Name'}}"
-                    type="text"
-                    value="{{@key}}"
-                />
-                <input
-                    class="meta-input value"
-                    type="text"
-                    placeholder="{{_ 'Value'}}"
-                    value="{{this}}"
-                />
-                <input
-                    name="{NAME}[{{@key}}]"
-                    type="hidden"
-                    value="{{this}}"
-                />
-                <a
-                    class="remove"
-                    href="javascript:void(0)"
-                >
-                    <i class="fa fa-times"></i>
-                </a>
-            </div>
-        {{/each}}
+        <div class="meta-fields">
+            {{#each item.{NAME}}}
+                <div class="meta">
+                    <input
+                        class="meta-input key"
+                        placeholder="{{_ 'Name'}}"
+                        type="text"
+                        value="{{@key}}"
+                    />
+                    <input
+                        class="meta-input value"
+                        type="text"
+                        placeholder="{{_ 'Value'}}"
+                        value="{{this}}"
+                    />
+                    <input
+                        name="{NAME}[{{@key}}]"
+                        type="hidden"
+                        value="{{this}}"
+                    />
+                    <a
+                        class="remove text-danger"
+                        href="javascript:void(0)"
+                    >
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            {{/each}}
+        </div>
+        <a class="text-success add-meta">
+            <i class="fa fa-plus"></i>
+        </a>
     </div>
-    <a
-        class="add-meta"
-        href="javascript:void(0)"
-    >
-        <i class="fa fa-plus"></i>
-    </a>
 {{/when}}
 {{#when field.type '===' 'multirange'}}
     <input
