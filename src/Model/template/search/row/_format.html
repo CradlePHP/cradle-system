@@ -7,7 +7,12 @@
                 </a>
             </td>
         {{else}}
-            <td>{{value}}</td>
+            <td>
+                {{#is_array value}}
+                {{else}}
+                    {{~value~}}
+                {{/is_array}}
+            </td>
         {{/in}}
     {{/when}}
     {{#when format '===' 'lower'}}
