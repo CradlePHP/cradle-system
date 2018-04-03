@@ -130,6 +130,18 @@
     {{#when format '===' 'comma'}}
         <td>{{join value ','}}</td>
     {{/when}}
+    {{#when format '===' 'meta'}}
+        <td>
+            <ul class="meta-list">
+                {{#each value}}
+                    <li>
+                        <span class="key">{{@key}}</span> :
+                        <span class="value">{{this}}</span>
+                    </li>
+                {{/each}}
+            </ul>
+        </td>
+    {{/when}}
     {{#when format '===' 'space'}}
         <td>{{join value ' '}}</td>
     {{/when}}

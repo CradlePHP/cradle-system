@@ -122,7 +122,8 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
             'search_filters',
             'search_actions',
             'search_row_format',
-            'search_row_actions'
+            'search_row_actions',
+            'styles',
         ]);
 
     //set content
@@ -268,7 +269,8 @@ $this->get('/admin/system/model/:schema/create', function ($request, $response) 
         ->template('model', 'form', $data, [
             'form_fields',
             'form_detail',
-            'form_format'
+            'form_format',
+            'styles'
         ]);
 
     //set content
@@ -423,7 +425,8 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
         ->template('model', 'form', $data, [
             'form_fields',
             'form_detail',
-            'form_format'
+            'form_format',
+            'styles'
         ]);
 
     //set content
