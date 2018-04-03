@@ -41,12 +41,15 @@ $(function() {
                             $.map( doc.results.rows, function(res) {
                                 var row = {
                                     id: res[model+'_id'],
-                                    title: res[model+'_title'],
                                     start: res[evntStart],
                                 }
 
-                                if (evntEnd) {
-                                    row.end = res[evntEnd];
+                                if (res[model+'_name']) {
+                                    row.title = res[model+'_name'];
+                                }
+
+                                if (res[model+'_title']) {
+                                    row.title = res[model+'_title'];
                                 }
 
                                 if (res[model+'_description']) {
@@ -75,8 +78,13 @@ $(function() {
                     eventData.id;
             },
             eventRender: function(eventData, $el) {
-                var content = eventData.description + ' start: ' +
-                    eventData.start.format('LLL');
+                var content = '';
+
+                if (eventData.description) {
+                    content += eventData.description + ' ';
+                }
+
+                content += 'start: ' + eventData.start.format('LLL');
 
                 if (eventData.end) {
                     content += ' end: ' + eventData.end.format('LLL')
