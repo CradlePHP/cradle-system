@@ -1171,7 +1171,7 @@ $this->get('/admin/system/model/:schema/export/:type', function ($request, $resp
 });
 
 /**
- * Render the System Model Search Page
+ * Render the System Model Calendar Page
  *
  * @param Request $request
  * @param Response $response
@@ -1179,8 +1179,15 @@ $this->get('/admin/system/model/:schema/export/:type', function ($request, $resp
 $this->get('/admin/system/model/:schema/calendar', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
-    //get schema data
-    $model = $request->getStage('schema');
+    //set redirect
+    $redirect = sprintf(
+        '/admin/system/model/%s/search',
+        $request->getStage('schema')
+    );
+
+    $request->setStage('redirect_uri', $redirect);
+
+    $schema = Schema::i($request->getStage('schema'));
 
     //if this is a return back from processing
     //this form and it's because of an error
@@ -1189,64 +1196,45 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
         $response->setFlash($response->getMessage(), 'error');
     }
 
-    //set redirect
-    $request->setStage(
-        'redirect_uri',
-        sprintf('/admin/system/model/%s/search', $model));
-    //----------------------------//
-    // 2. Validate
-    // check if there's a schema
-    $schema = $this->package('global')->config(sprintf('schema/%s', $model));
-
-    if (!$schema) {
-        // redirect
-        $error = $this
-            ->package('global')
-            ->translate('There is no schema for this.');
-        cradle('global')->flash($error, 'error');
-        cradle('global')->redirect('/admin/system/schema/search');
-    }
-
-    foreach ($schema['fields'] as $key => $field) {
-        $schema['fields'][$field['name']] = $field;
-        unset($schema['fields'][$key]);
-    }
+    //also pass the schema to the template
+    $schema = $schema->getAll();
 
     $dates = ['date', 'datetime', 'created', 'updated', 'time', 'week', 'month'];
 
+    if (!$request->getStage('show')) {
+        // redirect
+        $error = $this
+            ->package('global')
+            ->translate('Please specify what to plot.');
+        cradle('global')->flash($error, 'error');
+        cradle('global')->redirect($redirect);
+    }
+
     // check if fields are date fields
-    if ($request->getStage('show')) {
-        $show = $request->getStage('show');
+    $show = $request->getStage('show');
 
-        $fields = explode(',', $show);
-        foreach ($fields as $index => $column) {
-            if (!isset($schema['fields'][$column]) ||
-                !in_array($schema['fields'][$column]['field']['type'], $dates)) {
-                cradle('global')->flash($column.' is not a date field', 'error');
-                $show = [];
-                continue;
-            }
-
-            $fields[$index] = $model.'_'.$column;
+    $fields = explode(',', $show);
+    foreach ($fields as $index => $column) {
+        if (!isset($schema['fields'][$column]) ||
+            !in_array($schema['fields'][$column]['field']['type'], $dates)) {
+            $error = $this->package('global')
+                ->translate('%s is not a date field', $column);
+            cradle('global')->flash($error, 'error');
+            cradle('global')->redirect($redirect);
         }
-
-        $show = $fields;
     }
 
-    if (!$show) {
-        $show = [sprintf('%s_created', $model)];
-    }
+    $show = $fields;
 
     //----------------------------//
     // 3. Render Template
-    $data = $request->getStage();
+    $title = $this->package('global')->translate('%s Calendar', $schema['singular']);
     $data = array_merge(
-        $data,
+        $request->getStage(),
         [
-            'title' => $this->package('global')
-                ->translate($schema['singular']. ' Calendar'),
+            'title' => $title,
             'package' => $schema['plural'],
-            'model' => $model,
+            'model' => $request->getStage('schema'),
             'icon'  => $schema['icon'],
             'show' => $show,
         ]);
@@ -1257,7 +1245,100 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
 
     //Set Content
     $response
-        ->setPage('title', $data['title'])
+        ->setPage('title', $title)
+        ->setPage('class', $class)
+        ->setContent($body);
+
+    //Render blank page
+    $this->trigger('admin-render-page', $request, $response);
+});
+
+/**
+ * Render the System Model Pipeline Page
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->get('/admin/system/model/:schema/pipeline', function ($request, $response) {
+    //----------------------------//
+    // 1. Prepare Data
+    //set redirect
+    $redirect = sprintf(
+        '/admin/system/model/%s/search',
+        $request->getStage('schema')
+    );
+
+    $request->setStage('redirect_uri', $redirect);
+
+    $schema = Schema::i($request->getStage('schema'));
+
+    //if this is a return back from processing
+    //this form and it's because of an error
+    if ($response->isError()) {
+        //pass the error messages to the template
+        $response->setFlash($response->getMessage(), 'error');
+    }
+
+    //also pass the schema to the template
+    $schema = $schema->getAll();
+
+    if (!$request->getStage('show')) {
+        // redirect
+        $error = $this
+            ->package('global')
+            ->translate('Please specify what to plot.');
+        cradle('global')->flash($error, 'error');
+        cradle('global')->redirect($redirect);
+    }
+
+    $dates = ['select', 'radios'];
+    $show = $request->getStage('show');
+
+    if (!isset($schema['fields'][$show]) ||
+        !in_array($schema['fields'][$show]['field']['type'], $dates)) {
+        $error = $this
+            ->package('global')
+            ->translate('%s is not a select/radio field', $show);
+
+        cradle('global')->flash($error, 'error');
+        cradle('global')->redirect($redirect);
+    }
+
+    //----------------------------//
+    // 2. Prepare Data
+    // pipeline stages
+    $stages = $schema['fields'][$show]['field']['options'];
+    foreach ($stages as $key => $stage) {
+        $stages[$key]['percentage'] = (($key + 1)/count($stages)) * 100;
+    }
+
+    $schema['filterable'] = array_values($schema['filterable']);
+
+    //----------------------------//
+    // 3. Render Template
+    $title =$this->package('global')->translate('%s Pipeline', $schema['singular']);
+    $data = array_merge(
+        $request->getStage(),
+        [
+            'title' => $title,
+            'package' => $schema['plural'],
+            'model' => $request->getStage('schema'),
+            'icon'  => $schema['icon'],
+            'stages' => $stages,
+            'schema' => $schema
+        ]);
+
+    $class = sprintf('page-admin-%s-pipeline page-admin', $model);
+    $body = $this->package('cradlephp/cradle-system')
+        ->template('model', 'board', $data, [
+            'search_filters',
+            'styles',
+            'scripts'
+        ]);
+
+    //Set Content
+    $response
+        ->setPage('title', $title)
         ->setPage('class', $class)
         ->setContent($body);
 

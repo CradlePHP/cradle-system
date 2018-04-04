@@ -1,0 +1,92 @@
+{{> styles}}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/admin">
+                <i class="fas fa-home"></i> {{_ 'Admin'}}
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="/admin/system/model/{{model}}/search">
+                <i class="{{icon}}"></i> {{package}}
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="fas fa-calendar-alt"></i> {{_ 'Pipeline'}}
+        </li>
+    </ol>
+</nav>
+
+<div class="main-padding">
+    <h3 class="main-title">{{title}}</h3>
+    <div class="row board-container">
+        <div class="col-md-3 filter-wrapper">
+            <div class="clearfix filter-head">
+                {{_ 'Filters'}}
+            </div>
+            <form class="" method="get">
+                <div class="clearfix form-group">
+                    <input
+                        class="form-control search"
+                        name="q"
+                        placeholder="{{_ 'Search Keyword'}}"
+                        type="text"
+                        value="{{q}}"
+                    />
+                </div>
+                {{> search_filters}}
+                <!--  START: Filter Actions-->
+                <div class="clearfix form-group">
+                    <input
+                        class="col-md-6 btn btn-success"
+                        type="submit"
+                        value="{{_ 'Filter'}}"
+                    />
+                    <input
+                        class="col-md-6 btn btn-danger float-right"
+                        type="reset"
+                        value="{{_ 'Reset'}}"
+                    />
+                </div>
+                <!--  END: Filter Actions-->
+            </form>
+        </div>
+        <div class="col-md-9 pipeline-board">
+            {{#each stages}}
+                <div
+                    class="column"
+                    data-do="board"
+                    data-stage="{{value}}"
+                    data-model={{../model}}
+                    data-field={{../show}}
+                >
+                    <div class="stage">
+                        <div class="stage-label">
+                            <span class="stage-name">{{value}}</span>
+                            <span class="badge badge-pill badge-dark"></span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress">
+                                <div
+                                    class="progress-bar bg-danger "
+                                    role="progressbar"
+                                    aria-valuenow="{{percentage}}"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                    style="width: {{percentage}}%"
+                                >
+                                    {{percentage}}%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="draggable-wrapper">
+                        <ul class="board-stage"></ul>
+                    </div>
+                </div>
+            {{/each}}
+        </div>
+    </div>
+</div>
+<script src="{{settings 'cdn'}}/components/jquery-sortable/source/js/jquery-sortable-min.js"></script>
+{{> scripts}}
