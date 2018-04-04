@@ -157,7 +157,7 @@
 </optgroup>
 <optgroup label="_________">
     <option
-        data-fieldset="input"
+        data-fieldset="textarea"
         data-placeholder="({\{salary}} * {\{tax}}) / 10"
         value="formula"
         {{#when format '===' 'formula'}}selected{{/when}}
@@ -165,7 +165,7 @@
         Formula
     </option>
     <option
-        data-fieldset="input"
+        data-fieldset="textarea"
         data-placeholder="{\{user_first}} {\{user_last}}"
         value="custom"
         {{#when format '===' 'custom'}}selected{{/when}}
@@ -175,5 +175,7 @@
     <option
         value="hide"
         {{#when format '===' 'hide'}}selected{{/when}}
-    >Dont Show</option>
+    >
+        Dont Show
+    </option>
 </optgroup>

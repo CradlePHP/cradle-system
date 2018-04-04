@@ -75,7 +75,7 @@
                                 data-on="change"
                                 name="fields[{INDEX}][list][format]"
                             >
-                                {{> options_format}}
+                                {{> options_format}} 
                             </select>
                         </div>
                     </div>
@@ -267,6 +267,18 @@
             class="form-control"
             type="text"
         />
+    </div>
+</script>
+
+<script id="field-textarea-template" type="text/x-template">
+    <div class="input-textarea">
+        <textarea
+            name="{NAME}"
+            class="form-control"
+            type="text"
+        >
+            {{~~}}
+        </textarea>
     </div>
 </script>
 
