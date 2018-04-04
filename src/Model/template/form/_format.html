@@ -3,7 +3,12 @@
         <tr>
             <td><strong>{{label}}</strong></td>
             {{#when format '===' 'none'}}
-                <td>{{value}}</td>
+                <td>
+                    {{#is_array value}}
+                    {{else}}
+                        {{~value~}}
+                    {{/is_array}}
+                </td>
             {{/when}}
             {{#when format '===' 'lower'}}
                 <td>{{lower value}}</td>
