@@ -922,6 +922,9 @@ class Schema extends Registry
         'markdown' => [
             'type' => 'TEXT'
         ],
+        'code' => [
+            'type' => 'TEXT'
+        ],
         'number' => [
             'type' => 'INT'
         ],
