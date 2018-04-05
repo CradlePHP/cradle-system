@@ -697,6 +697,15 @@ $this->post('/admin/system/model/:schema/update/:id', function ($request, $respo
             continue;
         }
 
+        //if password has no value
+        if ($request->hasStage($name) && !$request->getStage($name) 
+            && $field['field']['type'] === 'password'
+        ) {
+            //make it null
+            $request->removeStage($name);
+            continue;
+        }
+
         //if no value
         if ($request->hasStage($name) && !$request->getStage($name)) {
             //make it null
