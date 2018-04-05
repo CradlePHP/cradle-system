@@ -1,5 +1,13 @@
 <tr class="model-field{{#if disable}} field-disabled{{/if}}" data-index="{{@index}}">
     <td class="model-action" nowrap="nowrap" valign="middle">
+        <a
+            class="field-copy-trigger text-purple"
+            data-do="modal-copy"
+            data-on="click"
+            title="{{_ 'Copy %s' name}}"
+        >
+            <i class="fas fa-copy fa-fw"></i>
+        </a>
         {{#if disable}}
             <i class="fas fa-lock fa-fw"></i>
         {{else}}
