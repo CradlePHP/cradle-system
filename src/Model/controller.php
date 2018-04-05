@@ -1206,8 +1206,8 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
         $error = $this
             ->package('global')
             ->translate('Please specify what to plot.');
-        cradle('global')->flash($error, 'error');
-        cradle('global')->redirect($redirect);
+        $this->package('global')->flash($error, 'error');
+        $this->package('global')->redirect($redirect);
     }
 
     // check if fields are date fields
@@ -1219,8 +1219,8 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
             !in_array($schema['fields'][$column]['field']['type'], $dates)) {
             $error = $this->package('global')
                 ->translate('%s is not a date field', $column);
-            cradle('global')->flash($error, 'error');
-            cradle('global')->redirect($redirect);
+            $this->package('global')->flash($error, 'error');
+            $this->package('global')->redirect($redirect);
         }
     }
 
@@ -1287,8 +1287,8 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
         $error = $this
             ->package('global')
             ->translate('Please specify what to plot.');
-        cradle('global')->flash($error, 'error');
-        cradle('global')->redirect($redirect);
+        $this->package('global')->flash($error, 'error');
+        $this->package('global')->redirect($redirect);
     }
 
     $dates = ['select', 'radios'];
@@ -1299,9 +1299,8 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
         $error = $this
             ->package('global')
             ->translate('%s is not a select/radio field', $show);
-
-        cradle('global')->flash($error, 'error');
-        cradle('global')->redirect($redirect);
+        $this->package('global')->flash($error, 'error');
+        $this->package('global')->redirect($redirect);
     }
 
     //----------------------------//
