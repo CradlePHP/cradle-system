@@ -26,13 +26,15 @@
             </div>
         </div>
     {{else}}
-        <div class="input-input">
-            <input
+        <div class="input-textarea">
+            <textarea
                 class="form-control"
                 name="fields[{{@index}}][list][parameters]"
                 type="text"
-                value="{{list.parameters}}"
-            />
+                value=""
+            >
+                {{~list.parameters~}}
+            </textarea>
         </div>
     {{/is_array}}
 {{/if}}

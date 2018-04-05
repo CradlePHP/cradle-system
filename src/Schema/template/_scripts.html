@@ -188,6 +188,15 @@
             }
         });
 
+        $('div.input-textarea textarea', modal).each(function() {
+            if(!$(this).val().length) {
+                error = true;
+                $(this)
+                    .addClass('is-error')
+                    .after('<div class="error-message">Value cannot be empty.</div>');
+            }
+        });
+
 
         if(error) {
             return;
@@ -318,7 +327,7 @@
 
         var row = trigger.parents('div.modal-body').eq(0);
         var option = $('option[value="' + trigger.val() + '"]', trigger);
-
+ 
         //configuration
         var fieldset = (option.attr('data-fieldset') || '').split('|');
         var format = (option.attr('data-format') || '').split('|');
@@ -602,6 +611,7 @@
 
         trigger.parent().find('div.input-input').remove();
         trigger.parent().find('div.input-pair').remove();
+        trigger.parent().find('div.input-textarea').remove();
 
         //determine ui
         switch(fieldset) {
@@ -639,6 +649,19 @@
 
                 trigger.after(input);
                 break;
+            case 'textarea':
+                var placeholder = option.attr('data-placeholder') || '';
+                var template = 'fields[{INDEX}][list][parameters]';
+                var textarea = $('#field-textarea-template')
+                    .compile({
+                        NAME: template.replace('{INDEX}', trigger.getModelIndex())
+                    })
+                    .doon();
+
+                $('textarea', textarea).attr('placeholder',placeholder);
+
+                trigger.after(textarea);
+                break;
         }
     });
 
@@ -650,6 +673,7 @@
 
         trigger.parent().find('div.input-input').remove();
         trigger.parent().find('div.input-pair').remove();
+        trigger.parent().find('div.input-textarea').remove();
 
         //determine ui
         switch(fieldset) {
@@ -686,6 +710,19 @@
                 });
 
                 trigger.after(input);
+                break;
+            case 'textarea':
+                var placeholder = option.attr('data-placeholder') || '';
+                var template = 'fields[{INDEX}][list][parameters]';
+                var textarea = $('#field-textarea-template')
+                    .compile({
+                        NAME: template.replace('{INDEX}', trigger.getModelIndex())
+                    })
+                    .doon();
+
+                $('textarea', textarea).attr('placeholder',placeholder);
+
+                trigger.after(textarea);
                 break;
         }
     });
@@ -835,6 +872,10 @@
                     'name',
                     name.replace('{INDEX}', i)
                 );
+                $('div.input-textarea textarea', $(this).parent()).attr(
+                    'name',
+                    name.replace('{INDEX}', i)
+                );
 
                 name = 'fields[{INDEX}][list][parameters][{INDEX}]';
                 $('div.input-pair input', $(this).parent()).each(function(j) {
@@ -845,6 +886,7 @@
                             .replace('{INDEX}', j)
                     );
                 });
+                
             });
 
             $('select.field-detail', this).each(function() {
@@ -855,6 +897,10 @@
 
                 var name = 'fields[{INDEX}][detail][parameters]';
                 $('div.input-input input', $(this).parent()).attr(
+                    'name',
+                    name.replace('{INDEX}', i)
+                );
+                $('div.input-textarea textarea', $(this).parent()).attr(
                     'name',
                     name.replace('{INDEX}', i)
                 );
