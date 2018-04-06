@@ -53,6 +53,33 @@
             .clone();
     });
 
+    $(window).on('modal-copy-click', function(e, trigger) {
+        var target = $('.field-add[data-do="field-add"]').data('target');
+        var index = $('tr', target).length;
+
+        var copy = $(trigger)
+            .siblings('div.modal')
+            .eq(0)
+            .find('div.modal-body')
+            .clone()
+            .html()
+            .replace(/name="fields\[[0-9]\]/g, 'name="fields['+index+']')
+            .replace(/name='fields\[[0-9]\]/g, "name='fields["+index+"]");
+
+        $('#field-modal-template')
+            .compile()
+            .find('div.modal-body')
+            .html(copy)
+            .parents('.modal')
+            .appendTo(document.body)
+            .modal({
+                backdrop: 'static',
+                keyboard: false
+            })
+            .attr('data-target', target)
+            .doon();
+    });
+
     $(window).on('modal-cancel-click', function(e, trigger) {
         var modal = $(trigger).parents('div.modal').eq(0).modal('hide');
 
@@ -327,7 +354,7 @@
 
         var row = trigger.parents('div.modal-body').eq(0);
         var option = $('option[value="' + trigger.val() + '"]', trigger);
- 
+
         //configuration
         var fieldset = (option.attr('data-fieldset') || '').split('|');
         var format = (option.attr('data-format') || '').split('|');
@@ -886,7 +913,7 @@
                             .replace('{INDEX}', j)
                     );
                 });
-                
+
             });
 
             $('select.field-detail', this).each(function() {
