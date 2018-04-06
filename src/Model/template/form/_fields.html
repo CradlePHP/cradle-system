@@ -23,27 +23,15 @@
     />
 {{/when}}
 {{#when field.type '===' 'password'}}
-    {{#when ../action '!==' 'update'}}
-        <input
-            autocomplete="password"
-            class="form-control"
-            name="{{@key}}"
-            type="password"
-            value="{{scope ../item @key}}"
-            {{#each field.attributes}}
-                {{@key}}="{{this}}"
-            {{/each}} 
-        />
-    {{else}}
-        <input
-            class="form-control"
-            name="{{@key}}"
-            type="password"
-            {{#each field.attributes}}
-                {{@key}}="{{this}}"
-            {{/each}} 
-        />
-    {{/when}}
+    <input
+        autocomplete="password"
+        class="form-control"
+        name="{{@key}}"
+        type="password"
+        {{#each field.attributes}}
+            {{@key}}="{{this}}"
+        {{/each}} 
+    />
 {{/when}}
 {{#when field.type '===' 'search'}}
     <input
