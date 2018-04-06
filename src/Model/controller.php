@@ -122,8 +122,7 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
             'search_filters',
             'search_actions',
             'search_row_format',
-            'search_row_actions',
-            'styles',
+            'search_row_actions'
         ]);
 
     //set content
@@ -270,7 +269,6 @@ $this->get('/admin/system/model/:schema/create', function ($request, $response) 
             'form_fields',
             'form_detail',
             'form_format',
-            'styles'
         ]);
 
     //set content
@@ -426,7 +424,6 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
             'form_fields',
             'form_detail',
             'form_format',
-            'styles'
         ]);
 
     //set content
@@ -698,7 +695,7 @@ $this->post('/admin/system/model/:schema/update/:id', function ($request, $respo
         }
 
         //if password has no value
-        if ($request->hasStage($name) && !$request->getStage($name) 
+        if ($request->hasStage($name) && !$request->getStage($name)
             && $field['field']['type'] === 'password'
         ) {
             //make it null
@@ -1250,7 +1247,7 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
 
     $class = sprintf('page-admin-%s-calendar page-admin', $model);
     $body = $this->package('cradlephp/cradle-system')
-        ->template('model', 'calendar', $data, ['scripts']);
+        ->template('model', 'calendar', $data);
 
     //Set Content
     $response
@@ -1338,11 +1335,7 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
 
     $class = sprintf('page-admin-%s-pipeline page-admin', $model);
     $body = $this->package('cradlephp/cradle-system')
-        ->template('model', 'board', $data, [
-            'search_filters',
-            'styles',
-            'scripts'
-        ]);
+        ->template('model', 'board', $data, ['search_filters']);
 
     //Set Content
     $response
