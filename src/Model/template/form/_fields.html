@@ -136,6 +136,16 @@
         {{/each}}
     >{{{scope ../item @key}}}</textarea>
 {{/when}}
+{{#when field.type '===' 'code'}}
+    <textarea
+        class="form-control hidden"
+        data-do="code-editor"
+        name="{{@key}}"
+        {{#each field.attributes}}
+            {{@key}}="{{this}}"
+        {{/each}}
+    >{{{scope ../item @key}}}</textarea>
+{{/when}}
 {{#when field.type '===' 'number'}}
     <input
         autocomplete="{{name}}"

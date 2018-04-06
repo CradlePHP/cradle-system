@@ -1,6 +1,6 @@
 {{#each schema.fields}}
     {{#in ../schema.filterable @key}}
-        {{#notin 'password,files,images,textarea,wysiwyg,markdown,none,hide,active' field.type}}
+        {{#notin 'password,files,images,textarea,wysiwyg,markdown,code,none,hide,active' field.type}}
             <div class="form-group">
                 <label for="filter[{{@key}}]">{{label}}</label>
                 {{#in 'text,slug,file,image,uuid' field.type}}
