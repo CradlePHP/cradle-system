@@ -1245,7 +1245,7 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
             'show' => $show,
         ]);
 
-    $class = sprintf('page-admin-%s-calendar page-admin', $model);
+    $class = sprintf('page-admin-%s-calendar page-admin', $request->getStage('schema'));
     $body = $this->package('cradlephp/cradle-system')
         ->template('model', 'calendar', $data);
 
@@ -1333,7 +1333,7 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
             'schema' => $schema
         ]);
 
-    $class = sprintf('page-admin-%s-pipeline page-admin', $model);
+    $class = sprintf('page-admin-%s-pipeline page-admin', $request->getStage('schema'));
     $body = $this->package('cradlephp/cradle-system')
         ->template('model', 'board', $data, ['search_filters']);
 
