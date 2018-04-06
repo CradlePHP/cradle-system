@@ -1347,6 +1347,31 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
     $this->trigger('admin-render-page', $request, $response);
 });
 
+/**
+ * Process Pipeline Update
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->post('/admin/system/model/:schema/pipeline', function ($request, $response) {
+    //----------------------------//
+    // get json response data only
+    $request->setStage('redirect_uri', 'false');
+    $request->setStage('render', 'false');
+
+    //now let the original post update take over
+    $this->routeTo(
+        'post',
+        sprintf(
+            '/admin/system/model/%s/update/%s',
+            $request->getStage('schema'),
+            $request->getStage('id')
+        ),
+        $request,
+        $response
+    );
+});
+
 //Front End Controllers
 
 /**
