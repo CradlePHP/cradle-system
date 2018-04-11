@@ -541,7 +541,9 @@
     $(window).on('keyval-add-click', function(e, trigger) {
         var last = $(trigger).parent().find('div.keyval-row:last');
 
-        var index = 0;
+        // since this is only activated after clicking the add option
+        // and there's previous option already
+        var index = 1;
         if(last.length) {
             index = parseInt(last.attr('data-index')) + 1;
         }
@@ -614,8 +616,24 @@
                 break;
             case 'one':
                 container.find('div.input-input').remove();
+
                 if(!container.find('div.input-options').length) {
+                    //compile option field
                     var template = 'fields[{INDEX}][validation][{INDEX}][parameters][{INDEX}]';
+                    var index = 0;
+                    var name = template
+                                .replace('{INDEX}', trigger.getModelIndex())
+                                .replace('{INDEX}', index)
+                                .replace('{INDEX}', index);
+                    var index1 = container.attr('data-index');
+                    var row = $('#field-option-row-template')
+                        .compile({
+                            NAME: name,
+                            INDEX: index
+                        })
+                        .doon();
+                    trigger.parent().after(row);
+
                     var parameters = $('#field-options-template')
                         .compile({
                             NAME: template
@@ -624,7 +642,7 @@
                         })
                         .doon();
 
-                    trigger.parent().after(parameters);
+                    row.after(parameters);
                 }
                 break;
         }
