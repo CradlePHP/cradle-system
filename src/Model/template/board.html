@@ -18,39 +18,43 @@
 
 <div class="main-padding">
     <h3 class="main-title">{{title}}</h3>
-    <div class="row board-container">
-        <div class="col-md-3 filter-wrapper">
-            <div class="clearfix filter-head">
-                {{_ 'Filters'}}
-            </div>
-            <form class="" method="get">
-                <div class="clearfix form-group">
+    <div class="box search-filters">
+        <div class="box-head box-default">
+            <h3 class="box-title">{{_ 'Filters'}}</h3>
+        </div>
+        <form method="get">
+            <div class="box-body box-padding">
+                <div class="form-group">
+                    <label for="q">{{_ 'Search'}}</label>
                     <input
-                        class="form-control search"
+                        class="form-control"
                         name="q"
-                        placeholder="{{_ 'Search Keyword'}}"
-                        type="text"
+                        placeholder="Enter Search {{schema.plural}}"
+                        type="search"
                         value="{{q}}"
                     />
                 </div>
-                {{> search_filters}}
-                <!--  START: Filter Actions-->
-                <div class="clearfix form-group">
-                    <input
-                        class="col-md-6 btn btn-success"
-                        type="submit"
-                        value="{{_ 'Filter'}}"
-                    />
-                    <input
-                        class="col-md-6 btn btn-danger float-right"
-                        type="reset"
-                        value="{{_ 'Reset'}}"
-                    />
+
+                {{#if schema.filterable.length}}
+                    {{> search_form}}
+                {{else}}
+                    {{#if filterable_relations.length}}
+                        {{> search_form}}
+                    {{/if}}
+                {{/if}}
+            </div>
+            <div class="box-foot box-light">
+                <div class="box-left">
+                    <button class="btn btn-danger" type="reset">{{_ 'Reset'}}</button>
                 </div>
-                <!--  END: Filter Actions-->
-            </form>
-        </div>
-        <div class="col-md-9 pipeline-board">
+                <div class="box-right">
+                    <button class="btn btn-primary">{{_ 'Search'}}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="row board-container">
+        <div class="pipeline-board">
             {{#each stages}}
                 <div
                     class="column"
