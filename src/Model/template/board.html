@@ -62,6 +62,9 @@
                     data-stage="{{value}}"
                     data-model={{../model}}
                     data-field={{../show}}
+                    {{#if ../order}}
+                        data-order="{{../order}}"
+                    {{/if}}
                 >
                     <div class="stage">
                         <div class="stage-label">
