@@ -1245,7 +1245,7 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
             'show' => $show,
         ]);
 
-    $class = sprintf('page-admin-%s-calendar page-admin', $request->getStage('schema'));
+    $class = sprintf('page-admin-%s-calendar page-admin-calendar page-admin', $request->getStage('schema'));
     $body = $this->package('cradlephp/cradle-system')
         ->template('model', 'calendar', $data);
 
