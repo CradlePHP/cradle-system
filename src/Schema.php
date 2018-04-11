@@ -953,14 +953,12 @@ class Schema extends Registry
             'type' => 'datetime'
         ],
         'week' => [
-            'type' => 'INT',
-            'length' => 2,
-            'attribute' => 'unsigned'
+            'type' => 'VARCHAR',
+            'length' => 255
         ],
         'month' => [
-            'type' => 'INT',
-            'length' => 2,
-            'attribute' => 'unsigned'
+            'type' => 'VARCHAR',
+            'length' => 255
         ],
         'checkbox' => [
             'type' => 'INT',
