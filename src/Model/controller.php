@@ -934,6 +934,24 @@ $this->post('/admin/system/model/:schema/import', function ($request, $response)
     // 1. Prepare Data
     $schema = Schema::i($request->getStage('schema'));
 
+    // data
+    $data = [];
+
+    // try to parse the data
+    try {
+        // decode the data
+        $data = @json_decode($request->getBody(), true);
+    } catch(\Exception $e) {
+        return $response
+            ->setContent(json_encode([
+                'error' => true,
+                'message' => 'Unable to parse data'
+            ]));
+    }
+
+    // set data
+    $request->setStage('rows', $data);
+
     //----------------------------//
     // 2. Process Request
     //get schema data
