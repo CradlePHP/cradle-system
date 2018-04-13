@@ -80,6 +80,11 @@ return function($request, $response) {
                 return $row[$schema->getPrimaryFieldName()];
             case 'active':
                 $key = $schema->getActiveFieldName();
+
+                if ($key === false) {
+                    return true;
+                }
+
                 if (isset($row[$key])) {
                     return $row[$key];
                 }
@@ -104,6 +109,7 @@ return function($request, $response) {
 
     $handlebars->registerHelper('active', function ($schema, $row, $options) {
         $schemaKey = cradle('global')->handlebars()->getHelper('schema_row');
+
         if ($schemaKey($schema, $row, 'active')) {
             return $options['fn']();
         }
