@@ -63,7 +63,7 @@
                 <td>{{{strip value parameters}}}</td>
             {{/when}}
             {{#when format '===' 'link'}}
-                <td><a href="{{compile parameters.0 ../this}}">{{compile parameters.1 ../detail}}</a></td>
+                <td><a href="{{compile parameters.0 ../detail}}">{{compile parameters.1 ../detail}}</a></td>
             {{/when}}
             {{#when format '===' 'image'}}
                 <td><img src="{{value}}" width="{{parameters.0}}" height="{{parameters.1}}" /></td>
