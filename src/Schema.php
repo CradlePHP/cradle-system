@@ -570,7 +570,7 @@ class Schema extends Registry
      */
     public function getUniqueFieldNames()
     {
-        $results = [];
+        $results = [ $this->getPrimaryFieldName() ];
         if (!isset($this->data['fields']) || empty($this->data['fields'])) {
             return $results;
         }

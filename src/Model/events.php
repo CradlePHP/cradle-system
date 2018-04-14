@@ -115,12 +115,11 @@ $this->on('system-model-detail', function ($request, $response) {
     $schema = Schema::i($data['schema']);
 
     $id = $key = null;
-    $slugs = $schema->getSlugableFieldNames($schema->getPrimaryFieldName());
-
-    foreach ($slugs as $slug) {
-        if (isset($data[$slug])) {
-            $id = $data[$slug];
-            $key = $slug;
+    $uniques = $schema->getUniqueFieldNames();
+    foreach ($uniques as $unique) {
+        if (isset($data[$unique])) {
+            $id = $data[$unique];
+            $key = $unique;
             break;
         }
     }
@@ -230,10 +229,10 @@ $this->on('system-model-remove', function ($request, $response) {
     $modelElastic->remove($data[$primary]);
 
     //invalidate cache
-    $slugs = $schema->getSlugableFieldNames($primary);
-    foreach ($slugs as $slug) {
-        if (isset($data[$slug])) {
-            $modelRedis->removeDetail($data[$slug]);
+    $uniques = $schema->getUniqueFieldNames();
+    foreach ($uniques as $unique) {
+        if (isset($data[$unique])) {
+            $modelRedis->removeDetail($data[$unique]);
         }
     }
 
@@ -479,10 +478,10 @@ $this->on('system-model-update', function ($request, $response) {
     $modelElastic->update($results[$primary]);
 
     //invalidate cache
-    $slugs = $schema->getSlugableFieldNames($primary);
-    foreach ($slugs as $slug) {
-        if (isset($data[$slug])) {
-            $modelRedis->removeDetail($data[$slug]);
+    $uniques = $schema->getUniqueFieldNames();
+    foreach ($uniques as $unique) {
+        if (isset($data[$unique])) {
+            $modelRedis->removeDetail($data[$unique]);
         }
     }
 
