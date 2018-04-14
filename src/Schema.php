@@ -583,7 +583,7 @@ class Schema extends Registry
             }
 
             foreach ($field['validation'] as $validation) {
-                if ($validation === 'unique') {
+                if ($validation['method'] === 'unique') {
                     $results[] = $name;
                 }
             }
