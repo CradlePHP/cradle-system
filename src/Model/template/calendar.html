@@ -22,15 +22,54 @@
 
 <div class="main-padding">
     <h3 class="main-title">{{title}}</h3>
+    <div class="calender-head clearfix">
+        <div class="float-left">
+            <div class="btn-group">
+                <a
+                    href="/admin/system/model/sink/calendar?{{query 'start_date' prev}}"
+                    class="btn btn-light"
+                ><i class="fas fa-chevron-left"></i></a>
+                <a
+                    href="/admin/system/model/sink/calendar?{{query 'start_date' next}}"
+                    class="btn btn-light"
+                ><i class="fas fa-chevron-right"></i></a>
+            </div>
+            <a
+                href="/admin/system/model/sink/calendar?{{query 'start_date' today}}"
+                class="btn btn-light{{#when start_date '==' today}} active{{/when}}
+                {{~#unless start_date}} active{{/unless}}"
+            >{{_ 'today'}}</a>
+        </div>
+        <div class="float-right">
+            <a
+                href="/admin/system/model/sink/calendar?{{query 'view' 'month'}}"
+                class="btn btn-light{{#when view '==' 'month'}} active{{/when}}
+                {{~#unless view}} active{{/unless}}"
+            >{{_ 'month'}}</a>
+            <a
+                href="/admin/system/model/sink/calendar?{{query 'view' 'agendaWeek'}}"
+                class="btn btn-light{{#when view '==' 'agendaWeek'}} active{{/when}}"
+            >{{_ 'week'}}</a>
+            <a
+                href="/admin/system/model/sink/calendar?{{query 'view' 'agendaDay'}}"
+                class="btn btn-light{{#when view '==' 'agendaDay'}} active{{/when}}"
+            >{{_ 'day'}}</a>
+            <a
+                href="/admin/system/model/sink/calendar?{{query 'view' 'listWeek'}}"
+                class="btn btn-light{{#when view '==' 'listWeek'}} active{{/when}}"
+            >{{_ 'list'}}</a>
+        </div>
+    </div>
     <div
         data-do="calendar"
         data-model="{{model}}"
+        data-view="{{#if view}}{{view}}{{else}}month{{/if}}"
         data-start="{{show.0}}"
         {{#if show.1}}
             data-end="{{show.1}}"
         {{/if}}
-        {{#if start}}
-            data-date="{{start}}"
+        {{#if start_date}}
+            data-date="{{start_date}}"
         {{/if}}
         id="calendar"
     ></div>

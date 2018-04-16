@@ -1249,12 +1249,46 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
     }
 
     $show = $fields;
+    $data = $request->getStage();
+
+    // set base date
+    $base = date('Y-m-d');
+    // today date for today button
+    $data['today'] =  date('Y-m-d');
+
+    // if there's a start date provide,
+    // we have to change our base date
+    if ($request->getStage('start_date')) {
+        $base = date('Y-m-d', strtotime($request->getStage('start_date')));
+    }
+
+    // set default the previous and next date based on our "base" date
+    // default is month view
+    $prev = strtotime($base .' -1 month');
+    $next = strtotime($base .' +1 month');
+
+    // change previous and next date if the user wanted a week view
+    if ($request->getStage('view') == 'listWeek' ||
+        $request->getStage('view') == 'agendaWeek') {
+        $prev = strtotime($base .' -1 week');
+        $next = strtotime($base .' +1 week');
+    }
+
+    // change previous and next date if the user wanted a day view
+    if ($request->getStage('view') == 'agendaDay') {
+        $prev = strtotime($base .' -1 day');
+        $next = strtotime($base .' +1 day');
+    }
+
+    // set whatever previous and next date we got from the changes above
+    $data['prev'] = date('Y-m-d', $prev);
+    $data['next'] = date('Y-m-d', $next);
 
     //----------------------------//
     // 3. Render Template
     $title = $this->package('global')->translate('%s Calendar', $schema['singular']);
     $data = array_merge(
-        $request->getStage(),
+        $data,
         [
             'title' => $title,
             'package' => $schema['plural'],
