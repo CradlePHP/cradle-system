@@ -103,6 +103,19 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
 
     //determine valid relations
     $data['valid_relations'] = [];
+
+    //if there's active filter, get its value
+    //for search purposes
+    if (isset($data['filter'])) {
+        $data['filter']['active'] = null;
+
+        foreach($data['filter'] as $filter => $value) {
+            if ($filter === $data['schema']['active']) {
+                $data['filter']['active'] = $value;
+            }
+        }
+    }
+
     $this->trigger('system-schema-search', $request, $response);
     foreach ($response->getResults('rows') as $relation) {
         $data['valid_relations'][] = $relation['name'];
