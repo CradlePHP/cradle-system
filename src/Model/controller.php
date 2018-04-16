@@ -1048,6 +1048,29 @@ $this->get('/admin/system/model/:schema/export/:type', function ($request, $resp
         }
     }
 
+    //filter possible filter options
+    //we do this to prevent SQL injections
+    //check if filter column has empty value
+    if (is_array($request->getStage('filter'))) {
+        foreach ($request->getStage('filter') as $key => $value) {
+            //if invalid key format or there is no value
+            if (!preg_match('/^[a-zA-Z0-9_]+$/', $key) || !strlen($value)) {
+                $request->removeStage('filter', $key);
+            }
+        }
+    }
+
+    //filter possible sort options
+    //we do this to prevent SQL injections
+    //check if filter column has empty value
+    if (is_array($request->getStage('order'))) {
+        foreach ($request->getStage('order') as $key => $value) {
+            if (!preg_match('/^[a-zA-Z0-9_]+$/', $key)) {
+                $request->removeStage('order', $key);
+            }
+        }
+    }
+
     $request->setStage('range', 0);
 
     //----------------------------//
