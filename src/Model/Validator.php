@@ -151,7 +151,7 @@ class Validator
                     case in_array($validation['method'], ['column_gt', 'column_gte', 'column_lt', 'column_lte'])
                         && !isset($data[$validation['parameters']]):
                         $errors[$name] = cradle('global')
-                            ->translate('Column compared against is not existing. Please check schema.');
+                            ->translate('Column compared against does not exist. Please check schema.');
                         break;
                     case $validation['method'] === 'column_gt'
                         && !($data[$name] > $data[$validation['parameters']]):
