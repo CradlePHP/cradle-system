@@ -416,10 +416,11 @@ class SqlService
 
         //add filters
         foreach ($filter as $column => $value) {
-            if ((!isset($data['q']) || 
-                (isset($data['q']) && empty($data['q']))) &&
-                !is_null($value) && 
-                 preg_match('/^[a-zA-Z0-9-_]+$/', $column)) {
+            if (strlen($value) <= 0) {
+                continue;
+            }
+            
+            if (preg_match('/^[a-zA-Z0-9-_]+$/', $column)) {
                 $search->addFilter($column . ' = %s', $value);
             }
         }
