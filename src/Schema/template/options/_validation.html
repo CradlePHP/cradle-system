@@ -64,6 +64,20 @@
         {{~#when method '===' 'gte'}} selected{{/when~}}
     >Greater Than Equals</option>
 </optgroup>
+<optgroup label="Column Validation">
+    <option value="column_lt"
+        {{~#when method '===' 'column_lt'}} selected{{/when~}}
+    >Column Less Than</option>
+    <option value="column_lte"
+        {{~#when method '===' 'column_lte'}} selected{{/when~}}
+    >Column Less Than Equals</option>
+    <option value="column_gt"
+        {{~#when method '===' 'column_gt'}} selected{{/when~}}
+    >Column Greater Than</option>
+    <option value="column_gte"
+        {{~#when method '===' 'column_gte'}} selected{{/when~}}
+    >Column Greater Than Equals</option>
+</optgroup>
 <optgroup label="Date Validation">
     <option value="date"
         {{~#when method '===' 'date'}} selected{{/when~}}
@@ -74,6 +88,15 @@
     <option value="datetime"
         {{~#when method '===' 'datetime'}} selected{{/when~}}
     >Valid DateTime</option>
+    <option value="pastdate"
+        {{~#when method '===' 'pastdate'}} selected{{/when~}}
+    >Valid Past Date</option>
+    <option value="presentdate"
+        {{~#when method '===' 'presentdate'}} selected{{/when~}}
+    >Valid Present Date</option>
+    <option value="futuredate"
+        {{~#when method '===' 'futuredate'}} selected{{/when~}}
+    >Valid Future Date</option>
 </optgroup>
 <optgroup label="Type Validation">
     <option value="email"

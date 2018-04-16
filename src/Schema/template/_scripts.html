@@ -593,11 +593,12 @@
                 container.find('div.input-input').remove();
                 container.find('div.input-options').remove();
                 break;
-            case 'ne':        case 'lt':        case 'lte':
-            case 'gt':        case 'gte':       case 'char_lt':
-            case 'char_lte':  case 'char_gt':   case 'char_gte':
-            case 'word_lt':   case 'word_lte':  case 'word_gt':
-            case 'word_gte':  case 'regex':
+            case 'ne':         case 'lt':        case 'lte':
+            case 'gt':         case 'gte':       case 'char_lt':
+            case 'char_lte':   case 'char_gt':   case 'char_gte':
+            case 'word_lt':    case 'word_lte':  case 'word_gt':
+            case 'word_gte':   case 'regex':     case 'column_gt':
+            case 'column_gte': case 'column_lt': case 'column_lte':
                 container.find('div.input-options').remove();
                 if(!container.find('div.input-input').length) {
                     var template = 'fields[{INDEX}][validation][{INDEX}][parameters]';

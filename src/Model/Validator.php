@@ -148,6 +148,19 @@ class Validator
 
             foreach ($field['validation'] as $validation) {
                 switch (true) {
+                    case in_array($validation['method'], ['column_gt', 'column_gte', 'column_lt', 'column_lte'])
+                        && !isset($data[$validation['parameters']]):
+                        $errors[$name] = cradle('global')
+                            ->translate('Column compared against is not existing. Please check schema.');
+                        break;
+                    case $validation['method'] === 'column_gt'
+                        && !($data[$name] > $data[$validation['parameters']]):
+                    case $validation['method'] === 'column_gte'
+                        && !($data[$name] >= $data[$validation['parameters']]):
+                    case $validation['method'] === 'column_lt'
+                        && !($data[$name] < $data[$validation['parameters']]):
+                    case $validation['method'] === 'column_lte'
+                        && !($data[$name] <= $data[$validation['parameters']]):
                     case $validation['method'] === 'empty'
                         && empty($data[$name]):
                     case $validation['method'] === 'number'
@@ -190,6 +203,12 @@ class Validator
                         && !preg_match('/^[0-9]{2}:[0-9]{2}:[0-9]{2}$/', $data[$name]):
                     case $validation['method'] === 'datetime'
                         && !preg_match('/^[0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/', $data[$name]):
+                    case $validation['method'] === 'futuredate'
+                        && !(strtotime($data[$name]) > strtotime(date('Y-m-d'))):
+                    case $validation['method'] === 'pastdate'
+                        && !(strtotime($data[$name]) < strtotime(date('Y-m-d'))):
+                    case $validation['method'] === 'presentdate'
+                        && !(strtotime($data[$name]) == strtotime(date('Y-m-d'))):
                     case $validation['method'] === 'email'
                         && !preg_match('/^(?:(?:(?:[^@,"\[\]\x5c\x00-\x20\x7f-\xff\.]|\x5c(?=[@,"\[\]'.
                         '\x5c\x00-\x20\x7f-\xff]))(?:[^@,"\[\]\x5c\x00-\x20\x7f-\xff\.]|(?<=\x5c)[@,"\[\]'.
