@@ -719,7 +719,7 @@ $this->post('/admin/system/model/:schema/update/:id', function ($request, $respo
         //if no value
         if ($request->hasStage($name) && !$request->getStage($name)) {
             //make it null
-            $request->setStage($name, '');
+            $request->setStage($name, null);
             continue;
         }
 
