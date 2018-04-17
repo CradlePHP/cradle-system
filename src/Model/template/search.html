@@ -86,6 +86,13 @@
                         <button class="btn btn-primary">{{_ 'Search'}}</button>
                     </div>
                 </div>
+                {{#when filter.active '===' '0'}}
+                    <input 
+                        name="filter[{{schema.active}}]" 
+                        type="hidden" 
+                        value = "0"
+                    />
+                {{/when}}
             </form>
         </div>
 

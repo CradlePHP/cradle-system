@@ -103,6 +103,19 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
 
     //determine valid relations
     $data['valid_relations'] = [];
+
+    //if there's active filter, get its value
+    //for search purposes
+    if (isset($data['filter'])) {
+        $data['filter']['active'] = null;
+
+        foreach($data['filter'] as $filter => $value) {
+            if ($filter === $data['schema']['active']) {
+                $data['filter']['active'] = $value;
+            }
+        }
+    }
+
     $this->trigger('system-schema-search', $request, $response);
     foreach ($response->getResults('rows') as $relation) {
         $data['valid_relations'][] = $relation['name'];
@@ -1043,6 +1056,29 @@ $this->get('/admin/system/model/:schema/export/:type', function ($request, $resp
 
         foreach ($request->getStage('order') as $key => $value) {
             if (!in_array($key, $sortable)) {
+                $request->removeStage('order', $key);
+            }
+        }
+    }
+
+    //filter possible filter options
+    //we do this to prevent SQL injections
+    //check if filter column has empty value
+    if (is_array($request->getStage('filter'))) {
+        foreach ($request->getStage('filter') as $key => $value) {
+            //if invalid key format or there is no value
+            if (!preg_match('/^[a-zA-Z0-9_]+$/', $key) || !strlen($value)) {
+                $request->removeStage('filter', $key);
+            }
+        }
+    }
+
+    //filter possible sort options
+    //we do this to prevent SQL injections
+    //check if filter column has empty value
+    if (is_array($request->getStage('order'))) {
+        foreach ($request->getStage('order') as $key => $value) {
+            if (!preg_match('/^[a-zA-Z0-9_]+$/', $key)) {
                 $request->removeStage('order', $key);
             }
         }
