@@ -668,9 +668,8 @@ $this->post('/admin/system/model/:schema/create', function ($request, $response)
     //add a flash
     $this->package('global')->flash(sprintf(
         '%s was Created',
-        'success',
         $schema->getSingular()
-    ));
+    ), 'success');
 
     $this->package('global')->redirect($redirect);
 });
@@ -797,9 +796,8 @@ $this->post('/admin/system/model/:schema/update/:id', function ($request, $respo
     //add a flash
     $this->package('global')->flash(sprintf(
         '%s was Updated',
-        'success',
         $schema->getSingular()
-    ));
+    ), 'success');
 
     $this->package('global')->redirect($redirect);
 });
@@ -958,7 +956,11 @@ $this->post('/admin/system/model/:schema/import', function ($request, $response)
         return $response
             ->setContent(json_encode([
                 'error' => true,
-                'message' => 'Unable to parse data'
+                'message' => 'Unable to parse data',
+                'errors' => [
+                    'Unable to parse data',
+                    $e->getMessage()
+                ]
             ]));
     }
 
@@ -967,8 +969,19 @@ $this->post('/admin/system/model/:schema/import', function ($request, $response)
 
     //----------------------------//
     // 2. Process Request
-    //get schema data
-    $this->trigger('system-model-import', $request, $response);
+    // catch errors for better debugging
+    try {
+        $this->trigger('system-model-import', $request, $response);
+    } catch(\Exception $e) {
+        return $response
+            ->setContent(json_encode([
+                'error' => true,
+                'message' => $e->getMessage(),
+                'errors' => [
+                    $e->getMessage()
+                ]
+            ]));
+    }
 
     //----------------------------//
     // 3. Interpret Results
@@ -1006,7 +1019,7 @@ $this->post('/admin/system/model/:schema/import', function ($request, $response)
     $message = $this->package('global')->translate(sprintf(
         '%s was Imported',
         $schema->getPlural()
-    ));
+    ), 'success');
 
     //Set JSON Content
     return $response->setContent(json_encode([
