@@ -259,7 +259,8 @@ class Schema extends Registry
                         'meta',
                         'checkboxes',
                         'multirange',
-                        'rawjson'
+                        'rawjson',
+                        'multiselect'
                     ]
             )
             ) {
@@ -974,6 +975,9 @@ class Schema extends Registry
         'select' => [
             'type' => 'VARCHAR',
             'length' => 255
+        ],
+        'multiselect' => [
+            'type' => 'JSON'
         ],
         'checkboxes' => [
             'type' => 'JSON'
