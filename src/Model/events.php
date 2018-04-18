@@ -470,7 +470,6 @@ $this->on('system-model-update', function ($request, $response) {
         if (isset($data[$relation['primary2']])
             && is_numeric($data[$relation['primary2']])
             && $lastId != $data[$relation['primary2']]
-            && $lastId
         ) {
             //remove last id
             $modelSql->unlink(
