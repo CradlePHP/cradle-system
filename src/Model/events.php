@@ -32,6 +32,16 @@ $this->on('system-model-create', function ($request, $response) {
 
     $schema = Schema::i($data['schema']);
 
+    //
+    // FIX: For import or in any part of the system
+    // if primary is set but doesn't have a value. 
+    //
+    if (isset($data[$schema->getPrimaryFieldName()])
+    && empty($data[$schema->getPrimaryFieldName()])) {
+        // remove the field instead
+        unset($data[$schema->getPrimaryFieldName()]);
+    }
+
     //----------------------------//
     // 2. Validate Data
     $errors = $schema
