@@ -57,7 +57,50 @@
         var target = $('.field-add[data-do="field-add"]').data('target');
         var index = $('tr', target).length;
 
-        var copy = $(trigger)
+        var elements = [
+            'div.modal-body input',
+            'div.modal-body input[type="checkbox"]',
+            'div.modal-body select',
+            'div.modal-body textarea'
+        ];
+
+        // case for inputs
+        $(trigger)
+            .siblings('div.modal')
+            .eq(0)
+            .find(elements.join(', '))
+            .each(function(index, el) {
+                var nodeName = $(el).prop('nodeName');
+
+                switch(nodeName) {
+                    case 'INPUT':
+                        if ($(el).is(':checkbox')) {
+                            if (!$(el).is(':checked')) {
+                                $(el).removeAttr('checked');
+                            } else {
+                                $(el).attr('checked', true);
+                            }
+                        } else {
+                            $(el).attr('value', $(el).val());
+                        }
+
+                        break;
+                    case 'SELECT':
+                        var filter = '[value="{value}"]'.replace('{value}', $(el).val());
+
+                        $(el)
+                            .find(filter)
+                            .attr('selected', 'selected');
+
+                        break;
+                    case 'TEXTAREA':
+                        $(el).html($(el).val());
+
+                        break;
+                }
+            });
+
+        copy = $(trigger)
             .siblings('div.modal')
             .eq(0)
             .find('div.modal-body')
@@ -276,6 +319,11 @@
         $('td.field-sortable-value', row).html(sortable ? 'Yes': 'No');
 
         copy = null;
+
+        //safely close the modal
+        modal.modal('hidden.bs.modal', function() {
+            modal.remove();
+        });
     });
 
     $(window).on('remove-click', function(e, trigger) {
