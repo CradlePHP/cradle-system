@@ -30,7 +30,7 @@
         type="password"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
-        {{/each}} 
+        {{/each}}
     />
 {{/when}}
 {{#when field.type '===' 'search'}}
@@ -774,4 +774,14 @@
             {{@key}}="{{this}}"
         {{/each}}
     />
+{{/when}}
+{{#when field.type '===' 'rawjson'}}
+    <textarea
+        class="form-control hidden"
+        data-do="code-editor"
+        name="{{@key}}"
+        {{#each field.attributes}}
+            {{@key}}="{{this}}"
+        {{/each}}
+    >{{{scope ../item @key}}}</textarea>
 {{/when}}
