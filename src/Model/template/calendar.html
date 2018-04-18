@@ -26,36 +26,36 @@
         <div class="float-left">
             <div class="btn-group">
                 <a
-                    href="/admin/system/model/sink/calendar?{{query 'start_date' prev}}"
+                    href="/admin/system/model/{{model}}/calendar?{{query 'start_date' prev}}"
                     class="btn btn-light"
                 ><i class="fas fa-chevron-left"></i></a>
                 <a
-                    href="/admin/system/model/sink/calendar?{{query 'start_date' next}}"
+                    href="/admin/system/model/{{model}}/calendar?{{query 'start_date' next}}"
                     class="btn btn-light"
                 ><i class="fas fa-chevron-right"></i></a>
             </div>
             <a
-                href="/admin/system/model/sink/calendar?{{query 'start_date' today}}"
+                href="/admin/system/model/{{model}}/calendar?{{query 'start_date' today}}"
                 class="btn btn-light{{#when start_date '==' today}} active{{/when}}
                 {{~#unless start_date}} active{{/unless}}"
             >{{_ 'today'}}</a>
         </div>
         <div class="float-right">
             <a
-                href="/admin/system/model/sink/calendar?{{query 'view' 'month'}}"
+                href="/admin/system/model/{{model}}/calendar?{{query 'view' 'month'}}"
                 class="btn btn-light{{#when view '==' 'month'}} active{{/when}}
                 {{~#unless view}} active{{/unless}}"
             >{{_ 'month'}}</a>
             <a
-                href="/admin/system/model/sink/calendar?{{query 'view' 'agendaWeek'}}"
+                href="/admin/system/model/{{model}}/calendar?{{query 'view' 'agendaWeek'}}"
                 class="btn btn-light{{#when view '==' 'agendaWeek'}} active{{/when}}"
             >{{_ 'week'}}</a>
             <a
-                href="/admin/system/model/sink/calendar?{{query 'view' 'agendaDay'}}"
+                href="/admin/system/model/{{model}}/calendar?{{query 'view' 'agendaDay'}}"
                 class="btn btn-light{{#when view '==' 'agendaDay'}} active{{/when}}"
             >{{_ 'day'}}</a>
             <a
-                href="/admin/system/model/sink/calendar?{{query 'view' 'listWeek'}}"
+                href="/admin/system/model/{{model}}/calendar?{{query 'view' 'listWeek'}}"
                 class="btn btn-light{{#when view '==' 'listWeek'}} active{{/when}}"
             >{{_ 'list'}}</a>
         </div>
