@@ -344,7 +344,7 @@
         {{#each field.options}}
             <option
                 value="{{./key}}"
-                {{#when ../../item ../@key '==' key}}selected{{/when}}
+                {{#in ../../item ../@key key}}selected{{/in}}
             >
                 {{value}}
             </option>

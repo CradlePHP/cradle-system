@@ -239,6 +239,14 @@
     <option
         data-fieldset="attributes|keyval"
         data-format="json"
+        value="multiselect"
+        {{#when field.type '===' 'multiselect'}}selected{{/when}}
+    >
+        Multi Select Field
+    </option>
+    <option
+        data-fieldset="attributes|keyval"
+        data-format="json"
         value="checkboxes"
         {{#when field.type '===' 'checkboxes'}}selected{{/when}}
     >
