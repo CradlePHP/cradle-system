@@ -107,17 +107,26 @@ class Formatter
                 case 'datetime':
                     if (trim($data[$name])) {
                         $data[$name] = date('Y-m-d H:i:s', strtotime($data[$name]));
+                    } else {
+                        $data[$name] = null;
                     }
+
                     break;
                 case 'date':
                     if (trim($data[$name])) {
                         $data[$name] = date('Y-m-d', strtotime($data[$name]));
+                    } else {
+                        $data[$name] = null;
                     }
+
                     break;
                 case 'time':
                     if (trim($data[$name])) {
                         $data[$name] = date('H:i:s', strtotime($data[$name]));
+                    } else {
+                        $data[$name] = null;
                     }
+
                     break;
                 case 'password':
                 case 'md5':
@@ -138,6 +147,10 @@ class Formatter
                 case 'token':
                     $data[$name] = md5(uniqid());
                     break;
+                case 'number' || 'small':
+                    if (!$data[$name]) {
+                        $data[$name] = null;
+                    }
             }
         }
 
