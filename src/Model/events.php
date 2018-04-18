@@ -435,7 +435,20 @@ $this->on('system-model-update', function ($request, $response) {
             continue;
         }
 
-        $lastId = $response->getResults($relation['primary2']);
+        $current = $response->getResults();
+        $lastId = null;
+
+        // is the relation array?
+        if (isset($current[$relation['name']])
+        && is_array($current[$relation['name']])
+        && isset($current[$relation['name']][$relation['primary2']])) {
+            // get the primary id from the array
+            $lastId = $current[$relation['name']][$relation['primary2']];
+
+        // relation already merged with the primary?
+        } else if(isset($current[$relation['primary2']])) {
+            $lastId = $current[$relation['primary2']];
+        }
 
         //if 0:1 and no primary
         if ($relation['many'] === 0
@@ -457,6 +470,7 @@ $this->on('system-model-update', function ($request, $response) {
         if (isset($data[$relation['primary2']])
             && is_numeric($data[$relation['primary2']])
             && $lastId != $data[$relation['primary2']]
+            && $lastId
         ) {
             //remove last id
             $modelSql->unlink(
