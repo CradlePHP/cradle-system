@@ -783,5 +783,5 @@
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
-    >{{{scope ../item @key}}}</textarea>
+    >{{json_encode ../item @key}}</textarea>
 {{/when}}
