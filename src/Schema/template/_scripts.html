@@ -197,28 +197,53 @@
             });
         }
 
-        var keys = [];
+        var attribKeys = [];
         $('div.attribute-row', modal).each(function() {
             var value = $('input.attribute-value', this);
             if(!value.val().length) {
                 error = true;
                 value.addClass('is-error');
-                $(this).after('<div class="error-message">Value cannot be empty.</div>');
+                $(this).find('input.attribute-value').after('<div class="error-message pl-1">Value cannot be empty.</div>');
             }
 
             var key = $('input.attribute-key', this);
             if(!key.val().length) {
                 error = true;
                 key.addClass('is-error');
-                $(this).after('<div class="error-message">Key cannot be empty.</div>');
+                $(this).find('input.attribute-key').after('<div class="error-message pl-1">Key cannot be empty.</div>');
             } else {
-                if(keys.indexOf(key.val()) !== -1) {
+                if(attribKeys.indexOf(key.val()) !== -1) {
                     error = true;
                     key.addClass('is-error');
-                    $(this).after('<div class="error-message">Key previously used.</div>');
+                    $(this).find('input.attribute-key').after('<div class="error-message pl-1">Key previously used.</div>');
                 }
 
-                keys.push(key.val());
+                attribKeys.push(key.val());
+            }
+        });
+
+        var optionKeys = [];
+        $('div.keyval-row', modal).each(function() {
+            var value = $('input.keyval-value', this);
+            if(!value.val().length) {
+                error = true;
+                value.addClass('is-error');
+                $(this).find('input.keyval-value').after('<div class="error-message pl-1">Value cannot be empty.</div>');
+            }
+
+            var key = $('input.keyval-key', this);
+            if(!key.val().length) {
+                error = true;
+                key.addClass('is-error');
+                $(this).find('input.keyval-key').after('<div class="error-message pl-1">Key cannot be empty.</div>');
+            } else {
+                if(optionKeys.indexOf(key.val()) !== -1) {
+                    error = true;
+                    key.addClass('is-error');
+                    $(this).find('input.keyval-key').after('<div class="error-message pl-1">Key previously used.</div>');
+                }
+
+                optionKeys.push(key.val());
             }
         });
 
@@ -330,13 +355,12 @@
         var level = parseInt($(trigger).attr('data-level'));
 
         var target = $(trigger);
-
         if(!isNaN(level)) {
             for(var i = 0; i < level; i++) {
                 target = target.parent();
             }
         }
-
+        
         // get error message element
         var err = target.nextAll('.error-message');
 
@@ -550,9 +574,7 @@
         var name = $(trigger).attr('data-name');
         var template = $('#field-attribute-row-template')
             .compile({ NAME: name })
-
         var row = $(template).doon();
-
         $(trigger).before(row);
     });
 
@@ -877,6 +899,43 @@
         reindexRelations();
     });
 
+    $(window).on('option-move-up-click', function(e, trigger) {
+        var row = $(trigger).parent().parent().parent();
+
+        if (row.hasClass('keyval-row')) {
+            divClass = 'div.keyval-row';
+        }
+
+        if(row.attr('data-index') == 0) {
+            return;
+        }
+
+        row.prev().before(row);
+
+        reindexOptions(divClass);
+    });
+
+    $(window).on('option-move-down-click', function(e, trigger) {
+        var row = $(trigger).parent().parent().parent();
+
+        var last = 0;
+        var divClass = '';
+
+        if (row.hasClass('keyval-row')) {
+            divClass = 'div.keyval-row';
+        }
+
+        var last = row.parent().find(divClass).length - 1;
+        
+        if(row.attr('data-index') == last) {
+            return;
+        }
+
+        row.next().after(row);
+
+        reindexOptions(divClass);
+    });
+
     var reindexFields = function() {
         var format = {
             disable: 'fields[{INDEX}][disable]',
@@ -1089,6 +1148,12 @@
                     'name',
                     format.replace('{INDEX}', i) + '[name]'
                 );
+        });
+    };
+
+    var reindexOptions = function(divClass) {
+        $(divClass).each(function(i) {
+            $(this).attr('data-index', i)
         });
     };
 })(jQuery);
