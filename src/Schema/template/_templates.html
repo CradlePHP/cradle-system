@@ -180,7 +180,7 @@
                 data-on="click"
                 href="javascript:void(0)"
             >
-                <i class="fas fa-edit"></i>
+                <i class="fas fa-edit fa-fw"></i>
             </a>
             <a
                 class="field-move-up-trigger"
@@ -189,7 +189,7 @@
                 data-level="2"
                 href="javascript:void(0)"
             >
-                <i class="fas fa-arrow-up"></i>
+                <i class="fas fa-arrow-up fa-fw"></i>
             </a>
             <a
                 class="field-move-down-trigger"
@@ -198,7 +198,7 @@
                 data-level="2"
                 href="javascript:void(0)"
             >
-                <i class="fas fa-arrow-down"></i>
+                <i class="fas fa-arrow-down fa-fw"></i>
             </a>
             <a
                 class="field-remove-trigger text-danger"
@@ -207,7 +207,7 @@
                 data-level="2"
                 href="javascript:void(0)"
             >
-                <i class="fas fa-times"></i>
+                <i class="fas fa-times fa-fw"></i>
             </a>
         </td>
         <td class="field-name-value"></td>
@@ -307,29 +307,38 @@
 
 <script id="field-attribute-row-template" type="text/x-template">
     <div
-        class="attribute-row"
+        class="attribute-row mt-2"
         data-do="attribute-field"
         data-name="{NAME}"
+        data-index="{INDEX}"
     >
-        <input
-            class="form-control attribute-key"
-            placeholder="{{_ 'Attribute'}}"
-            type="text"
-        />
-        <input
-            class="form-control attribute-value"
-            placeholder="{{_ 'Value'}}"
-            type="text"
-        />
-        <a
-            class="btn btn-danger"
-            data-do="remove"
-            data-on="click"
-            data-level="1"
-            href="javascript:void(0)"
-        >
-            <i class="fas fa-times"></i>
-        </a>
+        <div class="col-auto p-0">
+            <input
+                class="form-control attribute-key"
+                placeholder="{{_ 'Attribute'}}"
+                type="text"
+            />
+        </div>
+        <div class="col-auto p-0">
+            <input
+                class="form-control attribute-value"
+                placeholder="{{_ 'Value'}}"
+                type="text"
+            />
+        </div>
+        <div class="col-auto p-0">
+            <div class="btn-group" role="group">
+                <a
+                    class="btn btn-danger"
+                    data-do="remove"
+                    data-on="click"
+                    data-level="3"
+                    href="javascript:void(0)"
+                >
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
     </div>
 </script>
 
@@ -385,27 +394,53 @@
 
 <script id="field-keyval-row-template" type="text/x-template">
     <div class="keyval-row" data-index="{INDEX}">
-        <input
-            class="form-control keyval-key"
-            name="{NAME_1}"
-            placeholder="{{_ 'Key'}}"
-            type="text"
-        />
-        <input
-            class="form-control keyval-value"
-            name="{NAME_2}"
-            placeholder="{{_ 'Value'}}"
-            type="text"
-        />
-        <a
-            class="btn btn-danger"
-            data-do="remove"
-            data-on="click"
-            data-level="1"
-            href="javascript:void(0)"
-        >
-            <i class="fas fa-times"></i>
-        </a>
+        <div class="col-auto p-0">
+            <input
+                class="form-control keyval-key"
+                name="{NAME_1}"
+                placeholder="{{_ 'Key'}}"
+                type="text"
+            />
+        </div>
+        <div class="col-auto p-0">
+            <input
+                class="form-control keyval-value"
+                name="{NAME_2}"
+                placeholder="{{_ 'Value'}}"
+                type="text"
+            />
+        </div>
+        <div class="col-auto p-0">
+            <div class="btn-group" role="group">
+                <a
+                    class="btn btn-success"
+                    data-do="option-move-up"
+                    data-on="click"
+                    data-level="1"
+                    href="javascript:void(0)"
+                >
+                    <i class="fas fa-arrow-up fa-fw"></i>
+                </a>
+                <a
+                    class="btn btn-info"
+                    data-do="option-move-down"
+                    data-on="click"
+                    data-level="1"
+                    href="javascript:void(0)"
+                >
+                    <i class="fas fa-arrow-down fa-fw"></i>
+                </a>
+                <a
+                    class="btn btn-danger"
+                    data-do="remove"
+                    data-on="click"
+                    data-level="3"
+                    href="javascript:void(0)"
+                >
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
     </div>
 </script>
 

@@ -11,29 +11,55 @@
     <div class="input-keyval">
         {{#each field.options}}
             <div class="keyval-row" data-index="{{@index}}">
-                <input
-                    class="form-control keyval-key"
-                    name="fields[{{../@index}}][field][options][{{@index}}][key]"
-                    placeholder="{{_ 'Key'}}"
-                    type="text"
-                    value="{{./key}}"
-                />
-                <input
-                    class="form-control keyval-value"
-                    name="fields[{{../@index}}][field][options][{{@index}}][value]"
-                    placeholder="{{_ 'Value'}}"
-                    type="text"
-                    value="{{value}}"
-                />
-                <a
-                    class="btn btn-danger"
-                    data-do="remove"
-                    data-on="click"
-                    data-level="1"
-                    href="javascript:void(0)"
-                >
-                    <i class="fas fa-times"></i>
-                </a>
+                <div class="col-auto p-0">
+                    <input
+                        class="form-control keyval-key"
+                        name="fields[{{../@index}}][field][options][{{@index}}][key]"
+                        placeholder="{{_ 'Key'}}"
+                        type="text"
+                        value="{{./key}}"
+                    />
+                </div>
+                <div class="col-auto p-0">
+                    <input
+                        class="form-control keyval-value"
+                        name="fields[{{../@index}}][field][options][{{@index}}][value]"
+                        placeholder="{{_ 'Value'}}"
+                        type="text"
+                        value="{{value}}"
+                    />
+                </div>
+                <div class="col-auto p-0">
+                    <div class="btn-group" role="group">
+                        <a
+                            class="btn btn-success"
+                            data-do="option-move-up"
+                            data-on="click"
+                            data-level="1"
+                            href="javascript:void(0)"
+                        >
+                            <i class="fas fa-arrow-up fa-fw"></i>
+                        </a>
+                        <a
+                            class="btn btn-info"
+                            data-do="option-move-down"
+                            data-on="click"
+                            data-level="1"
+                            href="javascript:void(0)"
+                        >
+                            <i class="fas fa-arrow-down fa-fw"></i>
+                        </a>
+                        <a
+                            class="btn btn-danger"
+                            data-do="remove"
+                            data-on="click"
+                            data-level="3"
+                            href="javascript:void(0)"
+                        >
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
         {{/each}}
         <button
@@ -52,32 +78,40 @@
     <div class="input-attributes">
         {{#each field.attributes}}
             <div
-                class="attribute-row"
+                class="attribute-row mt-2"
                 data-do="attribute-field"
                 data-name="fields[{{../@index}}][field][attributes][{INDEX}]"
             >
-                <input
-                    class="form-control attribute-key"
-                    placeholder="{{_ 'Attribute'}}"
-                    type="text"
-                    value="{{@key}}"
-                />
-                <input
-                    class="form-control attribute-value"
-                    name="fields[{{../@index}}][field][attributes][{{@key}}]"
-                    placeholder="{{_ 'Value'}}"
-                    type="text"
-                    value="{{this}}"
-                />
-                <a
-                    class="btn btn-danger"
-                    data-do="remove"
-                    data-on="click"
-                    data-level="1"
-                    href="javascript:void(0)"
-                >
-                    <i class="fas fa-times"></i>
-                </a>
+                <div class="col-auto p-0">
+                    <input
+                        class="form-control attribute-key"
+                        placeholder="{{_ 'Attribute'}}"
+                        type="text"
+                        value="{{@key}}"
+                    />
+                </div>
+                <div class="col-auto p-0">
+                    <input
+                        class="form-control attribute-value"
+                        name="fields[{{../@index}}][field][attributes][{{@key}}]"
+                        placeholder="{{_ 'Value'}}"
+                        type="text"
+                        value="{{this}}"
+                    />
+                </div>
+                <div class="col-auto p-0">
+                    <div class="btn-group" role="group">
+                        <a
+                            class="btn btn-danger"
+                            data-do="remove"
+                            data-on="click"
+                            data-level="3"
+                            href="javascript:void(0)"
+                        >
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
         {{/each}}
         <button
