@@ -1316,7 +1316,6 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
 
     //also pass the schema to the template
     $schema = $schema->getAll();
-
     $dates = ['date', 'datetime', 'created', 'updated', 'time', 'week', 'month'];
 
     if (!$request->getStage('show')) {
@@ -1344,7 +1343,6 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
 
     $show = $fields;
     $data = $request->getStage();
-
     // set base date
     $base = date('Y-m-d');
     // today date for today button
@@ -1377,6 +1375,13 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
     // set whatever previous and next date we got from the changes above
     $data['prev'] = date('Y-m-d', $prev);
     $data['next'] = date('Y-m-d', $next);
+    
+    // set suggestion format
+    $suggestion = $schema['suggestion'];
+    
+    if (!$suggestion) {
+        $suggestion = 'No Title';
+    }
 
     //----------------------------//
     // 3. Render Template
@@ -1389,6 +1394,7 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
             'model' => $request->getStage('schema'),
             'icon'  => $schema['icon'],
             'show' => $show,
+            'suggestion' => $suggestion
         ]);
 
     $class = sprintf('page-admin-%s-calendar page-admin-calendar page-admin', $request->getStage('schema'));
@@ -1433,7 +1439,6 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
 
     //also pass the schema to the template
     $schema = $schema->getAll();
-
     if (!$request->getStage('show')) {
         // redirect
         $error = $this
@@ -1465,6 +1470,11 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
 
     $schema['filterable'] = array_values($schema['filterable']);
 
+    $suggestion = $schema['suggestion'];
+    
+    if (!$suggestion) {
+        $suggestion = 'No Title';
+    }
     //----------------------------//
     // 3. Render Template
     $title =$this->package('global')->translate('%s Pipeline', $schema['singular']);
@@ -1476,7 +1486,8 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
             'model' => $request->getStage('schema'),
             'icon'  => $schema['icon'],
             'stages' => $stages,
-            'schema' => $schema
+            'schema' => $schema,
+            'suggestion' => $suggestion
         ]);
 
     $class = sprintf('page-admin-%s-pipeline page-admin', $request->getStage('schema'));
