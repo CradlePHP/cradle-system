@@ -1343,6 +1343,7 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
 
     $show = $fields;
     $data = $request->getStage();
+
     // set base date
     $base = date('Y-m-d');
     // today date for today button
@@ -1375,8 +1376,8 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
     // set whatever previous and next date we got from the changes above
     $data['prev'] = date('Y-m-d', $prev);
     $data['next'] = date('Y-m-d', $next);
-    
-    // set suggestion format
+
+    // set suggestion
     $suggestion = $schema['suggestion'];
     
     if (!$suggestion) {
@@ -1439,6 +1440,7 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
 
     //also pass the schema to the template
     $schema = $schema->getAll();
+
     if (!$request->getStage('show')) {
         // redirect
         $error = $this
@@ -1460,6 +1462,29 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
         $this->package('global')->redirect($redirect);
     }
 
+    // validates if total and range column is valid or not
+    $stageHeader = ['total' => $request->getStage('total'),
+                    'range' => $request->getStage('range')];
+    $totalRangeFieldType = ['number', 'small', 'float', 'price'];
+    $invalidField = 0;
+
+    foreach ($stageHeader as $key => $value) {
+        // if key exists, check it's field type
+        if ($request->hasStage($key)) {
+            if(!in_array($schema['fields'][$value]['field']['type'], 
+                $totalRangeFieldType)){
+                // redirect
+                $error = $this
+                    ->package('global')
+                    ->translate('The specified field is invalid');
+                $this->package('global')->flash($error, 'error');
+                $this->package('global')->redirect($redirect);
+            }
+        } else {
+            unset($key);
+        }
+    }
+
     //----------------------------//
     // 2. Prepare Data
     // pipeline stages
@@ -1471,10 +1496,10 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
     $schema['filterable'] = array_values($schema['filterable']);
 
     $suggestion = $schema['suggestion'];
-    
     if (!$suggestion) {
         $suggestion = 'No Title';
     }
+
     //----------------------------//
     // 3. Render Template
     $title =$this->package('global')->translate('%s Pipeline', $schema['singular']);
@@ -1487,7 +1512,9 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
             'icon'  => $schema['icon'],
             'stages' => $stages,
             'schema' => $schema,
-            'suggestion' => $suggestion
+            'suggestion' => $suggestion,
+            'stageHeader' => $stageHeader,
+            'currency' => $request->getStage('currency')
         ]);
 
     $class = sprintf('page-admin-%s-pipeline page-admin', $request->getStage('schema'));
