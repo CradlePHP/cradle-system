@@ -565,6 +565,13 @@ $this->on('system-model-import', function ($request, $response) {
     //validate data
     $errors = [];
 
+    // if we don't have rows
+    if (!is_array($data['rows'])) {
+        return $response
+            ->setError(true, 'Data is empty')
+            ->set('json', 'validation', []);
+    }
+
     foreach ($data['rows'] as $i => $row) {
         $error = $schema
             ->model()

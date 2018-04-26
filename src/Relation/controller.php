@@ -453,9 +453,8 @@ $this->post('/admin/system/model/:schema1/:id/create/:schema2', function ($reque
     //add a flash
     $this->package('global')->flash(sprintf(
         '%s was Created',
-        'success',
         $schema2->getSingular()
-    ));
+    ), 'success');
 
     $this->package('global')->redirect($redirect);
 });
