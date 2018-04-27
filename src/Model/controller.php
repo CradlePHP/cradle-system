@@ -117,6 +117,7 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
     }
 
     $this->trigger('system-schema-search', $request, $response);
+
     foreach ($response->getResults('rows') as $relation) {
         $data['valid_relations'][] = $relation['name'];
     }
@@ -1413,6 +1414,62 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
 });
 
 /**
+ * Gets the System Model Calendar Data
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->get('/admin/system/model/:schema/calendar/data', function ($request, $response) {
+    //----------------------------//
+    // 1. Route Permissions
+
+    //----------------------------//
+    // 2. Prepare Data
+    // render raw data
+    $request->setStage('render', 'false');
+    // disable redirect
+    $request->setStage('redirect', 'false');
+
+    //----------------------------//
+    // 3. Render Request
+    // get data from search
+    $this->routeTo(
+        'get',
+        sprintf(
+            '/admin/system/model/%s/search',
+            $request->getStage('schema')
+        ),
+        $request,
+        $response
+    );
+
+    // get schema data
+    $schema = Schema::i($request->getStage('schema'));
+    $schema = $schema->getAll();
+
+    // get suggestion format
+    $suggestion = $schema['suggestion'];
+
+    //get results
+    $results = $response->getResults('rows');
+
+    // compile template
+    $template = cradle('global')->handlebars()->compile($suggestion);
+
+    // get suggestion format per row
+    foreach($results as $key => $result) {
+        if ($suggestion) {
+            $results[$key]['suggestion'] = $template($result);
+        } else {
+            $results[$key]['suggestion'] = "No Title";
+        }
+    }
+
+    // set response
+    return $response->setResults('rows',$results);
+});
+
+/**
  * Render the System Model Pipeline Page
  *
  * @param Request $request
@@ -1462,26 +1519,52 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
         $this->package('global')->redirect($redirect);
     }
 
-    // validates if total and range column is valid or not
-    $stageHeader = ['total' => $request->getStage('total'),
-                    'range' => $request->getStage('range')];
-    $totalRangeFieldType = ['number', 'small', 'float', 'price'];
-    $invalidField = 0;
+    // initialize the stageHeader keys into null 
+    // so that even there's no total or range, it will not get errors
+    $stageHeader = ['total' => null,
+                    'minRange' => null,
+                    'maxRange' => null];
 
-    foreach ($stageHeader as $key => $value) {
-        // if key exists, check it's field type
-        if ($request->hasStage($key)) {
-            if(!in_array($schema['fields'][$value]['field']['type'], 
-                $totalRangeFieldType)){
-                // redirect
+    // only do this if there's total and range in stage
+    if ($request->hasStage('total') || $request->hasStage('range')) {
+        // sets the range with 2 elements
+        $range = [null, null];
+
+        if ($request->hasStage('range')) {
+            // separate the entry in range into 2 columns
+            if (strpos($request->getStage('range'), ',') !== false) {
+                $range = explode(',', $request->getStage('range'));
+            } else {
+                // flash error message
                 $error = $this
                     ->package('global')
-                    ->translate('The specified field is invalid');
+                    ->translate('Range only contains one column');
                 $this->package('global')->flash($error, 'error');
-                $this->package('global')->redirect($redirect);
             }
-        } else {
-            unset($key);
+        }
+        
+        // validates if total and range column is valid or not
+        // gets the value of entered columns
+        $stageHeader = ['total' => $request->getStage('total'),
+                        'minRange' => $range[0],
+                        'maxRange' => $range[1]];
+        $totalRangeFieldType = ['number', 'small', 'float', 'price'];
+        $invalidField = 0;
+
+        foreach ($stageHeader as $key => $value) {
+            // if key exists, check it's field type
+            if (!empty($value)) {
+                if(!in_array($schema['fields'][$value]['field']['type'], 
+                    $totalRangeFieldType)){
+                    $stageHeader[$key] = null;
+                    
+                    // flash error message
+                    $error = $this
+                        ->package('global')
+                        ->translate('The specified field is invalid');
+                    $this->package('global')->flash($error, 'error');
+                }
+            }
         }
     }
 
@@ -1494,12 +1577,6 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
     }
 
     $schema['filterable'] = array_values($schema['filterable']);
-
-    $suggestion = $schema['suggestion'];
-    if (!$suggestion) {
-        $suggestion = 'No Title';
-    }
-
     //----------------------------//
     // 3. Render Template
     $title =$this->package('global')->translate('%s Pipeline', $schema['singular']);
@@ -1512,7 +1589,6 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
             'icon'  => $schema['icon'],
             'stages' => $stages,
             'schema' => $schema,
-            'suggestion' => $suggestion,
             'stageHeader' => $stageHeader,
             'currency' => $request->getStage('currency')
         ]);
@@ -1554,6 +1630,62 @@ $this->post('/admin/system/model/:schema/pipeline', function ($request, $respons
         $request,
         $response
     );
+});
+
+/**
+ * Gets the System Model Pipeline Data
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->get('/admin/system/model/:schema/pipeline/data', function ($request, $response) {
+    //----------------------------//
+    // 1. Route Permissions
+
+    //----------------------------//
+    // 2. Prepare Data
+    // render raw data
+    $request->setStage('render', 'false');
+    // disable redirect
+    $request->setStage('redirect', 'false');
+
+    //----------------------------//
+    // 3. Render Request
+    // get data from search
+    $this->routeTo(
+        'get',
+        sprintf(
+            '/admin/system/model/%s/search',
+            $request->getStage('schema')
+        ),
+        $request,
+        $response
+    );
+
+    // get schema data
+    $schema = Schema::i($request->getStage('schema'));
+    $schema = $schema->getAll();
+
+    // get suggestion format
+    $suggestion = $schema['suggestion'];
+
+    //get results
+    $results = $response->getResults('rows');
+
+    // compile template
+    $template = cradle('global')->handlebars()->compile($suggestion);
+
+    // get suggestion format per row
+    foreach($results as $key => $result) {
+        if ($suggestion) {
+            $results[$key]['suggestion'] = $template($result);
+        } else {
+            $results[$key]['suggestion'] = "No Title";
+        }
+    }
+
+    // set response
+    return $response->setResults('rows',$results);
 });
 
 //Front End Controllers
