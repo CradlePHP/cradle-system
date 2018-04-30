@@ -59,10 +59,13 @@
                 <div
                     class="column"
                     data-do="board"
+                    data-currency="{{../currency}}"
                     data-stage="{{value}}"
                     data-model={{../model}}
                     data-field={{../show}}
-                    data-suggestion="{{../suggestion}}"
+                    data-max-range="{{../stageHeader.maxRange}}"
+                    data-min-range="{{../stageHeader.minRange}}"
+                    data-total="{{../stageHeader.total}}"
                     {{#if ../order}}
                         data-order="{{../order}}"
                     {{/if}}
@@ -86,7 +89,10 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="total-range-container">
+                        </div>
                     </div>
+                    <hr class="m-0"/>
                     <div class="draggable-wrapper">
                         <ul class="board-stage"></ul>
                     </div>
