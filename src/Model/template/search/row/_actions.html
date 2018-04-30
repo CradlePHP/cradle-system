@@ -1,7 +1,7 @@
 <a
     class="text-purple"
     {{#if ../relation.suggestion}}
-        href="/admin/system/model/{{../schema.name}}/{{scope ../relation.data ../relation.schema.primary}}/create/{{../relation.schema.name}}?copy={{key this ../schema.primary}}&redirect_uri={{redirecturl}}"
+        href="/admin/system/model/{{../relation.schema.name}}/{{scope ../relation.data ../relation.schema.primary}}/create/{{../schema.name}}?copy={{scope this ../schema.primary}}&redirect_uri={{redirecturl}}"
     {{else}}
         href="/admin/system/model/{{../schema.name}}/create?copy={{scope this ../schema.primary}}&redirect_uri={{redirecturl}}"
     {{/if}}
