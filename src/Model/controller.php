@@ -1526,19 +1526,19 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
                     'maxRange' => null];
 
     // only do this if there's total and range in stage
-    if ($request->hasStage('total') || $request->hasStage('range')) {
+    if ($request->hasStage('total') || $request->hasStage('price')) {
         // sets the range with 2 elements
         $range = [null, null];
 
-        if ($request->hasStage('range')) {
+        if ($request->hasStage('price')) {
             // separate the entry in range into 2 columns
-            if (strpos($request->getStage('range'), ',') !== false) {
-                $range = explode(',', $request->getStage('range'));
+            if (strpos($request->getStage('price'), ',') !== false) {
+                $range = explode(',', $request->getStage('price'));
             } else {
                 // flash error message
                 $error = $this
                     ->package('global')
-                    ->translate('Range only contains one column');
+                    ->translate('Price only contains one column');
                 $this->package('global')->flash($error, 'error');
             }
         }
@@ -1568,6 +1568,18 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
         }
     }
 
+    // only do this if profile == true in stage
+    $profile = false;
+    if ($request->hasStage('profile') && ($request->getStage('profile') == true)) {
+        // check if schema has 1:1 relation
+        foreach ($schema['relations'] as $relationName => $relation) {
+            if ($relation['many'] == 1) {
+                $profile = true;
+                break;
+            }
+        }
+    }
+
     //----------------------------//
     // 2. Prepare Data
     // pipeline stages
@@ -1590,7 +1602,8 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
             'stages' => $stages,
             'schema' => $schema,
             'stageHeader' => $stageHeader,
-            'currency' => $request->getStage('currency')
+            'currency' => $request->getStage('currency'),
+            'profile' => $profile
         ]);
 
     $class = sprintf('page-admin-%s-pipeline page-admin', $request->getStage('schema'));
@@ -1666,6 +1679,8 @@ $this->get('/admin/system/model/:schema/pipeline/data', function ($request, $res
     $schema = Schema::i($request->getStage('schema'));
     $schema = $schema->getAll();
 
+    // get schema name
+    $model = $schema['name'];
     // get suggestion format
     $suggestion = $schema['suggestion'];
 
@@ -1678,14 +1693,21 @@ $this->get('/admin/system/model/:schema/pipeline/data', function ($request, $res
     // get suggestion format per row
     foreach($results as $key => $result) {
         if ($suggestion) {
-            $results[$key]['suggestion'] = $template($result);
+            $results[$key][$model . '_suggestion'] = $template($result);
         } else {
-            $results[$key]['suggestion'] = "No Title";
+            $results[$key][$model . '_suggestion'] = "No Title";
         }
     }
 
-    // set response
-    return $response->setResults('rows',$results);
+    // get current session
+    $me = $request->getSession('me');
+
+    // set response results
+    $response->setResults('me', $me);
+    $response->setResults('rows', $results);
+
+    // return new response
+    return $response->getResults();
 });
 
 //Front End Controllers
