@@ -1298,78 +1298,129 @@ $this->get('/admin/system/model/:schema/export/:type', function ($request, $resp
 $this->get('/admin/system/model/:schema/calendar', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
-    //set redirect
+    $data = $request->getStage();
+
+    // set redirect
     $redirect = sprintf(
         '/admin/system/model/%s/search',
         $request->getStage('schema')
     );
 
+    if ($request->getStage('redirect_uri')) {
+        $redirect = $request->getStage('redirect_uri');
+    }
+
     $request->setStage('redirect_uri', $redirect);
 
-    $schema = Schema::i($request->getStage('schema'));
+    // if no ajax set, set this page as default
+    if (!isset($data['ajax']) || empty($data['ajax'])) {
+        $data['ajax'] = sprintf(
+            '/admin/system/model/%s/search',
+            $request->getStage('schema')
+        );
+    }
+
+    // if no detail set, set update page as the default
+    if (!isset($data['detail']) || empty($data['detail'])) {
+        $data['detail'] = sprintf(
+            '/admin/system/model/%s/update',
+            $request->getStage('schema')
+        );
+    }
+
+    //----------------------------//
+    // 2. Validate
+    // does the schema exists?
+    try {
+        $data['schema'] = Schema::i($request->getStage('schema'))->getAll();
+    } catch (\Exception $e) {
+        $message = $this
+            ->package('global')
+            ->translate($e->getMessage());
+
+        $response->setError(true, $message);
+        $this
+            ->package('global')
+            ->flash($message, 'error');
+    }
 
     //if this is a return back from processing
     //this form and it's because of an error
     if ($response->isError()) {
         //pass the error messages to the template
-        $response->setFlash($response->getMessage(), 'error');
+        $this
+            ->package('global')
+            ->flash($response->getMessage(), 'error');
+        $this
+            ->package('global')
+            ->redirect($redirect);
     }
 
     //also pass the schema to the template
-    $schema = $schema->getAll();
     $dates = ['date', 'datetime', 'created', 'updated', 'time', 'week', 'month'];
 
-    if (!$request->getStage('show')) {
-        // redirect
+    //check what to show
+    if (!isset($data['show']) || !$data['show']) {
+        //flash an error message and redirect
         $error = $this
             ->package('global')
             ->translate('Please specify what to plot.');
-        $this->package('global')->flash($error, 'error');
-        $this->package('global')->redirect($redirect);
+        $this
+            ->package('global')
+            ->flash($error, 'error');
+        $this
+            ->package('global')
+            ->redirect($redirect);
     }
 
-    // check if fields are date fields
-    $show = $request->getStage('show');
-
-    $fields = explode(',', $show);
-    foreach ($fields as $index => $column) {
-        if (!isset($schema['fields'][$column]) ||
-            !in_array($schema['fields'][$column]['field']['type'], $dates)) {
-            $error = $this->package('global')
-                ->translate('%s is not a date field', $column);
-            $this->package('global')->flash($error, 'error');
-            $this->package('global')->redirect($redirect);
+    $data['show'] = explode(',', $data['show']);
+    foreach ($data['show'] as $column) {
+        if (isset($data['schema']['fields'][$column])
+            && in_array($data['schema']['fields'][$column]['field']['type'], $dates)
+        ) {
+            continue;
         }
+
+        $error = $this
+            ->package('global')
+            ->translate('%s is not a date field', $column);
+        $this
+            ->package('global')
+            ->flash($error, 'error');
+        $this
+            ->package('global')
+            ->redirect($redirect);
     }
 
-    $show = $fields;
-    $data = $request->getStage();
-
-    // set base date
-    $base = date('Y-m-d');
-    // today date for today button
-    $data['today'] =  date('Y-m-d');
+    //----------------------------//
+    // 3. Process
+    // set base date & today date for button
+    $base = $data['today'] = date('Y-m-d');
 
     // if there's a start date provide,
     // we have to change our base date
-    if ($request->getStage('start_date')) {
-        $base = date('Y-m-d', strtotime($request->getStage('start_date')));
+    if (isset($data['start_date']) && $data['start_date']) {
+        $base = date('Y-m-d', strtotime($data['start_date']));
     }
 
     // set default the previous and next date based on our "base" date
     // default is month view
-    $prev = strtotime($base .' -1 month');
-    $next = strtotime($base .' +1 month');
+    $prev = strtotime($base . ' -1 month');
+    $next = strtotime($base . ' +1 month');
+
+    // set view if not defined
+    if (!isset($data['view']) || empty($data['view'])) {
+        $data['view'] = 'month';
+    }
 
     // change previous and next date if the user wanted a week view
-    if ($request->getStage('view') == 'listWeek' ||
-        $request->getStage('view') == 'agendaWeek') {
-        $prev = strtotime($base .' -1 week');
-        $next = strtotime($base .' +1 week');
+    if ($data['view'] == 'listWeek' || $data['view'] == 'agendaWeek') {
+        $prev = strtotime($base . ' -1 week');
+        $next = strtotime($base . ' +1 week');
     }
 
     // change previous and next date if the user wanted a day view
-    if ($request->getStage('view') == 'agendaDay') {
+    if ($data['view'] == 'agendaDay') {
         $prev = strtotime($base .' -1 day');
         $next = strtotime($base .' +1 day');
     }
@@ -1378,95 +1429,58 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
     $data['prev'] = date('Y-m-d', $prev);
     $data['next'] = date('Y-m-d', $next);
 
-    // set suggestion
-    $suggestion = $schema['suggestion'];
-    
-    if (!$suggestion) {
-        $suggestion = 'No Title';
+    // if no breadcrumb set, set a default breadcrumb
+    // we will not check if breadcrumb is in array format
+    // or has value to be flexible just in case the user
+    // doesn't want a breadcrumb
+    if (!isset($data['breadcrumb'])) {
+        $data['breadcrumb'] = [
+            [
+                'icon' => 'fas fa-home',
+                'link' => '/admin',
+                'page' => 'Admin'
+            ],
+            [
+                'icon' => $data['schema']['icon'],
+                'link' => $data['schema']['redirect_uri'],
+                'page' => $data['schema']['plural']
+            ],
+            [
+                'icon' => 'fas fa-calendar-alt',
+                'page' => 'Calendar',
+                'active' => true
+            ]
+        ];
     }
 
     //----------------------------//
-    // 3. Render Template
-    $title = $this->package('global')->translate('%s Calendar', $schema['singular']);
-    $data = array_merge(
-        $data,
-        [
-            'title' => $title,
-            'package' => $schema['plural'],
-            'model' => $request->getStage('schema'),
-            'icon'  => $schema['icon'],
-            'show' => $show,
-            'suggestion' => $suggestion
-        ]);
+    // 4. Render Template
+    $data['title'] = $this
+        ->package('global')
+        ->translate('%s Calendar', $data['schema']['plural']);
 
-    $class = sprintf('page-admin-%s-calendar page-admin-calendar page-admin', $request->getStage('schema'));
-    $body = $this->package('cradlephp/cradle-system')
+    $class = sprintf(
+            'page-admin-%s-calendar page-admin-calendar page-admin',
+            $data['schema']['name']
+        );
+
+    $body = $this
+        ->package('cradlephp/cradle-system')
         ->template('model', 'calendar', $data);
 
-    //Set Content
+    // set content
     $response
-        ->setPage('title', $title)
+        ->setPage('title', $data['title'])
         ->setPage('class', $class)
         ->setContent($body);
 
-    //Render blank page
-    $this->trigger('admin-render-page', $request, $response);
-});
-
-/**
- * Gets the System Model Calendar Data
- *
- * @param Request $request
- * @param Response $response
- */
-$this->get('/admin/system/model/:schema/calendar/data', function ($request, $response) {
-    //----------------------------//
-    // 1. Route Permissions
-
-    //----------------------------//
-    // 2. Prepare Data
-    // render raw data
-    $request->setStage('render', 'false');
-    // disable redirect
-    $request->setStage('redirect', 'false');
-
-    //----------------------------//
-    // 3. Render Request
-    // get data from search
-    $this->routeTo(
-        'get',
-        sprintf(
-            '/admin/system/model/%s/search',
-            $request->getStage('schema')
-        ),
-        $request,
-        $response
-    );
-
-    // get schema data
-    $schema = Schema::i($request->getStage('schema'));
-    $schema = $schema->getAll();
-
-    // get suggestion format
-    $suggestion = $schema['suggestion'];
-
-    //get results
-    $results = $response->getResults('rows');
-
-    // compile template
-    $template = cradle('global')->handlebars()->compile($suggestion);
-
-    // get suggestion format per row
-    foreach($results as $key => $result) {
-        if ($suggestion) {
-            $results[$key]['suggestion'] = $template($result);
-        } else {
-            $results[$key]['suggestion'] = "No Title";
-        }
+    // if we only want the body
+    if ($request->getStage('render') === 'body') {
+        return;
     }
 
-    // set response
-    return $response->setResults('rows',$results);
+    //Render blank page
+    $this->trigger('admin-render-page', $request, $response);
 });
 
 /**
@@ -1519,7 +1533,7 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
         $this->package('global')->redirect($redirect);
     }
 
-    // initialize the stageHeader keys into null 
+    // initialize the stageHeader keys into null
     // so that even there's no total or range, it will not get errors
     $stageHeader = ['total' => null,
                     'minRange' => null,
@@ -1542,7 +1556,7 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
                 $this->package('global')->flash($error, 'error');
             }
         }
-        
+
         // validates if total and range column is valid or not
         // gets the value of entered columns
         $stageHeader = ['total' => $request->getStage('total'),
@@ -1554,10 +1568,10 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
         foreach ($stageHeader as $key => $value) {
             // if key exists, check it's field type
             if (!empty($value)) {
-                if(!in_array($schema['fields'][$value]['field']['type'], 
+                if(!in_array($schema['fields'][$value]['field']['type'],
                     $totalRangeFieldType)){
                     $stageHeader[$key] = null;
-                    
+
                     // flash error message
                     $error = $this
                         ->package('global')
