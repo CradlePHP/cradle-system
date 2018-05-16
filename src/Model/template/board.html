@@ -45,7 +45,13 @@
             </div>
             <div class="box-foot box-light">
                 <div class="box-left">
-                    <button class="btn btn-danger" type="reset">{{_ 'Reset'}}</button>
+                    <a 
+                        class="btn btn-danger" 
+                        href="/admin/system/model/{{schema.name}}/search"
+                        role="button"
+                    >
+                        {{_ 'Reset'}}
+                    </a>
                 </div>
                 <div class="box-right">
                     <button class="btn btn-primary">{{_ 'Search'}}</button>
@@ -59,26 +65,31 @@
                 <div
                     class="column"
                     data-do="board"
-                    data-currency="{{../currency}}"
                     data-stage="{{value}}"
                     data-model={{../model}}
                     data-field={{../show}}
-                    data-max-range="{{../stageHeader.maxRange}}"
-                    data-min-range="{{../stageHeader.minRange}}"
-                    data-total="{{../stageHeader.total}}"
+                    {{#if ../currency}}
+                        data-currency="{{../currency}}"
+                    {{/if}}
+                    {{#if ../totalAndPrice}}
+                        data-total-price = "{{../totalAndPrice}}"
+                    {{/if}}
+                    {{#if ../profile}}
+                        data-profile-true={{../profile}}
+                    {{/if}}
                     {{#if ../order}}
                         data-order="{{../order}}"
                     {{/if}}
                 >
                     <div class="stage">
-                        <div class="stage-label">
+                        <div class="stage-label box-head box-primary">
                             <span class="stage-name">{{value}}</span>
                             <span class="badge badge-pill badge-dark"></span>
                         </div>
                         <div class="progress-container">
                             <div class="progress">
                                 <div
-                                    class="progress-bar bg-danger "
+                                    class="progress-bar bg-primary "
                                     role="progressbar"
                                     aria-valuenow="{{percentage}}"
                                     aria-valuemin="0"

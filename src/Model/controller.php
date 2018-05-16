@@ -1519,51 +1519,53 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
         $this->package('global')->redirect($redirect);
     }
 
-    // initialize the stageHeader keys into null 
-    // so that even there's no total or range, it will not get errors
-    $stageHeader = ['total' => null,
-                    'minRange' => null,
-                    'maxRange' => null];
+    // only do this if there's total and price in stage
+    if ($request->hasStage('total') || $request->hasStage('price')) {
+        $numberFieldType = ['number', 'small', 'float', 'price'];
+        $totalAndPrice = [];
 
-    // only do this if there's total and range in stage
-    if ($request->hasStage('total') || $request->hasStage('range')) {
-        // sets the range with 2 elements
-        $range = [null, null];
+        $total = $request->getStage('total');
+        $totals = explode(',', $total);
+        // add this to totalAndPrice if $total is not empty
+        if (!empty($total)) {
+            $totalAndPrice = ['total' => $totals];
+        }
 
-        if ($request->hasStage('range')) {
-            // separate the entry in range into 2 columns
-            if (strpos($request->getStage('range'), ',') !== false) {
-                $range = explode(',', $request->getStage('range'));
-            } else {
-                // flash error message
-                $error = $this
-                    ->package('global')
-                    ->translate('Range only contains one column');
-                $this->package('global')->flash($error, 'error');
+        $price = $request->getStage('price');
+        $prices = explode(',', $price);
+        // add this to totalAndPrice if $price is not empty
+        if (!empty($price)) {
+            $totalAndPrice['price'] = $prices;
+        }
+
+        // validates if total and price has invalid column/s
+        foreach ($totalAndPrice as $value) {
+            foreach ($value as $column) {
+                if (!isset($schema['fields'][$column]) ||
+                    !in_array($schema['fields'][$column]['field']['type'], 
+                    $numberFieldType)
+                ) {
+                    $error = $this->package('global')
+                        ->translate('%s is not a number field', $column);
+                    $this->package('global')->flash($error, 'error');
+                    $this->package('global')->redirect($redirect);
+                }
             }
         }
         
-        // validates if total and range column is valid or not
-        // gets the value of entered columns
-        $stageHeader = ['total' => $request->getStage('total'),
-                        'minRange' => $range[0],
-                        'maxRange' => $range[1]];
-        $totalRangeFieldType = ['number', 'small', 'float', 'price'];
-        $invalidField = 0;
+        // pass totalAndPrice as json
+        $totalAndPrice = json_encode($totalAndPrice);
+    }
 
-        foreach ($stageHeader as $key => $value) {
-            // if key exists, check it's field type
-            if (!empty($value)) {
-                if(!in_array($schema['fields'][$value]['field']['type'], 
-                    $totalRangeFieldType)){
-                    $stageHeader[$key] = null;
-                    
-                    // flash error message
-                    $error = $this
-                        ->package('global')
-                        ->translate('The specified field is invalid');
-                    $this->package('global')->flash($error, 'error');
-                }
+
+    // only do this if profile == true in stage
+    $profile = false;
+    if ($request->hasStage('profile') && ($request->getStage('profile') == true)) {
+        // check if schema has 1:1 relation
+        foreach ($schema['relations'] as $relationName => $relation) {
+            if ($relation['many'] == 1) {
+                $profile = true;
+                break;
             }
         }
     }
@@ -1588,10 +1590,19 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
             'model' => $request->getStage('schema'),
             'icon'  => $schema['icon'],
             'stages' => $stages,
-            'schema' => $schema,
-            'stageHeader' => $stageHeader,
-            'currency' => $request->getStage('currency')
+            'schema' => $schema
         ]);
+
+    // add these if the ff. keys are existing
+    if ($request->hasStage('currency') && !empty($request->getStage('currency'))) {
+        $data['currency'] = $request->getStage('currency');
+    }
+    if (isset($totalAndPrice)) {
+        $data['totalAndPrice'] = $totalAndPrice;
+    }
+    if (isset($profile) && !empty($profile)) {
+        $data['profile'] = $profile;
+    }
 
     $class = sprintf('page-admin-%s-pipeline page-admin', $request->getStage('schema'));
     $body = $this->package('cradlephp/cradle-system')
@@ -1606,7 +1617,7 @@ $this->get('/admin/system/model/:schema/pipeline', function ($request, $response
     //Render blank page
     $this->trigger('admin-render-page', $request, $response);
 });
-
+ 
 /**
  * Process Pipeline Update
  *
@@ -1666,6 +1677,8 @@ $this->get('/admin/system/model/:schema/pipeline/data', function ($request, $res
     $schema = Schema::i($request->getStage('schema'));
     $schema = $schema->getAll();
 
+    // get schema name
+    $model = $schema['name'];
     // get suggestion format
     $suggestion = $schema['suggestion'];
 
@@ -1678,14 +1691,21 @@ $this->get('/admin/system/model/:schema/pipeline/data', function ($request, $res
     // get suggestion format per row
     foreach($results as $key => $result) {
         if ($suggestion) {
-            $results[$key]['suggestion'] = $template($result);
+            $results[$key][$model . '_suggestion'] = $template($result);
         } else {
-            $results[$key]['suggestion'] = "No Title";
+            $results[$key][$model . '_suggestion'] = "No Title";
         }
     }
 
-    // set response
-    return $response->setResults('rows',$results);
+    // get current session
+    $me = $request->getSession('me');
+
+    // set response results
+    $response->setResults('me', $me);
+    $response->setResults('rows', $results);
+
+    // return new response
+    return $response->getResults();
 });
 
 //Front End Controllers
