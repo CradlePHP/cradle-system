@@ -52,53 +52,60 @@
         </h3>
     {{/when}}
 
-    {{#if rows.length}}
-        <div class="box search-filters">
-            <div class="box-head box-default">
-                <h3 class="box-title">{{_ 'Filters'}}</h3>
-            </div>
-            <form method="get">
-                <div class="box-body box-padding">
-                    <div class="form-group">
-                        <label for="q">{{_ 'Search'}}</label>
-                        <input
-                            class="form-control"
-                            name="q"
-                            placeholder="Enter Search {{schema.plural}}"
-                            type="search"
-                            value="{{q}}"
-                        />
-                    </div>
-
-                    {{#if schema.filterable.length}}
-                        {{> search_form}}
-                    {{else}}
-                        {{#if filterable_relations.length}}
-                            {{> search_form}}
-                        {{/if}}
-                    {{/if}}
-                </div>
-                <div class="box-foot box-light">
-                    <div class="box-left">
-                        <button class="btn btn-danger" type="reset">{{_ 'Reset'}}</button>
-                    </div>
-                    <div class="box-right">
-                        <button class="btn btn-primary">{{_ 'Search'}}</button>
-                    </div>
-                </div>
-                {{#when filter.active '===' '0'}}
-                    <input 
-                        name="filter[{{schema.active}}]" 
-                        type="hidden" 
-                        value = "0"
-                    />
-                {{/when}}
-            </form>
+    <!-- show search bar even there's no result -->
+    <div class="box search-filters">
+        <div class="box-head box-default">
+            <h3 class="box-title">{{_ 'Filters'}}</h3>
         </div>
+        <form method="get">
+            <div class="box-body box-padding">
+                <div class="form-group">
+                    <label for="q">{{_ 'Search'}}</label>
+                    <input
+                        class="form-control"
+                        name="q"
+                        placeholder="Enter Search {{schema.plural}}"
+                        type="search"
+                        value="{{q}}"
+                    />
+                </div>
 
+                {{#if schema.filterable.length}}
+                    {{> search_form}}
+                {{else}}
+                    {{#if filterable_relations.length}}
+                        {{> search_form}}
+                    {{/if}}
+                {{/if}}
+            </div>
+            <div class="box-foot box-light">
+                <div class="box-left">
+                    <a 
+                        class="btn btn-danger" 
+                        href="/admin/system/model/{{schema.name}}/search"
+                        role="button"
+                    >
+                        {{_ 'Reset'}}
+                    </a>
+                </div>
+                <div class="box-right">
+                    <button class="btn btn-primary">{{_ 'Search'}}</button>
+                </div>
+            </div>
+            {{#when filter.active '===' '0'}}
+                <input 
+                    name="filter[{{schema.active}}]" 
+                    type="hidden" 
+                    value = "0"
+                />
+            {{/when}}
+        </form>
+    </div>
+
+    {{> search_actions}}
+
+    {{#if rows.length}}
         <form method="post">
-            {{> search_actions}}
-
             <div class="table-overflow">
                 <table class="table table-responsive-sm table-striped table-data">
                     <thead>
@@ -145,8 +152,6 @@
             {{/pager}}
         </ul>
     {{else}}
-        {{> search_actions}}
-
         <!-- START: NO RESULTS -->
         <div class="alert alert-info no-results">
             <center>{{_ 'No Results Found.'}}</center>
