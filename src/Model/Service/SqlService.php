@@ -559,6 +559,49 @@ class SqlService
             $data[$updated] = date('Y-m-d H:i:s');
         }
 
+        // we will be using moved, since
+        // 'order' is used for sorting
+        // if there is moved, the the user
+        // attempts to update ordering
+        if (isset($data['moved'])) {
+            // update the item affected by the move
+            $query = sprintf('UPDATE `%s` ', $table);
+
+            if (!isset($data['fields'])) {
+                $data['fields']= [];
+            }
+
+            // update the update field if any
+            if ($updated) {
+                $data['fields'][$updated] = '"' . $data[$updated] . '"';
+            }
+
+            if ($data['fields']) {
+                $query .= 'SET ';
+            }
+
+            // add fields to be updated
+            foreach ($data['fields'] as $field => $value) {
+                $query .= sprintf('%s = %s, ', $field, $value);
+            }
+
+            // remove the last extra ', '
+            $query = substr($query, 0, -2);
+
+            // add filters if any
+            if (isset($data['filters']) && $data['filters']) {
+                $query .= ' WHERE ';
+                foreach ($data['filters'] as $condition) {
+                    $query .= sprintf('%s AND ', $condition);
+                }
+            }
+
+            // remove the last extra 'AND '
+            $query = substr($query, 0, -4);
+
+            $this->resource->query($query);
+        }
+
         return $this
             ->resource
             ->model($data)

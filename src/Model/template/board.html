@@ -6,8 +6,8 @@
             </a>
         </li>
         <li class="breadcrumb-item">
-            <a href="/admin/system/model/{{model}}/search">
-                <i class="{{icon}}"></i> {{package}}
+            <a href="/admin/system/model/{{schema.name}}/search">
+                <i class="{{schema.icon}}"></i> {{schema.plural}}
             </a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
@@ -15,7 +15,7 @@
         </li>
     </ol>
 </nav>
- 
+
 <div class="main-padding">
     <h3 class="main-title">{{title}}</h3>
     <div class="box search-filters">
@@ -59,39 +59,28 @@
                 <div
                     class="column"
                     data-do="board"
+                    data-ajax-pull="{{../ajax.pull}}"
+                    data-ajax-update="{{../ajax.update}}"
                     data-currency="{{../currency}}"
                     data-stage="{{value}}"
-                    data-model={{../model}}
+                    data-model={{../schema.name}}
                     data-field={{../show}}
-                    data-max-range="{{../stageHeader.maxRange}}"
-                    data-min-range="{{../stageHeader.minRange}}"
-                    data-total="{{../stageHeader.total}}"
-                    {{#if ../order}}
-                        data-order="{{../order}}"
-                    {{/if}}
+                    data-total-1="{{../total.0}}"
+                    data-total-2="{{../total.1}}"
+                    data-order="{{../order}}"
+                    data-card-detail="{{../detail}}"
+                    data-card-title="{{../schema.suggestion}}"
+                    data-card-date="{{../date}}"
+                    data-primary="{{../schema.primary}}"
                 >
                     <div class="stage">
                         <div class="stage-label">
                             <span class="stage-name">{{value}}</span>
                             <span class="badge badge-pill badge-dark"></span>
                         </div>
-                        <div class="progress-container">
-                            <div class="progress">
-                                <div
-                                    class="progress-bar bg-danger "
-                                    role="progressbar"
-                                    aria-valuenow="{{percentage}}"
-                                    aria-valuemin="0"
-                                    aria-valuemax="100"
-                                    style="width: {{percentage}}%"
-                                >
-                                    {{percentage}}%
-                                </div>
-                            </div>
-                        </div>
-                        <div class="total-range-container">
-                        </div>
+                        <div class="total-range-container"></div>
                     </div>
+
                     <hr class="m-0"/>
                     <div class="draggable-wrapper">
                         <ul class="board-stage"></ul>
@@ -101,4 +90,3 @@
         </div>
     </div>
 </div>
-<script src="{{settings 'cdn'}}/components/jquery-sortable/source/js/jquery-sortable-min.js"></script>
