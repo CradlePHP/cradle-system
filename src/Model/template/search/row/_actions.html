@@ -12,6 +12,14 @@
 
 {{#active ../schema.name this}}
     <a
+        class="text-blue"
+        href="/admin/system/model/{{../schema.name}}/detail/{{scope this ../schema.primary}}?redirect_uri={{redirecturl}}"
+        title="{{_ 'View %s' ../schema.singular}}"
+    >
+        <i class="fa fa-eye"></i>
+    </a>
+
+    <a
         class="text-grey"
         href="/admin/system/model/{{../schema.name}}/update/{{scope this ../schema.primary}}?redirect_uri={{redirecturl}}"
         title="{{_ 'Edit %s' ../schema.singular}}"
