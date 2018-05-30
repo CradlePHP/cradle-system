@@ -94,6 +94,16 @@ $this->get('/admin/system/schema/create', function ($request, $response) {
         $data['item'] = $response->getResults();
     }
 
+    //trigger job to get all the schema
+    $this->trigger('system-schema-search', $request, $response);
+    $rows = $response->getResults('rows');
+    //loop and remove the uneditable (those with disable)
+    foreach ($rows as $row => $field) {
+        if (!isset($field['disable'])) {
+            $data['schemas']= [$row => $field];
+        }
+    }
+
     //add CSRF
     $this->trigger('csrf-load', $request, $response);
     $data['csrf'] = $response->getResults('csrf');
@@ -204,6 +214,16 @@ $this->get('/admin/system/schema/update/:name', function ($request, $response) {
     //add CSRF
     $this->trigger('csrf-load', $request, $response);
     $data['csrf'] = $response->getResults('csrf');
+
+    //trigger job to get all the schema
+    $this->trigger('system-schema-search', $request, $response);
+    $rows = $response->getResults('rows');
+    //loop and remove the uneditable (those with disable)
+    foreach ($rows as $row => $field) {
+        if (!isset($field['disable'])) {
+            $data['schemas']= [$row => $field];
+        }
+    }
 
     //----------------------------//
     // 2. Render Template

@@ -122,6 +122,37 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
         $data['valid_relations'][] = $relation['name'];
     }
 
+    //initialize each columns
+    $data['total_rows'] = [];
+    foreach ($data['rows'] as $row) {
+        //initialize each row
+        foreach ($row as $field => $value) {
+            //skip the _id
+            if (strpos($field, '_id') !== false) {
+                continue;
+            }
+            //initialize columns
+            $data['total_rows'][$field] = null;
+        }
+        //we only need the first row. no need to continue
+        break;
+    }
+    //compute for the sum of each columns
+    foreach ($data['rows'] as $row) {
+        //initialize each row
+        foreach ($row as $field => $value) {
+            //skip the _id
+            if (strpos($field, '_id') !== false) {
+                continue;
+            }
+            
+            //if number get value and add to current field
+            if (is_numeric($value)) {
+                $data['total_rows'][$field] += $value;
+            }
+        }
+    }
+
     //----------------------------//
     // 2. Render Template
     //set the class name
