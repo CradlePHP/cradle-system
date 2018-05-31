@@ -39,10 +39,6 @@ class Validator
             $errors['name'] = 'Keyword is required';
         }
 
-        if (!isset($data['suggestion']) || empty($data['suggestion'])) {
-            $errors['suggestion'] = 'Suggestion is required';
-        }
-
         if (!isset($data['fields']) || empty($data['fields'])) {
             $errors['fields'] = 'Fields is required';
         }
