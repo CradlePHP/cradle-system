@@ -32,7 +32,11 @@
             {{#when action '===' 'create'}}
                 <i class="fas fa-plus"></i> {{title}}
             {{else}}
-                <i class="fas fa-edit"></i> {{title}}
+                {{#when action '===' 'detail'}}
+                    <i class="fas fa-eye"></i> {{title}}
+                {{else}}
+                    <i class="fas fa-edit"></i> {{title}}
+                {{/when}}
             {{/when}}
         </li>
     </ol>
@@ -43,154 +47,158 @@
         {{> form_detail}}
     {{/when}}
 
-    {{#if relation.suggestion}}
-        <h3 class="main-title">
-            <i class="{{relation.schema.icon}}"></i>
-            {{relation.suggestion}}
-        </h3>
-    {{/if}}
-
-    <form
-        class="box"
-        method="post"
-        {{#if cdn_config}}
-            data-do="cdn-upload"
-            data-on="submit"
-            data-progress="{{_ 'We are uploading your files. Please do not refresh page.'}}"
-            data-complete="{{_ 'Upload Complete'}}"
-            data-enctype="{{cdn_config.form.enctype}}"
-            data-method="{{cdn_config.form.method}}"
-            data-action="{{cdn_config.form.action}}"
-            data-cdn="{{cdn_config.form.action}}"
-            data-acl="{{cdn_config.inputs.acl}}"
-            data-key="{{cdn_config.inputs.key}}"
-            data-credential="{{cdn_config.inputs.X-Amz-Credential}}"
-            data-algorythm="{{cdn_config.inputs.X-Amz-Algorithm}}"
-            data-date="{{cdn_config.inputs.X-Amz-Date}}"
-            data-policy="{{cdn_config.inputs.Policy}}"
-            data-signature="{{cdn_config.inputs.X-Amz-Signature}}"
+    {{#when action '!=' 'detail'}}
+        {{#if relation.suggestion}}
+            <h3 class="main-title">
+                <i class="{{relation.schema.icon}}"></i>
+                {{relation.suggestion}}
+            </h3>
         {{/if}}
-    >
-        <div class="box-head box-success">
-            <div class="box-title">
-                <i class="fa fa-plus"></i> {{title}}
+
+        <form
+            class="box"
+            method="post"
+            {{#if cdn_config}}
+                data-do="cdn-upload"
+                data-on="submit"
+                data-progress="{{_ 'We are uploading your files. Please do not refresh page.'}}"
+                data-complete="{{_ 'Upload Complete'}}"
+                data-enctype="{{cdn_config.form.enctype}}"
+                data-method="{{cdn_config.form.method}}"
+                data-action="{{cdn_config.form.action}}"
+                data-cdn="{{cdn_config.form.action}}"
+                data-acl="{{cdn_config.inputs.acl}}"
+                data-key="{{cdn_config.inputs.key}}"
+                data-credential="{{cdn_config.inputs.X-Amz-Credential}}"
+                data-algorythm="{{cdn_config.inputs.X-Amz-Algorithm}}"
+                data-date="{{cdn_config.inputs.X-Amz-Date}}"
+                data-policy="{{cdn_config.inputs.Policy}}"
+                data-signature="{{cdn_config.inputs.X-Amz-Signature}}"
+            {{/if}}
+        >
+            <div class="box-head box-success">
+                <div class="box-title">
+                    <i class="fa fa-plus"></i> {{title}}
+                </div>
             </div>
-        </div>
 
-        <div class="box-body box-padding">
-            {{#relations schema.name 1}}
-                <div class="form-group{{#has ../errors primary2}} has-error{{/has}}">
-                    <label class="control-label">{{singular}}</label>
-                    <div>
-                        <input
-                            autocomplete="off"
-                            class="form-control suggestion-label-{{name}}"
-                            name="{{suggestion_name}}"
-                            placeholder="{{_ 'Enter %s' singular}}"
-                            type="text"
-                            value="{{scope ../item suggestion_name}}"
-                        />
-                        <input
-                            class="suggestion-value-{{name}}"
-                            name="{{primary2}}"
-                            type="hidden"
-                            value="{{scope ../item primary2}}"
-                        />
-                        <div
-                            class="input-suggestion d-none"
-                            data-do="suggestion-field"
-                            data-format="{{suggestion}}"
-                            data-target-label="input.suggestion-label-{{name}}"
-                            data-target-value="input.suggestion-value-{{name}}"
-                            {{#in ../valid_relations name}}
-                                data-url="/admin/system/model/{{name}}/search?q={QUERY}&render=false"
-                            {{else}}
-                                data-url="/admin/{{name}}/search?q={QUERY}&render=false"
-                            {{/in}}
-                            data-value="{{primary2}}"
-                        ></div>
-                        {{#has ../errors primary2}}
-                            <span class="help-text">{{scope ../errors primary2}}</span>
-                        {{/has}}
-                    </div>
-                </div>
-            {{/relations}}
-
-            {{#relations schema.name 0}}
-                <div class="form-group{{#has ../errors primary2}} has-error{{/has}}">
-                    <label class="control-label">{{singular}}</label>
-                    <div>
-                        <input
-                            autocomplete="off"
-                            class="form-control suggestion-label-{{name}}"
-                            name="{{suggestion_name}}"
-                            placeholder="{{_ 'Enter %s' singular}}"
-                            type="text"
-                            value="
-                            {{~#has ../item suggestion_name}}
-                                {{~scope ../item suggestion_name}}
-                            {{~else~}}
-                                {{~#has ../item name}}
-                                    {{~#scope ../item name}}
-                                        {{~suggest ../this this}}
-                                    {{~/scope~}}
-                                {{~/has~}}
-                            {{~/has}}"
-                        />
-                        <input
-                            class="suggestion-value-{{name}}"
-                            name="{{primary2}}"
-                            type="hidden"
-                            value="
-                            {{~#has ../item primary2}}
-                                {{~scope ../item primary2}}
-                            {{~else~}}
-                                {{~#has ../item name}}
-                                    {{~#scope ../item name}}
-                                        {{~scope this ../primary2}}
-                                    {{~/scope~}}
-                                {{~/has~}}
-                            {{~/has}}"
-                        />
-                        <div
-                            class="input-suggestion d-none"
-                            data-do="suggestion-field"
-                            data-format="{{suggestion}}"
-                            data-target-label="input.suggestion-label-{{name}}"
-                            data-target-value="input.suggestion-value-{{name}}"
-                            {{#in ../valid_relations name}}
-                                data-url="/admin/system/model/{{name}}/search?q={QUERY}&render=false"
-                            {{else}}
-                                data-url="/admin/{{name}}/search?q={QUERY}&render=false"
-                            {{/in}}
-                            data-value="{{primary2}}"
-                        ></div>
-                        {{#has ../errors primary2}}
-                            <span class="help-text">{{scope ../errors primary2}}</span>
-                        {{/has}}
-                    </div>
-                </div>
-            {{/relations}}
-
-            {{#each schema.fields}}
-                {{#notin 'none,hide,active,created,updated,uuid' field.type}}
-                    <div class="form-group{{#has ../errors @key}} has-error{{/has}}">
-                        <label class="control-label">{{label}}</label>
+            <div class="box-body box-padding">
+                {{#relations schema.name 1}}
+                    <div class="form-group{{#has ../errors primary2}} has-error{{/has}}">
+                        <label class="control-label">{{singular}}</label>
                         <div>
-                            {{> form_fields}}
-                            {{#has ../errors @key}}
-                                <span class="help-text">{{scope ../errors @key}}</span>
+                            <input
+                                autocomplete="off"
+                                class="form-control suggestion-label-{{name}}"
+                                name="{{suggestion_name}}"
+                                placeholder="{{_ 'Enter %s' singular}}"
+                                type="text"
+                                value="{{scope ../item suggestion_name}}"
+                            />
+                            <input
+                                class="suggestion-value-{{name}}"
+                                name="{{primary2}}"
+                                type="hidden"
+                                value="{{scope ../item primary2}}"
+                            />
+                            <div
+                                class="input-suggestion d-none"
+                                data-do="suggestion-field"
+                                data-format="{{suggestion}}"
+                                data-target-label="input.suggestion-label-{{name}}"
+                                data-target-value="input.suggestion-value-{{name}}"
+                                {{#in ../valid_relations name}}
+                                    data-url="/admin/system/model/{{name}}/search?q={QUERY}&render=false"
+                                {{else}}
+                                    data-url="/admin/{{name}}/search?q={QUERY}&render=false"
+                                {{/in}}
+                                data-value="{{primary2}}"
+                            ></div>
+                            {{#has ../errors primary2}}
+                                <span class="help-text">{{scope ../errors primary2}}</span>
                             {{/has}}
                         </div>
                     </div>
-                {{/notin}}
-            {{/each}}
-        </div>
-        <div class="box-foot box-light">
-            <div class="box-left">
-                <input type="hidden" name="csrf" value="{{csrf}}" />
-                <button type="submit" class="btn btn-primary">{{_ 'Submit'}}</button>
+                {{/relations}}
+
+                {{#relations schema.name 0}}
+                    <div class="form-group{{#has ../errors primary2}} has-error{{/has}}">
+                        <label class="control-label">{{singular}}</label>
+                        <div>
+                            <input
+                                autocomplete="off"
+                                class="form-control suggestion-label-{{name}}"
+                                name="{{suggestion_name}}"
+                                placeholder="{{_ 'Enter %s' singular}}"
+                                type="text"
+                                value="
+                                {{~#has ../item suggestion_name}}
+                                    {{~scope ../item suggestion_name}}
+                                {{~else~}}
+                                    {{~#has ../item name}}
+                                        {{~#scope ../item name}}
+                                            {{~suggest ../this this}}
+                                        {{~/scope~}}
+                                    {{~/has~}}
+                                {{~/has}}"
+                            />
+                            <input
+                                class="suggestion-value-{{name}}"
+                                name="{{primary2}}"
+                                type="hidden"
+                                value="
+                                {{~#has ../item primary2}}
+                                    {{~scope ../item primary2}}
+                                {{~else~}}
+                                    {{~#has ../item name}}
+                                        {{~#scope ../item name}}
+                                            {{~scope this ../primary2}}
+                                        {{~/scope~}}
+                                    {{~/has~}}
+                                {{~/has}}"
+                            />
+                            <div
+                                class="input-suggestion d-none"
+                                data-do="suggestion-field"
+                                data-format="{{suggestion}}"
+                                data-target-label="input.suggestion-label-{{name}}"
+                                data-target-value="input.suggestion-value-{{name}}"
+                                {{#in ../valid_relations name}}
+                                    data-url="/admin/system/model/{{name}}/search?q={QUERY}&render=false"
+                                {{else}}
+                                    data-url="/admin/{{name}}/search?q={QUERY}&render=false"
+                                {{/in}}
+                                data-value="{{primary2}}"
+                            ></div>
+                            {{#has ../errors primary2}}
+                                <span class="help-text">{{scope ../errors primary2}}</span>
+                            {{/has}}
+                        </div>
+                    </div>
+                {{/relations}}
+
+                {{#each schema.fields}}
+                    {{#notin 'none,hide,active,created,updated,uuid' field.type}}
+                        <div class="form-group{{#has ../errors @key}} has-error{{/has}}">
+                            <label class="control-label">{{label}}</label>
+                            <div>
+                                {{> form_fields}}
+                                {{#has ../errors @key}}
+                                    <span class="help-text">{{scope ../errors @key}}</span>
+                                {{/has}}
+                            </div>
+                        </div>
+                    {{/notin}}
+                {{/each}}
             </div>
-        </div>
-    </form>
+            <div class="box-foot box-light">
+                <div class="box-left">
+                    <input type="hidden" name="csrf" value="{{csrf}}" />
+                    <button type="submit" class="btn btn-primary">{{_ 'Submit'}}</button>
+                </div>
+            </div>
+        </form>
+    {{else}}
+        {{> form_detail}}
+    {{/when}}
 </div>

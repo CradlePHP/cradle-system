@@ -501,6 +501,186 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
 });
 
 /**
+ * Render the System Model Update Page
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->get('/admin/system/model/:schema/detail/:id', function ($request, $response) {
+    //----------------------------//
+    // 1. Prepare Data
+    //get schema data
+    $schema = Schema::i($request->getStage('schema'));
+
+    //pass the item with only the post data
+    $data = ['item' => $request->getPost()];
+
+    //also pass the schema to the template
+    $data['schema'] = $schema->getAll();
+
+    //if this is a return back from processing
+    //this form and it's because of an error
+    if ($response->isError()) {
+        //pass the error messages to the template
+        $response->setFlash($response->getMessage(), 'error');
+        $data['errors'] = $response->getValidation();
+    }
+
+    //table_id, 1 for example
+    $request->setStage(
+        $schema->getPrimaryFieldName(),
+        $request->getStage('id')
+    );
+
+    //get the original table row
+    $this->trigger('system-model-detail', $request, $response);
+
+    //can we update ?
+    if ($response->isError()) {
+        //redirect
+        $redirect = sprintf(
+            '/admin/system/model/%s/search',
+            $request->getStage('schema')
+        );
+
+        //this is for flexibility
+        if ($request->hasStage('redirect_uri')) {
+            $redirect = $request->getStage('redirect_uri');
+        }
+
+        //add a flash
+        $this->package('global')->flash($response->getMessage(), 'error');
+        return $this->package('global')->redirect($redirect);
+    }
+
+    $data['detail'] = $response->getResults();
+
+    //if no item
+    if (empty($data['item'])) {
+        //pass the item to the template
+        $data['item'] = $data['detail'];
+
+        //add suggestion value for each relation
+        foreach ($data['schema']['relations'] as $name => $relation) {
+            if ($relation['many'] > 1) {
+                continue;
+            }
+
+            $suggestion = '_' . $relation['primary2'];
+
+            $suggestionData = $data['item'];
+            if ($relation['many'] == 0) {
+                if (!isset($data['item'][$relation['name']])) {
+                    continue;
+                }
+
+                $suggestionData = $data['item'][$relation['name']];
+
+                if (!$suggestionData) {
+                    continue;
+                }
+            }
+
+            try {
+                $data['item'][$suggestion] = Schema::i($relation['name'])
+                    ->getSuggestionFormat($suggestionData);
+            } catch (Exception $e) {
+            }
+        }
+    }
+
+    //if we only want the raw data
+    if ($request->getStage('render') === 'false') {
+        return;
+    }
+
+    //determine the suggestion
+    $data['detail']['suggestion'] = $schema->getSuggestionFormat($data['item']);
+
+    //add CSRF
+    $this->trigger('csrf-load', $request, $response);
+    $data['csrf'] = $response->getResults('csrf');
+
+    //if there are file fields
+    if (!empty($data['schema']['files'])) {
+        //add CDN
+        $config = $this->package('global')->service('s3-main');
+        $data['cdn_config'] = File::getS3Client($config);
+    }
+
+    //determine valid relations
+    $data['valid_relations'] = [];
+    $this->trigger('system-schema-search', $request, $response);
+    foreach ($response->getResults('rows') as $relation) {
+        $data['valid_relations'][] = $relation['name'];
+    }
+
+    $data['redirect'] = urlencode($request->getServer('REQUEST_URI'));
+
+    //----------------------------//
+    // 2. Render Template
+    //set the class name
+    $class = 'page-admin-system-model-update page-admin';
+
+    //set the action
+    $data['action'] = 'detail';
+
+    // get the suggestion title
+    $suggestion = str_replace('{', '', $data['schema']['suggestion']);
+    $suggestion = str_replace('}', '', $suggestion);
+
+    //determine the title
+    $data['title'] = $this->package('global')->translate(
+        '%s Detail',
+        $data['item'][$suggestion]
+    );
+
+    //add custom page helpers
+    $this->package('global')
+        ->handlebars()
+        ->registerHelper('json_encode', function (...$args) {
+            $options = array_pop($args);
+            $value = array_shift($args);
+            foreach ($args as $arg) {
+                if (!isset($value[$arg])) {
+                    $value = null;
+                    break;
+                }
+
+                $value = $value[$arg];
+            }
+
+            if (!$value) {
+                return '';
+            }
+
+            return json_encode($value, JSON_PRETTY_PRINT);
+        });
+
+    //render the body
+    $body = $this
+        ->package('cradlephp/cradle-system')
+        ->template('model', 'form', $data, [
+            'form_detail',
+            'form_format',
+        ]);
+
+    //set content
+    $response
+        ->setPage('title', $data['title'])
+        ->setPage('class', $class)
+        ->setContent($body);
+
+    //if we only want the body
+    if ($request->getStage('render') === 'body') {
+        return;
+    }
+
+    //render page
+    $this->trigger('admin-render-page', $request, $response);
+});
+
+/**
  * Process the System Model Search Actions
  *
  * @param Request $request
@@ -1298,78 +1478,126 @@ $this->get('/admin/system/model/:schema/export/:type', function ($request, $resp
 $this->get('/admin/system/model/:schema/calendar', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
-    //set redirect
+    $data = $request->getStage();
+
+    // set redirect
     $redirect = sprintf(
         '/admin/system/model/%s/search',
         $request->getStage('schema')
     );
 
+    if ($request->getStage('redirect_uri')) {
+        $redirect = $request->getStage('redirect_uri');
+    }
+
     $request->setStage('redirect_uri', $redirect);
 
-    $schema = Schema::i($request->getStage('schema'));
+    // if no ajax set, set this page as default
+    if (!isset($data['ajax']) || empty($data['ajax'])) {
+        $data['ajax'] = sprintf(
+            '/admin/system/model/%s/search',
+            $request->getStage('schema')
+        );
+    }
+
+    // if no detail set, set update page as the default
+    if (!isset($data['detail']) || empty($data['detail'])) {
+        $data['detail'] = sprintf(
+            '/admin/system/model/%s/update',
+            $request->getStage('schema')
+        );
+    }
+
+    //----------------------------//
+    // 2. Validate
+    // does the schema exists?
+    try {
+        $data['schema'] = Schema::i($request->getStage('schema'))->getAll();
+    } catch (\Exception $e) {
+        $message = $this
+            ->package('global')
+            ->translate($e->getMessage());
+
+        $response->setError(true, $message);
+    }
 
     //if this is a return back from processing
     //this form and it's because of an error
     if ($response->isError()) {
         //pass the error messages to the template
-        $response->setFlash($response->getMessage(), 'error');
+        $this
+            ->package('global')
+            ->flash($response->getMessage(), 'error');
+        $this
+            ->package('global')
+            ->redirect($redirect);
     }
 
     //also pass the schema to the template
-    $schema = $schema->getAll();
     $dates = ['date', 'datetime', 'created', 'updated', 'time', 'week', 'month'];
 
-    if (!$request->getStage('show')) {
-        // redirect
+    //check what to show
+    if (!isset($data['show']) || !$data['show']) {
+        //flash an error message and redirect
         $error = $this
             ->package('global')
             ->translate('Please specify what to plot.');
-        $this->package('global')->flash($error, 'error');
-        $this->package('global')->redirect($redirect);
+        $this
+            ->package('global')
+            ->flash($error, 'error');
+        $this
+            ->package('global')
+            ->redirect($redirect);
     }
 
-    // check if fields are date fields
-    $show = $request->getStage('show');
-
-    $fields = explode(',', $show);
-    foreach ($fields as $index => $column) {
-        if (!isset($schema['fields'][$column]) ||
-            !in_array($schema['fields'][$column]['field']['type'], $dates)) {
-            $error = $this->package('global')
-                ->translate('%s is not a date field', $column);
-            $this->package('global')->flash($error, 'error');
-            $this->package('global')->redirect($redirect);
+    $data['show'] = explode(',', $data['show']);
+    foreach ($data['show'] as $column) {
+        if (isset($data['schema']['fields'][$column])
+            && in_array($data['schema']['fields'][$column]['field']['type'], $dates)
+        ) {
+            continue;
         }
+
+        $error = $this
+            ->package('global')
+            ->translate('%s is not a date field', $column);
+        $this
+            ->package('global')
+            ->flash($error, 'error');
+        $this
+            ->package('global')
+            ->redirect($redirect);
     }
 
-    $show = $fields;
-    $data = $request->getStage();
-
-    // set base date
-    $base = date('Y-m-d');
-    // today date for today button
-    $data['today'] =  date('Y-m-d');
+    //----------------------------//
+    // 3. Process
+    // set base date & today date for button
+    $base = $data['today'] = date('Y-m-d');
 
     // if there's a start date provide,
     // we have to change our base date
-    if ($request->getStage('start_date')) {
-        $base = date('Y-m-d', strtotime($request->getStage('start_date')));
+    if (isset($data['start_date']) && $data['start_date']) {
+        $base = date('Y-m-d', strtotime($data['start_date']));
     }
 
     // set default the previous and next date based on our "base" date
     // default is month view
-    $prev = strtotime($base .' -1 month');
-    $next = strtotime($base .' +1 month');
+    $prev = strtotime($base . ' -1 month');
+    $next = strtotime($base . ' +1 month');
+
+    // set view if not defined
+    if (!isset($data['view']) || empty($data['view'])) {
+        $data['view'] = 'month';
+    }
 
     // change previous and next date if the user wanted a week view
-    if ($request->getStage('view') == 'listWeek' ||
-        $request->getStage('view') == 'agendaWeek') {
-        $prev = strtotime($base .' -1 week');
-        $next = strtotime($base .' +1 week');
+    if ($data['view'] == 'listWeek' || $data['view'] == 'agendaWeek') {
+        $prev = strtotime($base . ' -1 week');
+        $next = strtotime($base . ' +1 week');
     }
 
     // change previous and next date if the user wanted a day view
-    if ($request->getStage('view') == 'agendaDay') {
+    if ($data['view'] == 'agendaDay') {
         $prev = strtotime($base .' -1 day');
         $next = strtotime($base .' +1 day');
     }
@@ -1378,315 +1606,324 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
     $data['prev'] = date('Y-m-d', $prev);
     $data['next'] = date('Y-m-d', $next);
 
-    // set suggestion
-    $suggestion = $schema['suggestion'];
-    
-    if (!$suggestion) {
-        $suggestion = 'No Title';
+    // if no breadcrumb set, set a default breadcrumb
+    // we will not check if breadcrumb is in array format
+    // or has value to be flexible just in case the user
+    // doesn't want a breadcrumb
+    if (!isset($data['breadcrumb'])) {
+        $data['breadcrumb'] = [
+            [
+                'icon' => 'fas fa-home',
+                'link' => '/admin',
+                'page' => 'Admin'
+            ],
+            [
+                'icon' => $data['schema']['icon'],
+                'link' => $data['schema']['redirect_uri'],
+                'page' => $data['schema']['plural']
+            ],
+            [
+                'icon' => 'fas fa-calendar-alt',
+                'page' => 'Calendar',
+                'active' => true
+            ]
+        ];
     }
 
     //----------------------------//
-    // 3. Render Template
-    $title = $this->package('global')->translate('%s Calendar', $schema['singular']);
-    $data = array_merge(
-        $data,
-        [
-            'title' => $title,
-            'package' => $schema['plural'],
-            'model' => $request->getStage('schema'),
-            'icon'  => $schema['icon'],
-            'show' => $show,
-            'suggestion' => $suggestion
-        ]);
+    // 4. Render Template
+    $data['title'] = $this
+        ->package('global')
+        ->translate('%s Calendar', $data['schema']['plural']);
 
-    $class = sprintf('page-admin-%s-calendar page-admin-calendar page-admin', $request->getStage('schema'));
-    $body = $this->package('cradlephp/cradle-system')
+    $class = sprintf(
+            'page-admin-%s-calendar page-admin-calendar page-admin',
+            $data['schema']['name']
+        );
+
+    $body = $this
+        ->package('cradlephp/cradle-system')
         ->template('model', 'calendar', $data);
 
-    //Set Content
+    // set content
     $response
-        ->setPage('title', $title)
+        ->setPage('title', $data['title'])
         ->setPage('class', $class)
         ->setContent($body);
+
+    // if we only want the body
+    if ($request->getStage('render') === 'body') {
+        return;
+    }
 
     //Render blank page
     $this->trigger('admin-render-page', $request, $response);
 });
 
-/**
- * Gets the System Model Calendar Data
- *
- * @param Request $request
- * @param Response $response
- */
-$this->get('/admin/system/model/:schema/calendar/data', function ($request, $response) {
-    //----------------------------//
-    // 1. Route Permissions
-
-    //----------------------------//
-    // 2. Prepare Data
-    // render raw data
-    $request->setStage('render', 'false');
-    // disable redirect
-    $request->setStage('redirect', 'false');
-
-    //----------------------------//
-    // 3. Render Request
-    // get data from search
-    $this->routeTo(
-        'get',
-        sprintf(
-            '/admin/system/model/%s/search',
-            $request->getStage('schema')
-        ),
-        $request,
-        $response
-    );
-
-    // get schema data
-    $schema = Schema::i($request->getStage('schema'));
-    $schema = $schema->getAll();
-
-    // get suggestion format
-    $suggestion = $schema['suggestion'];
-
-    //get results
-    $results = $response->getResults('rows');
-
-    // compile template
-    $template = cradle('global')->handlebars()->compile($suggestion);
-
-    // get suggestion format per row
-    foreach($results as $key => $result) {
-        if ($suggestion) {
-            $results[$key]['suggestion'] = $template($result);
-        } else {
-            $results[$key]['suggestion'] = "No Title";
-        }
-    }
-
-    // set response
-    return $response->setResults('rows',$results);
-});
-
-/**
- * Render the System Model Pipeline Page
- *
- * @param Request $request
- * @param Response $response
- */
-$this->get('/admin/system/model/:schema/pipeline', function ($request, $response) {
-    //----------------------------//
-    // 1. Prepare Data
-    //set redirect
-    $redirect = sprintf(
-        '/admin/system/model/%s/search',
-        $request->getStage('schema')
-    );
-
-    $request->setStage('redirect_uri', $redirect);
-
-    $schema = Schema::i($request->getStage('schema'));
-
-    //if this is a return back from processing
-    //this form and it's because of an error
-    if ($response->isError()) {
-        //pass the error messages to the template
-        $response->setFlash($response->getMessage(), 'error');
-    }
-
-    //also pass the schema to the template
-    $schema = $schema->getAll();
-
-    if (!$request->getStage('show')) {
-        // redirect
-        $error = $this
-            ->package('global')
-            ->translate('Please specify what to plot.');
-        $this->package('global')->flash($error, 'error');
-        $this->package('global')->redirect($redirect);
-    }
-
-    $dates = ['select', 'radios'];
-    $show = $request->getStage('show');
-
-    if (!isset($schema['fields'][$show]) ||
-        !in_array($schema['fields'][$show]['field']['type'], $dates)) {
-        $error = $this
-            ->package('global')
-            ->translate('%s is not a select/radio field', $show);
-        $this->package('global')->flash($error, 'error');
-        $this->package('global')->redirect($redirect);
-    }
-
-    // initialize the stageHeader keys into null 
-    // so that even there's no total or range, it will not get errors
-    $stageHeader = ['total' => null,
-                    'minRange' => null,
-                    'maxRange' => null];
-
-    // only do this if there's total and range in stage
-    if ($request->hasStage('total') || $request->hasStage('range')) {
-        // sets the range with 2 elements
-        $range = [null, null];
-
-        if ($request->hasStage('range')) {
-            // separate the entry in range into 2 columns
-            if (strpos($request->getStage('range'), ',') !== false) {
-                $range = explode(',', $request->getStage('range'));
-            } else {
-                // flash error message
-                $error = $this
-                    ->package('global')
-                    ->translate('Range only contains one column');
-                $this->package('global')->flash($error, 'error');
-            }
-        }
-        
-        // validates if total and range column is valid or not
-        // gets the value of entered columns
-        $stageHeader = ['total' => $request->getStage('total'),
-                        'minRange' => $range[0],
-                        'maxRange' => $range[1]];
-        $totalRangeFieldType = ['number', 'small', 'float', 'price'];
-        $invalidField = 0;
-
-        foreach ($stageHeader as $key => $value) {
-            // if key exists, check it's field type
-            if (!empty($value)) {
-                if(!in_array($schema['fields'][$value]['field']['type'], 
-                    $totalRangeFieldType)){
-                    $stageHeader[$key] = null;
-                    
-                    // flash error message
-                    $error = $this
-                        ->package('global')
-                        ->translate('The specified field is invalid');
-                    $this->package('global')->flash($error, 'error');
-                }
-            }
-        }
-    }
-
-    //----------------------------//
-    // 2. Prepare Data
-    // pipeline stages
-    $stages = $schema['fields'][$show]['field']['options'];
-    foreach ($stages as $key => $stage) {
-        $stages[$key]['percentage'] = (($key + 1)/count($stages)) * 100;
-    }
-
-    $schema['filterable'] = array_values($schema['filterable']);
-    //----------------------------//
-    // 3. Render Template
-    $title =$this->package('global')->translate('%s Pipeline', $schema['singular']);
-    $data = array_merge(
-        $request->getStage(),
-        [
-            'title' => $title,
-            'package' => $schema['plural'],
-            'model' => $request->getStage('schema'),
-            'icon'  => $schema['icon'],
-            'stages' => $stages,
-            'schema' => $schema,
-            'stageHeader' => $stageHeader,
-            'currency' => $request->getStage('currency')
-        ]);
-
-    $class = sprintf('page-admin-%s-pipeline page-admin', $request->getStage('schema'));
-    $body = $this->package('cradlephp/cradle-system')
-        ->template('model', 'board', $data, ['search_form', 'search_filters']);
-
-    //Set Content
-    $response
-        ->setPage('title', $title)
-        ->setPage('class', $class)
-        ->setContent($body);
-
-    //Render blank page
-    $this->trigger('admin-render-page', $request, $response);
-});
-
-/**
- * Process Pipeline Update
- *
- * @param Request $request
- * @param Response $response
- */
-$this->post('/admin/system/model/:schema/pipeline', function ($request, $response) {
-    //----------------------------//
-    // get json response data only
-    $request->setStage('redirect_uri', 'false');
-    $request->setStage('render', 'false');
-
-    //now let the original post update take over
-    $this->routeTo(
-        'post',
-        sprintf(
-            '/admin/system/model/%s/update/%s',
-            $request->getStage('schema'),
-            $request->getStage('id')
-        ),
-        $request,
-        $response
-    );
-});
-
-/**
- * Gets the System Model Pipeline Data
- *
- * @param Request $request
- * @param Response $response
- */
-$this->get('/admin/system/model/:schema/pipeline/data', function ($request, $response) {
-    //----------------------------//
-    // 1. Route Permissions
-
-    //----------------------------//
-    // 2. Prepare Data
-    // render raw data
-    $request->setStage('render', 'false');
-    // disable redirect
-    $request->setStage('redirect', 'false');
-
-    //----------------------------//
-    // 3. Render Request
-    // get data from search
-    $this->routeTo(
-        'get',
-        sprintf(
-            '/admin/system/model/%s/search',
-            $request->getStage('schema')
-        ),
-        $request,
-        $response
-    );
-
-    // get schema data
-    $schema = Schema::i($request->getStage('schema'));
-    $schema = $schema->getAll();
-
-    // get suggestion format
-    $suggestion = $schema['suggestion'];
-
-    //get results
-    $results = $response->getResults('rows');
-
-    // compile template
-    $template = cradle('global')->handlebars()->compile($suggestion);
-
-    // get suggestion format per row
-    foreach($results as $key => $result) {
-        if ($suggestion) {
-            $results[$key]['suggestion'] = $template($result);
-        } else {
-            $results[$key]['suggestion'] = "No Title";
-        }
-    }
-
-    // set response
-    return $response->setResults('rows',$results);
-});
+// /**
+//  * Render the System Model Pipeline Page
+//  *
+//  * @param Request $request
+//  * @param Response $response
+//  */
+// $this->get('/admin/system/model/:schema/pipeline', function ($request, $response) {
+//     //----------------------------//
+//     // 1. Prepare Data
+//     $data = $request->getStage();
+//
+//     // set redirect
+//     $redirect = sprintf(
+//         '/admin/system/model/%s/search',
+//         $request->getStage('schema')
+//     );
+//
+//     if ($request->getStage('redirect_uri')) {
+//         $redirect = $request->getStage('redirect_uri');
+//     }
+//
+//     $request->setStage('redirect_uri', $redirect);
+//
+//     if (!isset($data['ajax'])) {
+//         $data['ajax'] = [];
+//     }
+//
+//     // if no ajax set, set this page as default
+//     if (!isset($data['ajax']['pull']) || empty($data['ajax']['pull'])) {
+//         $data['ajax']['pull'] = sprintf(
+//             '/admin/system/model/%s/search',
+//             $request->getStage('schema')
+//         );
+//     }
+//
+//     if (!isset($data['ajax']['update']) || empty($data['ajax']['update'])) {
+//         $data['ajax']['update'] = sprintf(
+//             '/admin/system/model/%s/pipeline',
+//             $request->getStage('schema')
+//         );
+//     }
+//
+//     // if no detail set, set update page as the default
+//     if (!isset($data['detail']) || empty($data['detail'])) {
+//         $data['detail'] = sprintf(
+//             '/admin/system/model/%s/update',
+//             $request->getStage('schema')
+//         );
+//     }
+//
+//     //----------------------------//
+//     // 2. Validate
+//     // does the schema exists?
+//     try {
+//         $data['schema'] = Schema::i($request->getStage('schema'))->getAll();
+//     } catch (\Exception $e) {
+//         $message = $this
+//             ->package('global')
+//             ->translate($e->getMessage());
+//
+//         $response->setError(true, $message);
+//     }
+//
+//     //if this is a return back from processing
+//     //this form and it's because of an error
+//     if ($response->isError()) {
+//         //pass the error messages to the template
+//         $this
+//             ->package('global')
+//             ->flash($response->getMessage(), 'error');
+//         $this
+//             ->package('global')
+//             ->redirect($redirect);
+//     }
+//
+//     //check what to show
+//     if (!isset($data['show']) || !$data['show']) {
+//         //flash an error message and redirect
+//         $error = $this
+//             ->package('global')
+//             ->translate('Please specify what to plot.');
+//         $this
+//             ->package('global')
+//             ->flash($error, 'error');
+//         $this
+//             ->package('global')
+//             ->redirect($redirect);
+//     }
+//
+//     // minimize long array chain
+//     $fields = $data['schema']['fields'];
+//     // pipeline stages
+//     $data['stages'] = $fields[$data['show']]['field']['options'];
+//
+//     $allowed = ['select', 'radios'];
+//
+//     if (!isset($fields[$data['show']])
+//         || !in_array($fields[$data['show']]['field']['type'], $allowed)
+//     ) {
+//         $error = $this
+//             ->package('global')
+//             ->translate('%s is not a select/radio field', $show);
+//         $this
+//             ->package('global')
+//             ->flash($error, 'error');
+//         $this
+//             ->package('global')
+//             ->redirect($redirect);
+//     }
+//
+//     $dates = ['date', 'datetime', 'created', 'updated', 'time', 'week', 'month'];
+//     if (isset($data['date'])
+//         && (!isset($fields[$data['date']])
+//             || !in_array($fields[$data['date']]['field']['type'], $dates))
+//     ) {
+//         $error = $this
+//             ->package('global')
+//             ->translate('%s is not a type of date field', $data['date']);
+//         $this
+//             ->package('global')
+//             ->flash($error, 'error');
+//         $this
+//             ->package('global')
+//             ->redirect($redirect);
+//     }
+//
+//     // initialize the stageHeader keys into null
+//     // so that even there's no total or range, it will not get errors
+//     $data['stageHeader'] = [
+//         'total' => null,
+//         'minRange' => null,
+//         'maxRange' => null
+//     ];
+//
+//     // check if the user want's to display the total
+//     if (isset($data['total'])) {
+//         if (strpos($data['total'], ',') !== false) {
+//             $data['total'] = explode(',', $data['total']);
+//         }
+//
+//         // if not array, make it an array
+//         if (!is_array($data['total'])) {
+//             $data['total'] = [$data['total']];
+//         }
+//
+//         $rangeFieldTypes = ['number', 'small', 'float', 'price'];
+//
+//         $fields = $data['schema']['fields'];
+//         foreach ($data['total'] as $field) {
+//             if (isset($fields[$field])
+//                 && in_array($fields[$field]['field']['type'], $rangeFieldTypes)
+//             ) {
+//                 continue;
+//             }
+//
+//             // flash error message
+//             $error = $this
+//                 ->package('global')
+//                 ->translate('%s is not a number type field', $value);
+//
+//             $this
+//                 ->package('global')
+//                 ->flash($error, 'error');
+//
+//             $this
+//                 ->package('global')
+//                 ->redirect($redirect);
+//         }
+//     }
+//
+//     $data['schema']['filterable'] = array_values($data['schema']['filterable']);
+//     //----------------------------//
+//     // 3. Render Template
+//     $data['title'] = $this
+//         ->package('global')
+//         ->translate('%s Pipeline', $data['schema']['singular']);
+//
+//     $class = sprintf('page-admin-%s-pipeline page-admin', $request->getStage('schema'));
+//     $body = $this
+//         ->package('cradlephp/cradle-system')
+//         ->template('model', 'board', $data, ['search_form', 'search_filters']);
+//
+//     //Set Content
+//     $response
+//         ->setPage('title', $data['title'])
+//         ->setPage('class', $class)
+//         ->setContent($body);
+//
+//     //Render blank page
+//     $this->trigger('admin-render-page', $request, $response);
+// });
+//
+// /**
+//  * Process Pipeline Update
+//  *
+//  * @param Request $request
+//  * @param Response $response
+//  */
+// $this->post('/admin/system/model/:schema/pipeline', function ($request, $response) {
+//     //----------------------------//
+//     // get json response data only
+//     $request->setStage('redirect_uri', 'false');
+//     $request->setStage('render', 'false');
+//
+//     $data = [];
+//     if ($request->getStage()) {
+//         $data = $request->getStage();
+//     }
+//
+//     $filters = [];
+//
+//     // if it reached here, then we're assumming
+//     // that the user attempted to do an order/sort update
+//     if (isset($data['moved']) && isset($data['sort'])) {
+//         if (isset($data['stage']) && isset($data[$data['stage']])) {
+//             $filters[] = sprintf(
+//                 '%s = "%s"',
+//                 $data['stage'],
+//                 $data[$data['stage']]
+//             );
+//         }
+//
+//         // if it was moved upwards
+//         // then we only update the rows from this item to the previous elder
+//         if ($request->getStage('moved') == 'upwards') {
+//             $request->setStage(
+//                 'fields',
+//                 [$data['sort'] => $data['sort'] . '+1']
+//             );
+//
+//             $filters = [
+//                 $data['sort'] . ' > ' . $data['new_elder'],
+//                 $data['sort'] . ' <= ' . $data['previous_elder']
+//             ];
+//         }
+//
+//         // if it was moved downwards
+//         // then we update from the previous elder to the newest elder
+//         if ($request->getStage('moved') == 'downwards') {
+//             $request->setStage(
+//                 'fields',
+//                 [$data['sort'] => $data['sort'] . '-1']
+//             );
+//             $filters = [
+//                 $data['sort'] . ' >= ' . $data['previous_elder'],
+//                 $data['sort'] . ' <= ' . $data['new_elder']
+//             ];
+//
+//         }
+//
+//         $request->setStage('filters', $filters);
+//     }
+//
+//     return $this->routeTo(
+//         'post',
+//         sprintf(
+//             '/admin/system/model/%s/update/%s',
+//             $request->getStage('schema'),
+//             $request->getStage('id')
+//         ),
+//         $request,
+//         $response
+//     );
+// });
 
 //Front End Controllers
 
