@@ -171,7 +171,7 @@ class SqlService
                 ->addFilter($relation['primary1'] . ' = %s', $id)
                 ->getRow();
 
-            $fields = Schema::i($table)->getJsonFieldNames();
+            $fields = Schema::i($relation['name'])->getJsonFieldNames();
 
             foreach ($fields as $field) {
                 if (isset($tbl[$field]) && $tbl[$field]) {
@@ -215,7 +215,7 @@ class SqlService
                 ->addFilter($relation['primary1'] . ' = %s', $id)
                 ->getRows();
 
-            $fields = Schema::i($table)->getJsonFieldNames();
+            $fields = Schema::i($relation['name'])->getJsonFieldNames();
 
             foreach ($fields as $field) {
                 if (isset($tbl[$field]) && $tbl[$field]) {
