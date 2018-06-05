@@ -56,6 +56,20 @@ $this->get('/admin/system/schema/search', function ($request, $response) {
         return;
     }
 
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/schema/search',
+            'method' => 'get',
+            'json_data' => json_encode($data)
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
+    }
+
     //render page
     $this->trigger('admin-render-page', $request, $response);
 });
@@ -144,6 +158,20 @@ $this->get('/admin/system/schema/create', function ($request, $response) {
         return;
     }
 
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/schema/create',
+            'method' => 'get',
+            'json_data' => json_encode($data)
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
+    }
+
     //set content
     $response
         ->setPage('title', $data['title'])
@@ -199,6 +227,20 @@ $this->get('/admin/system/schema/update/:name', function ($request, $response) {
     //if we only want the raw data
     if ($request->getStage('render') === 'false') {
         return;
+    }
+
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/schema/update/:name',
+            'method' => 'get',
+            'json_data' => json_encode($data)
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
     }
 
     //add CSRF
@@ -318,6 +360,20 @@ $this->post('/admin/system/schema/create', function ($request, $response) {
         return;
     }
 
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/schema/create',
+            'method' => 'post',
+            'json_data' => json_encode($data)
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
+    }
+
     //record logs
     $this->log(
         sprintf(
@@ -417,6 +473,20 @@ $this->post('/admin/system/schema/update/:name', function ($request, $response) 
         return;
     }
 
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/schema/update/:name',
+            'method' => 'post',
+            'json_data' => json_encode($response->getResults())
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
+    }
+
     //it was good
     //add a flash
     $this->package('global')->flash('System Schema was Updated', 'success');
@@ -453,6 +523,20 @@ $this->get('/admin/system/schema/remove/:name', function ($request, $response) {
     //if we dont want to redirect
     if ($redirect === 'false') {
         return;
+    }
+
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/schema/remove/:name',
+            'method' => 'get',
+            'json_data' => json_encode($response->getResults())
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
     }
 
     if ($response->isError()) {
@@ -507,6 +591,20 @@ $this->get('/admin/system/schema/restore/:name', function ($request, $response) 
         return;
     }
 
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/schema/restore/:name',
+            'method' => 'post',
+            'json_data' => json_encode($response->getResults())
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
+    }
+
     if ($response->isError()) {
         //add a flash
         $this->package('global')->flash($response->getMessage(), 'error');
@@ -550,11 +648,25 @@ $this->get('/admin/system/schema/elastic/search', function ($request, $response)
 
     $data = $response->getResults();
 
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/schema/elastic/search',
+            'method' => 'get',
+            'json_data' => json_encode($data)
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
+    }
+
     //----------------------------//
     // 3. Render Template
     $class = 'page-admin-system-schema-search page-admin';
     $data['title'] = cradle('global')->translate('System Elastic Schema');
-    
+
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
@@ -584,7 +696,7 @@ $this->get('/admin/system/schema/elastic/search', function ($request, $response)
     if($request->getStage('render') === 'body') {
         return;
     }
-    
+
     //render page
     $this->trigger('admin-render-page', $request, $response);
 });
@@ -616,7 +728,7 @@ $this->get('/admin/system/schema/elastic/create/:name', function ($request, $res
     $this->package('global')
         ->flash(sprintf('Elastic schema for %s generated successfully.',
             $request->getStage('name')), 'success');
-    
+
     $this->package('global')->redirect($nextUrl);
 });
 
@@ -645,7 +757,7 @@ $this->get('/admin/system/schema/elastic/map/:name', function ($request, $respon
 
     $this->package('global')
         ->flash(sprintf('%s mapped successfully', ucwords ($request->getStage('name'))), 'success');
-    
+
     $this->package('global')->redirect($nextUrl);
 });
 
@@ -673,7 +785,7 @@ $this->get('/admin/system/schema/elastic/populate/:name', function ($request, $r
 
     $this->package('global')
         ->flash(sprintf('Successully populated %s', $request->getStage('name')), 'success');
-    
+
     $this->package('global')->redirect($nextUrl);
 });
 
@@ -697,10 +809,10 @@ $this->get('/admin/system/schema/elastic/flush/:name', function ($request, $resp
         $this->package('global')->flash($response->getMessage(), 'error');
         $this->package('global')->redirect($nextUrl);
     }
-    
+
     $this->package('global')
         ->flash(sprintf('Successfully flushed %s.', $request->getStage('name')), 'success');
-    
+
     $this->package('global')->redirect($nextUrl);
 });
 
@@ -715,7 +827,7 @@ $this->get('/admin/system/schema/elastic/edit/:name', function ($request, $respo
     //----------------------------//
     // 1. Prepare Data
     $data = [];
-    
+
     //----------------------------//
     // 2. Process Request
     //----------------------------//
@@ -730,7 +842,7 @@ $this->get('/admin/system/schema/elastic/edit/:name', function ($request, $respo
     // 3. Render Template
     $class = 'page-admin-system-schema-search page-admin';
     $data['title'] = 'Profile Elastic Schema';
-    
+
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
@@ -755,12 +867,12 @@ $this->get('/admin/system/schema/elastic/edit/:name', function ($request, $respo
         ->setPage('title', $data['title'])
         ->setPage('class', $class)
         ->setContent($body);
-    
+
     //if we only want the body
     if($request->getStage('render') === 'body') {
         return;
     }
-    
+
     //render page
     $this->trigger('admin-render-page', $request, $response);
 });
@@ -776,7 +888,7 @@ $this->post('/admin/system/schema/elastic/edit/:name', function ($request, $resp
     //----------------------------//
     // 1. Prepare Data
     $nextUrl = '/admin/system/schema/elastic/search';
-    
+
     //----------------------------//
     // 2. Process Request
     // trigger update elastic schema
@@ -789,7 +901,6 @@ $this->post('/admin/system/schema/elastic/edit/:name', function ($request, $resp
 
     $this->package('global')
         ->flash(sprintf('Elastic schema %s', $request->getStage('name')), 'success');
-    
+
     $this->package('global')->redirect($nextUrl);
 });
-
