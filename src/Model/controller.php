@@ -122,6 +122,19 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
         $data['valid_relations'][] = $relation['name'];
     }
 
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/model/:schema/search',
+            'method' => 'get',
+            'json_data' => json_encode($data)
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
+    }
     //----------------------------//
     // 2. Render Template
     //set the class name
@@ -260,6 +273,20 @@ $this->get('/admin/system/model/:schema/create', function ($request, $response) 
     //if we only want the data
     if ($request->getStage('render') === 'false') {
         return $response->setJson($data);
+    }
+
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/model/:schema/create',
+            'method' => 'get',
+            'json_data' => json_encode($data)
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
     }
 
     //----------------------------//
@@ -440,6 +467,20 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
 
     $data['redirect'] = urlencode($request->getServer('REQUEST_URI'));
 
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/model/:schema/update/:id',
+            'method' => 'get',
+            'json_data' => json_encode($data)
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
+    }
+
     //----------------------------//
     // 2. Render Template
     //set the class name
@@ -616,6 +657,20 @@ $this->get('/admin/system/model/:schema/detail/:id', function ($request, $respon
     }
 
     $data['redirect'] = urlencode($request->getServer('REQUEST_URI'));
+
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/model/:schema/detail/:id',
+            'method' => 'get',
+            'json_data' => json_encode($data)
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
+    }
 
     //----------------------------//
     // 2. Render Template
@@ -891,6 +946,20 @@ $this->post('/admin/system/model/:schema/create', function ($request, $response)
         return;
     }
 
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/model/:schema/create',
+            'method' => 'post',
+            'json_data' => json_encode($response->getResults())
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
+    }
+
     //add a flash
     $this->package('global')->flash(sprintf(
         '%s was Created',
@@ -1019,6 +1088,20 @@ $this->post('/admin/system/model/:schema/update/:id', function ($request, $respo
         return;
     }
 
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/model/:schema/update/:id',
+            'method' => 'post',
+            'json_data' => json_encode($response->getResults())
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
+    }
+
     //add a flash
     $this->package('global')->flash(sprintf(
         '%s was Updated',
@@ -1080,6 +1163,20 @@ $this->get('/admin/system/model/:schema/remove/:id', function ($request, $respon
     //if we dont want to redirect
     if ($redirect === 'false') {
         return;
+    }
+
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/model/:schema/remove/:id',
+            'method' => 'get',
+            'json_data' => json_encode($response->getResults())
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
     }
 
     if ($response->isError()) {
@@ -1146,6 +1243,20 @@ $this->get('/admin/system/model/:schema/restore/:id', function ($request, $respo
     //if we dont want to redirect
     if ($redirect === 'false') {
         return;
+    }
+
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/admin/system/model/:schema/restore/:id',
+            'method' => 'get',
+            'json_data' => json_encode($response->getResults())
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
     }
 
     if ($response->isError()) {
@@ -1246,6 +1357,22 @@ $this->post('/admin/system/model/:schema/import', function ($request, $response)
         '%s was Imported',
         $schema->getPlural()
     ), 'success');
+
+    if ($request->getStage('render') != 'false') {
+        // execute webhook distribution
+        try {
+            $webhook = [
+                'uri' => '/admin/system/model/:schema/import',
+                'method' => 'post',
+                'json_data' => json_encode($response->getResults())
+            ];
+
+            $this
+                ->package('cradlephp/cradle-queue')
+                ->queue('webhook-distribution', $webhook);
+        } catch (Exception $e) {
+    }
+    }
 
     //Set JSON Content
     return $response->setContent(json_encode([
@@ -1948,6 +2075,22 @@ $this->get('/system/model/:schema/search', function ($request, $response) {
         $request,
         $response
     );
+
+    // if successful, execute webhook distribution
+    if (!$response->isError()) {
+        try {
+            $webhook = [
+                'uri' => '/system/model/:schema/search',
+                'method' => 'get',
+                'json_data' => json_encode($response->getResults())
+            ];
+
+            $this
+                ->package('cradlephp/cradle-queue')
+                ->queue('webhook-distribution', $webhook);
+        } catch (Exception $e) {
+        }
+    }
 });
 
 /**
@@ -1971,6 +2114,22 @@ $this->get('/system/model/:schema/create', function ($request, $response) {
         $request,
         $response
     );
+
+    // if successful, execute webhook distribution
+    if (!$response->isError()) {
+        try {
+            $webhook = [
+                'uri' => '/system/model/:schema/create',
+                'method' => 'get',
+                'json_data' => json_encode($response->getResults())
+            ];
+
+            $this
+                ->package('cradlephp/cradle-queue')
+                ->queue('webhook-distribution', $webhook);
+        } catch (Exception $e) {
+        }
+    }
 });
 
 /**
@@ -1995,6 +2154,22 @@ $this->get('/system/model/:schema/update/:id', function ($request, $response) {
         $request,
         $response
     );
+
+    // if successful, execute webhook distribution
+    if (!$response->isError()) {
+        try {
+            $webhook = [
+                'uri' => '/system/model/:schema/update/:id',
+                'method' => 'get',
+                'json_data' => json_encode($response->getResults())
+            ];
+
+            $this
+                ->package('cradlephp/cradle-queue')
+                ->queue('webhook-distribution', $webhook);
+        } catch (Exception $e) {
+        }
+    }
 });
 
 /**
@@ -2041,6 +2216,22 @@ $this->post('/system/model/:schema/create', function ($request, $response) {
         $request,
         $response
     );
+
+    // if successful, execute webhook distribution
+    if (!$response->isError()) {
+        try {
+            $webhook = [
+                'uri' => '/system/model/:schema/create',
+                'method' => 'post',
+                'json_data' => json_encode($response->getResults())
+            ];
+
+            $this
+                ->package('cradlephp/cradle-queue')
+                ->queue('webhook-distribution', $webhook);
+        } catch (Exception $e) {
+        }
+    }
 });
 
 /**
@@ -2065,6 +2256,22 @@ $this->post('/system/model/:schema/update/:id', function ($request, $response) {
         $request,
         $response
     );
+
+    // if successful, execute webhook distribution
+    if (!$response->isError()) {
+        try {
+            $webhook = [
+                'uri' => '/system/model/:schema/update/:id',
+                'method' => 'post',
+                'json_data' => json_encode($response->getResults())
+            ];
+
+            $this
+                ->package('cradlephp/cradle-queue')
+                ->queue('webhook-distribution', $webhook);
+        } catch (Exception $e) {
+        }
+    }
 });
 
 /**
@@ -2089,6 +2296,22 @@ $this->get('/system/model/:schema/remove/:id', function ($request, $response) {
         $request,
         $response
     );
+
+    // if successful, execute webhook distribution
+    if (!$response->isError()) {
+        try {
+            $webhook = [
+                'uri' => '/system/model/:schema/remove/:id',
+                'method' => 'get',
+                'json_data' => json_encode($response->getResults())
+            ];
+
+            $this
+                ->package('cradlephp/cradle-queue')
+                ->queue('webhook-distribution', $webhook);
+        } catch (Exception $e) {
+        }
+    }
 });
 
 /**
@@ -2113,6 +2336,22 @@ $this->get('/system/model/:schema/restore/:id', function ($request, $response) {
         $request,
         $response
     );
+
+    // if successful, execute webhook distribution
+    if (!$response->isError()) {
+        try {
+            $webhook = [
+                'uri' => '/system/model/:schema/restore/:id',
+                'method' => 'get',
+                'json_data' => json_encode($response->getResults())
+            ];
+
+            $this
+                ->package('cradlephp/cradle-queue')
+                ->queue('webhook-distribution', $webhook);
+        } catch (Exception $e) {
+        }
+    }
 });
 
 /**
@@ -2122,6 +2361,7 @@ $this->get('/system/model/:schema/restore/:id', function ($request, $response) {
  * @param Response $response
  */
 $this->post('/system/model/:schema/import', function ($request, $response) {
+    $request->setStage('render', 'false');
     //----------------------------//
     //trigger original import route
     $this->routeTo(
@@ -2133,6 +2373,21 @@ $this->post('/system/model/:schema/import', function ($request, $response) {
         $request,
         $response
     );
+
+    // execute webhook distribution
+    try {
+        $webhook = [
+            'uri' => '/system/model/:schema/import',
+            'method' => 'post',
+            'json_data' => json_encode($response->getResults())
+        ];
+
+        $this
+            ->package('cradlephp/cradle-queue')
+            ->queue('webhook-distribution', $webhook);
+    } catch (Exception $e) {
+
+    }
 });
 
 /**

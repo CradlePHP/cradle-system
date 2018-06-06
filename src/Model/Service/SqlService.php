@@ -126,6 +126,9 @@ class SqlService
             ->search($this->schema->getName())
             ->addFilter($key . ' = %s', $id);
 
+        // get json fields
+        $fields = $this->schema->getJsonFieldNames();
+
         //get 1:1 relations
         $relations = $this->schema->getRelations(1);
 
@@ -139,6 +142,9 @@ class SqlService
                     $relation['name'],
                     $relation['primary2']
                 );
+
+            $relatedJson = Schema::i($relation['name'])->getJsonFieldNames();
+            $fields = array_merge($fields, $relatedJson);
         }
 
         $results = $search->getRow();
@@ -146,8 +152,6 @@ class SqlService
         if (!$results) {
             return $results;
         }
-
-        $fields = $this->schema->getJsonFieldNames();
 
         foreach ($fields as $field) {
             if (isset($results[$field]) && $results[$field]) {
@@ -160,12 +164,24 @@ class SqlService
         //get 1:0 relations
         $relations = $this->schema->getRelations(0);
         foreach ($relations as $table => $relation) {
-            $results[$relation['name']] = $this
+            $tbl = $this
                 ->resource
                 ->search($table)
                 ->innerJoinUsing($relation['name'], $relation['primary2'])
                 ->addFilter($relation['primary1'] . ' = %s', $id)
                 ->getRow();
+
+            $fields = Schema::i($relation['name'])->getJsonFieldNames();
+
+            foreach ($fields as $field) {
+                if (isset($tbl[$field]) && $tbl[$field]) {
+                    $tbl[$field] = json_decode($tbl[$field], true);
+                } else {
+                    $tbl[$field] = [];
+                }
+            }
+
+            $results[$relation['name']] = $tbl;
         }
 
         //get 1:N, N:N relations
@@ -176,7 +192,7 @@ class SqlService
 
         foreach ($relations as $table => $relation) {
             $schema = $this->schema;
-            $results[$relation['name']] = $this
+            $tbl = $this
                 ->resource
                 ->search($table)
                 ->when(
@@ -198,6 +214,18 @@ class SqlService
                 )
                 ->addFilter($relation['primary1'] . ' = %s', $id)
                 ->getRows();
+
+            $fields = Schema::i($relation['name'])->getJsonFieldNames();
+
+            foreach ($fields as $field) {
+                if (isset($tbl[$field]) && $tbl[$field]) {
+                    $tbl[$field] = json_decode($tbl[$field], true);
+                } else {
+                    $tbl[$field] = [];
+                }
+            }
+
+            $results[$relation['name']] = $tbl;
         }
 
         return $results;
@@ -318,6 +346,9 @@ class SqlService
             ->setStart($start)
             ->setRange($range);
 
+        // get json fields
+        $fields = $this->schema->getJsonFieldNames();
+
         //get 1:1 relations
         $relations = $this->schema->getRelations(1);
         foreach ($relations as $table => $relation) {
@@ -335,6 +366,9 @@ class SqlService
                     $relation['name'],
                     $relation['primary2']
                 );
+
+            $relatedJson = Schema::i($relation['name'])->getJsonFieldNames();
+            $fields = array_merge($fields, $relatedJson);
         }
 
         //get N:N relations
@@ -475,7 +509,6 @@ class SqlService
         }
 
         $rows = $search->getRows();
-        $fields = $this->schema->getJsonFieldNames();
 
         foreach ($rows as $i => $results) {
             foreach ($fields as $field) {
