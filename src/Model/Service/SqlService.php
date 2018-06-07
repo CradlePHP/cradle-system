@@ -309,6 +309,7 @@ class SqlService
             throw SystemException::forNoSchema();
         }
 
+        $sum = null;
         $filter = [];
         $span  = [];
         $range = 50;
@@ -334,6 +335,10 @@ class SqlService
 
         if (isset($data['order']) && is_array($data['order'])) {
             $order = $data['order'];
+        }
+
+        if (isset($data['sum']) && !empty($data['sum'])) {
+            $sum = sprintf('sum(%s) as total', $data['sum']);
         }
 
         $active = $this->schema->getActiveFieldName();
@@ -521,10 +526,20 @@ class SqlService
         }
 
         //return response format
-        return [
+        $response =  [
             'rows' => $rows,
             'total' => $search->getTotal()
         ];
+
+        if ($sum) {
+            $total = $search
+                ->setColumns($sum)
+                ->getRow();
+
+            $response['sum_field'] = $total['total'] ? $total['total'] : 0;
+        }
+
+        return $response;
     }
 
     /**
