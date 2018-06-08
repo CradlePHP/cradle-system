@@ -175,7 +175,7 @@
                         </div>
 
                         {{#if errors.fields}}
-                            <div class="invalid-feedback">
+                            <div class="d-block invalid-feedback">
                                 {{errors.fields}}
                             </div><br/>
                         {{/if}}
@@ -310,7 +310,7 @@
                 <label class="control-label">{{_ 'Suggestion Format'}}</label>
                 <div>
                     <input
-                        class="form-control schema-suggestion {{#if errors.plural}}is-invalid{{/if}}"
+                        class="form-control schema-suggestion {{#if errors.suggestion}}is-invalid{{/if}}"
                         name="suggestion"
                         value="{{item.suggestion}}"
                         placeholder="{\{keyword_field}} - {\{keyword_field}}"
