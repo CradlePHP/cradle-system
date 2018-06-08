@@ -365,7 +365,7 @@ $this->post('/admin/system/schema/create', function ($request, $response) {
         $webhook = [
             'uri' => '/admin/system/schema/create',
             'method' => 'post',
-            'json_data' => json_encode($data)
+            'json_data' => json_encode($response->getResults())
         ];
 
         $this

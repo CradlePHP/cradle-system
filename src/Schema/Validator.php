@@ -7,6 +7,9 @@
  */
 namespace Cradle\Package\System\Schema;
 
+use Cradle\Package\System\Schema;
+use Cradle\Package\System\Exception;
+
 /**
  * Validator layer
  *
@@ -41,6 +44,18 @@ class Validator
 
         if (!isset($data['fields']) || empty($data['fields'])) {
             $errors['fields'] = 'Fields is required';
+        }
+
+        if (isset($data['name'])) {
+            $exists = false;
+            try {
+                $exists = Schema::i($data['name'])->getAll();
+            } catch (Exception $e) {
+            }
+
+            if ($exists) {
+                $errors['name'] = 'Name is already in used.';
+            }
         }
 
         return self::getOptionalErrors($data, $errors);
