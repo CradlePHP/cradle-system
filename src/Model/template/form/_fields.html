@@ -728,33 +728,35 @@
         {{/each}}
     >
         <div class="meta-fields">
-            {{#each item.{NAME}}}
-                <div class="meta">
-                    <input
-                        class="meta-input key"
-                        placeholder="{{_ 'Name'}}"
-                        type="text"
-                        value="{{@key}}"
-                    />
-                    <input
-                        class="meta-input value"
-                        type="text"
-                        placeholder="{{_ 'Value'}}"
-                        value="{{this}}"
-                    />
-                    <input
-                        name="{NAME}[{{@key}}]"
-                        type="hidden"
-                        value="{{this}}"
-                    />
-                    <a
-                        class="remove text-danger"
-                        href="javascript:void(0)"
-                    >
-                        <i class="fa fa-times"></i>
-                    </a>
-                </div>
-            {{/each}}
+            {{#scope ../item @key}}
+                {{#each this}}
+                    <div class="meta">
+                        <input
+                            class="meta-input key"
+                            placeholder="{{_ 'Name'}}"
+                            type="text"
+                            value="{{@key}}"
+                        />
+                        <input
+                            class="meta-input value"
+                            type="text"
+                            placeholder="{{_ 'Value'}}"
+                            value="{{this}}"
+                        />
+                        <input
+                            name="{{../../@key}}[{{@key}}]"
+                            type="hidden"
+                            value="{{this}}"
+                        />
+                        <a
+                            class="remove text-danger"
+                            href="javascript:void(0)"
+                        >
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                {{/each}}
+            {{/scope}}
         </div>
         <a class="text-success add-meta">
             <i class="fa fa-plus"></i>
