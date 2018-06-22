@@ -316,6 +316,14 @@
         Meta Field
     </option>
     <option
+        data-fieldset="schema"
+        data-format="json"
+        value="multifield"
+        {{#when field.type '===' 'multifield'}}selected{{/when}}
+    >
+        Multi Field (Schema Fields)
+    </option>
+    <option
         data-fieldset="attributes"
         data-format="json"
         value="multirange"

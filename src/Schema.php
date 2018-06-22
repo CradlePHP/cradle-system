@@ -260,7 +260,8 @@ class Schema extends Registry
                         'checkboxes',
                         'multirange',
                         'rawjson',
-                        'multiselect'
+                        'multiselect',
+                        'multifield'
                     ]
             )
             ) {
@@ -1010,6 +1011,9 @@ class Schema extends Registry
             'type' => 'JSON'
         ],
         'rawjson' => [
+            'type' => 'JSON'
+        ],
+        'multifield' => [
             'type' => 'JSON'
         ],
         'uuid' => [

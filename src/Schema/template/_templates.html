@@ -75,7 +75,7 @@
                                 data-on="change"
                                 name="fields[{INDEX}][list][format]"
                             >
-                                {{> options_format}} 
+                                {{> options_format}}
                             </select>
                         </div>
                     </div>
@@ -478,4 +478,32 @@
             type="text"
         />
     </div>
+</script>
+
+<script id="field-schema-template" type="text/x-template">
+    <div class="schema-select">
+        <select
+            class="form-control"
+            name="fields[{INDEX}][field][schema][name]"
+            data-do="schema-select"
+            data-on="change"
+            data-fields="{FIELDS}"
+        >
+            {SCHEMAS}
+        </select>
+        <div class="schema-field-select"></div>
+    </div>
+</script>
+
+<script id="field-schema-fields-template" type="text/x-template">
+    <select
+        class="form-control"
+        data-do="select-field"
+        multiple="multiple"
+        name="fields[{INDEX}][field][schema][fields][]"
+    >
+        <optgroup label="Select which fields to add in the form">
+            {FIELDS}
+        </optgroup>
+    </select>
 </script>

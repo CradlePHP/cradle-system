@@ -55,6 +55,37 @@ $this->on('system-schema-create', function ($request, $response) {
         }
     }
 
+    $this->trigger('system-schema-search', $request, $response);
+    $schemas = $response->getResults('rows');
+
+    foreach ($schemas as $key => $schema) {
+        foreach ($schema['fields'] as $fkey => $field) {
+            $schema['fields'][$field['name']] = $field;
+            unset($schema['fields'][$fkey]);
+        }
+
+        $schemas[$schema['name']] = $schema;
+        unset($schemas[$key]);
+    }
+
+    foreach ($data['fields'] as $key => $field) {
+        if ($field['field']['type'] == 'multifield'
+            && isset($field['field']['schema'])
+            && isset($schemas[$field['field']['schema']['name']])
+        ) {
+            $detail = [];
+            $fields = $field['field']['schema']['fields'];
+            $multifield = $schemas[$field['field']['schema']['name']];
+            foreach ($fields as $fkey => $fname) {
+                if (isset($multifield['fields'][$fname])) {
+                    $detail[$fname] = $multifield['fields'][$fname];
+                }
+            }
+
+            $data['fields'][$key]['field']['schema']['detail'] = $detail;
+        }
+    }
+
     //----------------------------//
     // 4. Process Data
     $schema = Schema::i($data);
@@ -331,6 +362,37 @@ $this->on('system-schema-update', function ($request, $response) {
 
         foreach ($data['relations'] as $key => $relation) {
             $data['relations'][$key]['name'] = strtolower($relation['name']);
+        }
+    }
+
+    $this->trigger('system-schema-search', $request, $response);
+    $schemas = $response->getResults('rows');
+
+    foreach ($schemas as $key => $schema) {
+        foreach ($schema['fields'] as $fkey => $field) {
+            $schema['fields'][$field['name']] = $field;
+            unset($schema['fields'][$fkey]);
+        }
+
+        $schemas[$schema['name']] = $schema;
+        unset($schemas[$key]);
+    }
+
+    foreach ($data['fields'] as $key => $field) {
+        if ($field['field']['type'] == 'multifield'
+            && isset($field['field']['schema'])
+            && isset($schemas[$field['field']['schema']['name']])
+        ) {
+            $detail = [];
+            $fields = $field['field']['schema']['fields'];
+            $multifield = $schemas[$field['field']['schema']['name']];
+            foreach ($fields as $fkey => $fname) {
+                if (isset($multifield['fields'][$fname])) {
+                    $detail[$fname] = $multifield['fields'][$fname];
+                }
+            }
+
+            $data['fields'][$key]['field']['schema']['detail'] = $detail;
         }
     }
 

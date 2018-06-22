@@ -2,9 +2,9 @@
     <input
         autocomplete="{{name}}"
         class="form-control"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="text"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -14,9 +14,9 @@
     <input
         autocomplete="email"
         class="form-control"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="email"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -26,7 +26,7 @@
     <input
         autocomplete="password"
         class="form-control"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="password"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
@@ -37,9 +37,9 @@
     <input
         autocomplete="search"
         class="form-control"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="search"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -49,9 +49,9 @@
     <input
         autocomplete="url"
         class="form-control"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="url"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -61,9 +61,9 @@
     <input
         autocomplete="color"
         class="form-control"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="color"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -74,9 +74,9 @@
         autocomplete="{{name}}"
         class="form-control"
         data-do="mask-field"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="text"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -87,9 +87,9 @@
         autocomplete="{{name}}"
         class="form-control"
         data-do="slugger"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="text"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -98,49 +98,49 @@
 {{#when field.type '===' 'textarea'}}
     <textarea
         class="form-control"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
-    >{{{scope ../item @key}}}</textarea>
+    >{{{scope ../../item ../@key @key}}}</textarea>
 {{/when}}
 {{#when field.type '===' 'wysiwyg'}}
     <textarea
         class="form-control"
         data-do="wysiwyg"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
-    >{{{scope ../item @key}}}</textarea>
+    >{{{scope ../../item ../@key @key}}}</textarea>
 {{/when}}
 {{#when field.type '===' 'markdown'}}
     <textarea
         class="form-control"
         data-do="markdown-editor"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
-    >{{{scope ../item @key}}}</textarea>
+    >{{{scope ../../item ../@key @key}}}</textarea>
 {{/when}}
 {{#when field.type '===' 'code'}}
     <textarea
         class="form-control hidden"
         data-do="code-editor"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
-    >{{{scope ../item @key}}}</textarea>
+    >{{{scope ../../item ../@key @key}}}</textarea>
 {{/when}}
 {{#when field.type '===' 'number'}}
     <input
         autocomplete="{{name}}"
         class="form-control"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="number"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -152,10 +152,10 @@
         class="form-control"
         max="9"
         min="0"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         step="1"
         type="number"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -165,10 +165,10 @@
     <input
         class="irs-hidden-input"
         data-do="multirange-field"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         tabindex="-1"
         type="hidden"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -178,9 +178,9 @@
     <input
         autocomplete="{{name}}"
         class="form-control"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="number"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -190,10 +190,10 @@
     <input
         autocomplete="{{name}}"
         class="form-control"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         step="0.01"
         type="number"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -205,9 +205,9 @@
         aria-expanded="false"
         class="form-control date"
         data-do="date-field"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="text"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -219,9 +219,9 @@
         aria-expanded="false"
         class="form-control date"
         data-do="time-field"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="text"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -233,9 +233,9 @@
         aria-expanded="false"
         class="form-control date"
         data-do="datetime-field"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="text"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -244,9 +244,9 @@
 {{#when field.type '===' 'week'}}
     <input
         class="form-control"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="week"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -255,9 +255,9 @@
 {{#when field.type '===' 'month'}}
     <input
         class="form-control"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="month"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -265,16 +265,16 @@
 {{/when}}
 {{#when field.type '===' 'checkbox'}}
     <input
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="hidden"
         value="0"
     />
     <label class="checkbox checkbox-2">
         <input
-            name="{{@key}}"
+            name="{{../@key}}[{{@key}}]"
             type="checkbox"
             value="1"
-            {{#when ../item @key '==' 1}}checked{{/when}}
+            {{#when ../../item ../@key @key '==' 1}}checked{{/when}}
             {{#each field.attributes}}
                 {{@key}}="{{this}}"
             {{/each}}
@@ -284,16 +284,16 @@
 {{/when}}
 {{#when field.type '===' 'switch'}}
     <input
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="hidden"
         value="0"
     />
     <label class="switch switch-1">
         <input
-            name="{{@key}}"
+            name="{{../@key}}[{{@key}}]"
             type="checkbox"
             value="1"
-            {{#when ../item @key '==' 1}}checked{{/when}}
+            {{#when ../../item ../@key @key '==' 1}}checked{{/when}}
             {{#each field.attributes}}
                 {{@key}}="{{this}}"
             {{/each}}
@@ -305,9 +305,9 @@
     <input
         class="form-control"
         data-do="knob-field"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         type="text"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key @key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -316,7 +316,7 @@
 {{#when field.type '===' 'select'}}
     <select
         class="form-control"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -324,7 +324,7 @@
         {{#each field.options}}
             <option
                 value="{{./key}}"
-                {{#when ../../item ../@key '==' key}}selected{{/when}}
+                {{#when ../../../item ../../@key ../@key '==' key}}selected{{/when}}
             >
                 {{value}}
             </option>
@@ -336,7 +336,7 @@
         class="form-control"
         data-do="select-field"
         multiple="multiple"
-        name="{{@key}}[]"
+        name="{{../@key}}[{{@key}}][]"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -344,7 +344,7 @@
         {{#each field.options}}
             <option
                 value="{{./key}}"
-                {{#in ../../item ../@key key}}selected{{/in}}
+                {{#in ../../../item ../../@key ../@key key}}selected{{/in}}
             >
                 {{value}}
             </option>
@@ -356,10 +356,10 @@
         {{#each field.options}}
             <label class="checkbox checkbox-2">
                 <input
-                    name="{{../@key}}[]"
+                    name="{{../../@key}}[{{../@key}}][]"
                     type="checkbox"
                     value="{{./key}}"
-                    {{#when ../../item ../@key '==' key}}checked{{/when}}
+                    {{#in ../../../item ../../@key ../@key ./key}}checked{{/in}}
                 />
                 <span>{{value}}</span>
             </label>
@@ -371,10 +371,10 @@
         {{#each field.options}}
             <label class="radio radio-2">
                 <input
-                    name="{{../@key}}"
+                    name="{{../../@key}}[{{../@key}}]"
                     type="radio"
                     value="{{./key}}"
-                    {{#when ../../item ../@key '==' key}}checked{{/when}}
+                    {{#when ../../../item ../../@key ../@key '==' key}}checked{{/when}}
                 />
                 <span>{{value}}</span>
             </label>
@@ -385,7 +385,7 @@
     <table
         class="table table-striped file-field"
         data-do="file-field"
-        data-name="{{@key}}"
+        data-name="{{../@key}}[{{@key}}]"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -397,7 +397,7 @@
             </tr>
         </thead>
         <tbody>
-            {{#scope ../item @key}}
+            {{#scope ../../item ../@key}}
                 <tr class="file-field-none" style="display:none;">
                     <td colspan="5">
                         <div class="alert alert-info">No File Selected</div>
@@ -449,7 +449,7 @@
     <table
         class="table table-striped file-field"
         data-do="file-field"
-        data-name="{{@key}}"
+        data-name="{{../@key}}[{{@key}}]"
         data-multiple="1"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
@@ -463,7 +463,7 @@
             </tr>
         </thead>
         <tbody>
-            {{#scope ../item @key}}
+            {{#scope ../../item ../@key}}
                 {{#if this.length}}
                     {{#each this}}
                         <tr class="file-field-none" style="display:none;">
@@ -539,7 +539,7 @@
         class="table table-striped file-field"
         data-accept="image/png,image/jpg,image/jpeg,image/gif"
         data-do="file-field"
-        data-name="{{@key}}"
+        data-name="{{../@key}}[{{@key}}]"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -551,7 +551,7 @@
             </tr>
         </thead>
         <tbody>
-            {{#scope ../item @key}}
+            {{#scope ../../item ../@key}}
                 <tr class="file-field-none" style="display:none;">
                     <td colspan="5">
                         <div class="alert alert-info">No File Selected</div>
@@ -604,7 +604,7 @@
         class="table table-striped file-field"
         data-accept="image/png,image/jpg,image/jpeg,image/gif"
         data-do="file-field"
-        data-name="{{@key}}"
+        data-name="{{../@key}}[{{@key}}]"
         data-multiple="1"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
@@ -618,7 +618,7 @@
             </tr>
         </thead>
         <tbody>
-            {{#scope ../item @key}}
+            {{#scope ../../item ../@key}}
                 {{#if this.length}}
                     {{#each this}}
                         <tr class="file-field-none" style="display:none;">
@@ -693,18 +693,18 @@
     <div
         data-do="tag-field"
         class="tag-field"
-        data-name="{{@key}}"
+        data-name="{{../@key}}[{{@key}}]"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
     >
-        {{#scope ../item @key}}
+        {{#scope ../../item ../@key}}
             {{#each this}}
                 <div class="tag">
                     <input
                         class="tag-input text-field"
                         type="text"
-                        name="{{../../@key}}[]"
+                        name="{{../../../@key}}[{{../../@key}}][]"
                         value="{{this}}"
                     />
                     <a
@@ -722,39 +722,41 @@
     <div
         data-do="meta-field"
         class="meta-field"
-        data-name="{{@key}}"
+        data-name="{{../@key}}[{{@key}}]"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
     >
         <div class="meta-fields">
-            {{#each item.{NAME}}}
-                <div class="meta">
-                    <input
-                        class="meta-input key"
-                        placeholder="{{_ 'Name'}}"
-                        type="text"
-                        value="{{@key}}"
-                    />
-                    <input
-                        class="meta-input value"
-                        type="text"
-                        placeholder="{{_ 'Value'}}"
-                        value="{{this}}"
-                    />
-                    <input
-                        name="{NAME}[{{@key}}]"
-                        type="hidden"
-                        value="{{this}}"
-                    />
-                    <a
-                        class="remove text-danger"
-                        href="javascript:void(0)"
-                    >
-                        <i class="fa fa-times"></i>
-                    </a>
-                </div>
-            {{/each}}
+            {{#scope ../../item ../@key @key}}
+                {{#each this}}
+                    <div class="meta">
+                        <input
+                            class="meta-input key"
+                            placeholder="{{_ 'Name'}}"
+                            type="text"
+                            value="{{@key}}"
+                        />
+                        <input
+                            class="meta-input value"
+                            type="text"
+                            placeholder="{{_ 'Value'}}"
+                            value="{{this}}"
+                        />
+                        <input
+                            name="{{../../../@key}}[{{../../@key}}][{{@key}}]"
+                            type="hidden"
+                            value="{{this}}"
+                        />
+                        <a
+                            class="remove text-danger"
+                            href="javascript:void(0)"
+                        >
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                {{/each}}
+            {{/scope}}
         </div>
         <a class="text-success add-meta">
             <i class="fa fa-plus"></i>
@@ -766,10 +768,10 @@
         class="irs-hidden-input"
         data-do="multirange-field"
         data-type="double"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         tabindex="-1"
         type="hidden"
-        value="{{scope ../item @key}}"
+        value="{{scope ../../item ../@key}}"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
@@ -779,26 +781,17 @@
     <textarea
         class="form-control hidden"
         data-do="code-editor"
-        name="{{@key}}"
+        name="{{../@key}}[{{@key}}]"
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
-    >{{json_encode ../item @key}}</textarea>
-{{/when}}
-{{#when field.type '===' 'multifield'}}
-    {{#each field.schema.detail}}
-        {{#when field.type '!=' 'multifield'}}
-            {{#notin 'none,hide,active,created,updated,uuid' field.type}}
-                <div class="form-group{{#has ../errors @key}} has-error{{/has}}">
-                    <label class="control-label">{{label}}</label>
-                    <div>
-                        {{> form_schema}}
-                        {{#has ../errors @key}}
-                            <span class="help-text">{{scope ../errors @key}}</span>
-                        {{/has}}
-                    </div>
-                </div>
-            {{/notin}}
-        {{/when}}
-    {{/each}}
+    >
+        {{~#is_array ../../item ../@key @key~}}
+            {{~json_encode ../../item ../@key @key~}}
+        {{~else~}}
+            {{~#scope ../../item ../@key @key~}}
+                {{~this~}}
+            {{~/scope~}}
+        {{~/is_array~}}
+    </textarea>
 {{/when}}

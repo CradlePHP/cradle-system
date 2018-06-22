@@ -360,7 +360,7 @@
                 target = target.parent();
             }
         }
-        
+
         // get error message element
         var err = target.nextAll('.error-message');
 
@@ -472,6 +472,53 @@
             }
         });
 
+        ['schema'].forEach(function(ui) {
+            if(fieldset.indexOf(ui) === -1) {
+                trigger.parent().find('div.input-' + ui).remove();
+            } else if(!trigger.parent().find('div.input-' + ui).length) {
+                $.get('/admin/system/schema/search', {render: 'false'})
+                .done(function(response) {
+                    if (response.error) {
+                        trigger.parent().find('div.input-' + ui).remove();
+                        return;
+                    }
+
+                    var option = '';
+                    var index = trigger.parents('.modal-body').data('index');
+                    var schema = trigger.data('schema');
+                    var results = response.results.rows;
+                    var fields = trigger.data('fields');
+                    if (fields) {
+                        fields = fields.replace(/'/g, '');
+                    }
+
+                    if (typeof index == 'undefined') {
+                        index = trigger.parents('tr').data('index');
+                    }
+
+                    for (var i in results) {
+                        option += '<option value="' + results[i].name + '"';
+
+                        if (schema == results[i].name) {
+                            option += ' selected';
+                        }
+
+                        option += '>' + results[i].singular + '</option>';
+                    }
+
+                    var html = $('#field-' + ui + '-template')
+                        .compile({
+                            SCHEMAS: option,
+                            INDEX: index,
+                            FIELDS: fields
+                        })
+                        .doon();
+                    trigger.parent().find('.schema-select').remove();
+                    trigger.after(html);
+                });
+            }
+        });
+
         //determine valid formats
         ['string', 'number', 'date', 'html', 'json'].forEach(function(type) {
             if(format.indexOf(type) === -1) {
@@ -568,6 +615,79 @@
         } else {
             $('input.field-sortable', row).parent().show();
         }
+    });
+
+    $(window).on('schema-select-init', function(e, trigger) {
+        var name = $(trigger).attr('data-name');
+        var schema = $(trigger).val();
+        $.get('/admin/system/schema/update/'+schema, {render: 'false'})
+            .done(function(response) {
+                if (response.error) {
+                    trigger.parent().find('div.input-' + ui).remove();
+                    return;
+                }
+
+                var option = '';
+                var results = response.results.fields;
+                var fields = $(trigger).data('fields').split(',');
+                for (var i in results) {
+                    option += '<option value="' + results[i].name + '"';
+
+                    if (fields.indexOf(results[i].name) != -1) {
+                        option += ' selected';
+                    }
+
+                    option += '>' + results[i].label + '</option>';
+                }
+
+                var index = $(trigger).parents('.modal-body').data('index');
+                if (typeof index == 'undefined') {
+                    index = $(trigger).parents('tr').data('index');
+                }
+
+                var html = $('#field-schema-fields-template')
+                    .compile({
+                        FIELDS: option,
+                        INDEX: index
+                    })
+                    .doon();
+
+                $(trigger).parent().find('div.schema-field-select').html(html);
+                $('.select2.select2-container.select2-container--default').css('width', '100%');
+            });
+    });
+    $(window).on('schema-select-change', function(e, trigger) {
+        var name = $(trigger).attr('data-name');
+        var schema = $(trigger).val();
+        $.get('/admin/system/schema/update/'+schema, {render: 'false'})
+            .done(function(response) {
+                if (response.error) {
+                    trigger.parent().find('div.input-' + ui).remove();
+                    return;
+                }
+
+                var option = '';
+                var results = response.results.fields;
+                for (var i in results) {
+                    option += '<option value="' + results[i].name
+                        + '">' + results[i].label + '</option>';
+                }
+
+                var index = $(trigger).parents('.modal-body').data('index');
+                if (typeof index == 'undefined') {
+                    index = $(trigger).parents('tr').data('index');
+                }
+
+                var html = $('#field-schema-fields-template')
+                    .compile({
+                        FIELDS: option,
+                        INDEX: index
+                    })
+                    .doon();
+
+                $(trigger).parent().find('div.schema-field-select').html(html);
+                $('.select2.select2-container.select2-container--default').css('width', '100%');
+            });
     });
 
     $(window).on('attribute-add-click', function(e, trigger) {
@@ -926,7 +1046,7 @@
         }
 
         var last = row.parent().find(divClass).length - 1;
-        
+
         if(row.attr('data-index') == last) {
             return;
         }

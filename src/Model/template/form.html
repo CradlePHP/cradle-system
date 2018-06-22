@@ -181,7 +181,7 @@
                     {{#notin 'none,hide,active,created,updated,uuid' field.type}}
                         <div class="form-group{{#has ../errors @key}} has-error{{/has}}">
                             <label class="control-label">{{label}}</label>
-                            <div>
+                            <div class="form-{{field.type}}">
                                 {{> form_fields}}
                                 {{#has ../errors @key}}
                                     <span class="help-text">{{scope ../errors @key}}</span>

@@ -335,6 +335,7 @@ $this->get('/admin/system/model/:schema/create', function ($request, $response) 
             'form_fields',
             'form_detail',
             'form_format',
+            'form_schema',
         ]);
 
     //set content
@@ -527,6 +528,7 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
             'form_fields',
             'form_detail',
             'form_format',
+            'form_schema',
         ]);
 
     //set content

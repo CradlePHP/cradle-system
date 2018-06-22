@@ -2,6 +2,8 @@
     class="field-type form-control"
     data-do="field-type"
     data-on="change"
+    data-schema="{{field.schema.name}}"
+    data-fields="{{#if field.schema.fields}}{{join field.schema.fields ','}}{{/if}}"
     name="fields[{{@index}}][field][type]"
 >
     {{> options_type}}
