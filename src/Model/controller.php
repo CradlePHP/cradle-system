@@ -1424,7 +1424,7 @@ $this->get('/admin/system/model/:schema/export/:type', function ($request, $resp
     //filter possible filter options
     //we do this to prevent SQL injections
     if (is_array($request->getStage('filter'))) {
-        $filterable = array_merge($filterable, $schema->getFilterableFieldNames();)
+        $filterable = array_merge($filterable, $schema->getFilterableFieldNames());
 
         //allow relation primary
         if (isset($relation['schema']['primary'])) {
