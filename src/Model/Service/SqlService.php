@@ -311,6 +311,7 @@ class SqlService
 
         $sum = null;
         $filter = [];
+        $in = [];
         $span  = [];
         $range = 50;
         $start = 0;
@@ -323,6 +324,10 @@ class SqlService
 
         if (isset($data['span']) && is_array($data['span'])) {
             $span = $data['span'];
+        }
+
+        if (isset($data['in_filter']) && is_array($data['in_filter'])) {
+            $in = $data['in_filter'];
         }
 
         if (isset($data['range']) && is_numeric($data['range'])) {
@@ -457,6 +462,13 @@ class SqlService
         foreach ($filter as $column => $value) {
             if (preg_match('/^[a-zA-Z0-9-_]+$/', $column)) {
                 $search->addFilter($column . ' = %s', $value);
+            }
+        }
+
+        // add in filters
+        foreach ($in as $column => $values) {
+            if (preg_match('/^[a-zA-Z0-9-_]+$/', $column)) {
+                $search->addFilter($column . ' IN ("' . implode('", "', $values) . '")');
             }
         }
 
