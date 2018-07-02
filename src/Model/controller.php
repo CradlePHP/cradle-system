@@ -1228,7 +1228,7 @@ $this->get('/admin/system/model/:schema/restore/:id', function ($request, $respo
         //record logs
         $this->log(
             sprintf(
-                '%s #%s restored.',
+                '%s #%s restored',
                 $schema->getSingular(),
                 $request->getStage('id')
             ),
