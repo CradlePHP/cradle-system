@@ -1409,10 +1409,22 @@ $this->get('/admin/system/model/:schema/export/:type', function ($request, $resp
         $relation = $request->getStage('relation');
     }
 
+    // get schema relations
+    $relations = $schema->getRelations(1);
+
+    $filterable = [];
+
+    // loop and collect relations primary
+    if (!empty($relations)) {
+        foreach ($relations as $relation) {
+            $filterable[] = $relation['primary'];
+        }
+    }
+
     //filter possible filter options
     //we do this to prevent SQL injections
     if (is_array($request->getStage('filter'))) {
-        $filterable = $schema->getFilterableFieldNames();
+        $filterable = array_merge($filterable, $schema->getFilterableFieldNames());
 
         //allow relation primary
         if (isset($relation['schema']['primary'])) {
