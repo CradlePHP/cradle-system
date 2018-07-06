@@ -681,13 +681,14 @@ $this->get('/admin/system/model/:schema/detail/:id', function ($request, $respon
     $data['action'] = 'detail';
 
     // get the suggestion title
-    $suggestion = str_replace('{', '', $data['schema']['suggestion']);
-    $suggestion = str_replace('}', '', $suggestion);
+    $suggestion = $data['schema']['suggestion'];
+    $handlebars = cradle('global')->handlebars();
+    $compiled = $handlebars->compile($data['schema']['suggestion'])($data['item']);
 
     //determine the title
     $data['title'] = $this->package('global')->translate(
         '%s Detail',
-        $data['item'][$suggestion]
+        $compiled
     );
 
     //add custom page helpers
