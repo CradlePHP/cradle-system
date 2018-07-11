@@ -43,7 +43,14 @@ $this->get('/admin/system/schema/search', function ($request, $response) {
 
     $body = $this
         ->package('cradlephp/cradle-system')
-        ->template('schema', 'search', $data);
+        ->template(
+            'schema',
+            'search',
+            $data,
+            [],
+            $response->getPage('template_root'),
+            $response->getPage('partials_root')
+        );
 
     //set content
     $response
@@ -137,21 +144,28 @@ $this->get('/admin/system/schema/create', function ($request, $response) {
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
-        ->template('schema', 'form', $data, [
-            'styles',
-            'templates',
-            'scripts',
-            'row',
-            'types',
-            'lists',
-            'details',
-            'validation',
-            'update',
-            'options_type',
-            'options_format',
-            'options_validation',
-            'options_icon'
-        ]);
+        ->template(
+            'schema',
+            'form',
+            $data,
+            [
+                'styles',
+                'templates',
+                'scripts',
+                'row',
+                'types',
+                'lists',
+                'details',
+                'validation',
+                'update',
+                'options_type',
+                'options_format',
+                'options_validation',
+                'options_icon'
+            ],
+            $response->getPage('template_root'),
+            $response->getPage('partials_root')
+        );
 
     //if we only want the body
     if ($request->getStage('render') === 'body') {
@@ -272,21 +286,28 @@ $this->get('/admin/system/schema/update/:name', function ($request, $response) {
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
-        ->template('schema', 'form', $data, [
-            'styles',
-            'templates',
-            'scripts',
-            'row',
-            'types',
-            'lists',
-            'details',
-            'validation',
-            'update',
-            'options_type',
-            'options_format',
-            'options_validation',
-            'options_icon'
-        ]);
+        ->template(
+            'schema',
+            'form',
+            $data,
+            [
+                'styles',
+                'templates',
+                'scripts',
+                'row',
+                'types',
+                'lists',
+                'details',
+                'validation',
+                'update',
+                'options_type',
+                'options_format',
+                'options_validation',
+                'options_icon'
+            ],
+            $response->getPage('template_root'),
+            $response->getPage('partials_root')
+        );
 
     //if we only want the body
     if ($request->getStage('render') === 'body') {
@@ -670,21 +691,28 @@ $this->get('/admin/system/schema/elastic/search', function ($request, $response)
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
-        ->template('schema', 'elastic/search', $data, [
-            'styles',
-            'templates',
-            'scripts',
-            'row',
-            'types',
-            'lists',
-            'details',
-            'validation',
-            'update',
-            'options_type',
-            'options_format',
-            'options_validation',
-            'options_icon'
-        ]);
+        ->template(
+            'schema',
+            'elastic/search',
+            $data,
+            [
+                'styles',
+                'templates',
+                'scripts',
+                'row',
+                'types',
+                'lists',
+                'details',
+                'validation',
+                'update',
+                'options_type',
+                'options_format',
+                'options_validation',
+                'options_icon'
+            ],
+            $response->getPage('template_root'),
+            $response->getPage('partials_root')
+        );
 
     //set content
     $response
@@ -846,21 +874,28 @@ $this->get('/admin/system/schema/elastic/edit/:name', function ($request, $respo
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
-        ->template('schema', 'elastic/form', $data, [
-            'styles',
-            'templates',
-            'scripts',
-            'row',
-            'types',
-            'lists',
-            'details',
-            'validation',
-            'update',
-            'options_type',
-            'options_format',
-            'options_validation',
-            'options_icon'
-        ]);
+        ->template(
+            'schema',
+            'elastic/form',
+            $data,
+            [
+                'styles',
+                'templates',
+                'scripts',
+                'row',
+                'types',
+                'lists',
+                'details',
+                'validation',
+                'update',
+                'options_type',
+                'options_format',
+                'options_validation',
+                'options_icon'
+            ],
+            $response->getPage('template_root'),
+            $response->getPage('partials_root')
+        );
 
     //set content
     $response

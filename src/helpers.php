@@ -124,11 +124,25 @@ return function($request, $response) {
         $type,
         $file,
         array $data = [],
-        $partials = []
+        $partials = [],
+        $customFileRoot  = null,
+        $customPartialsRoot = null
     ) {
         // get the root directory
+        $root =  $customFileRoot;
+        $partialRoot = $customPartialsRoot;
+
+        // get the root directory
         $type = ucwords($type);
-        $root =  sprintf('%s/%s/template/', __DIR__, $type);
+        $originalRoot =  sprintf('%s/%s/template/', __DIR__, $type);
+
+        if (!$customFileRoot) {
+            $root = $originalRoot;
+        }
+
+        if (!$customPartialsRoot) {
+            $partialRoot =  $originalRoot;
+        }
 
         // check for partials
         if (!is_array($partials)) {
@@ -153,7 +167,7 @@ return function($request, $response) {
                 $path = '_' . $path;
             }
 
-            $paths[$partial] = $root . $path;
+            $paths[$partial] = $partialRoot . $path;
         }
 
         $file = $root . $file . '.html';

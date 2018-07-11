@@ -293,7 +293,14 @@ $this->get('/admin/system/model/:schema1/:id/link/:schema2', function ($request,
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
-        ->template('relation', 'link', $data);
+        ->template(
+            'relation',
+            'link',
+            $data,
+            [],
+            $response->getPage('template_root'),
+            $response->getPage('partials_root')
+        );
 
     //if we only want the body
     if ($request->getStage('render') === 'body') {

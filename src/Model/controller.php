@@ -144,14 +144,21 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
-        ->template('model', 'search', $data, [
-            'search_head',
-            'search_form',
-            'search_filters',
-            'search_actions',
-            'search_row_format',
-            'search_row_actions'
-        ]);
+        ->template(
+            'model',
+            'search',
+            $data,
+            [
+                'search_head',
+                'search_form',
+                'search_filters',
+                'search_actions',
+                'search_row_format',
+                'search_row_actions'
+            ],
+            $response->getPage('template_root'),
+            $response->getPage('partials_root')
+        );
 
     //set content
     $response
@@ -331,12 +338,19 @@ $this->get('/admin/system/model/:schema/create', function ($request, $response) 
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
-        ->template('model', 'form', $data, [
-            'form_fields',
-            'form_detail',
-            'form_format',
-            'form_schema',
-        ]);
+        ->template(
+            'model',
+            'form',
+            $data,
+            [
+                'form_fields',
+                'form_detail',
+                'form_format',
+                'form_schema',
+            ],
+            $response->getPage('template_root'),
+            $response->getPage('partials_root')
+        );
 
     //set content
     $response
@@ -524,12 +538,19 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
-        ->template('model', 'form', $data, [
-            'form_fields',
-            'form_detail',
-            'form_format',
-            'form_schema',
-        ]);
+        ->template(
+            'model',
+            'form',
+            $data,
+            [
+                'form_fields',
+                'form_detail',
+                'form_format',
+                'form_schema',
+            ],
+            $response->getPage('template_root'),
+            $response->getPage('partials_root')
+        );
 
     //set content
     $response
@@ -722,10 +743,17 @@ $this->get('/admin/system/model/:schema/detail/:id', function ($request, $respon
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
-        ->template('model', 'form', $data, [
-            'form_detail',
-            'form_format',
-        ]);
+        ->template(
+            'model',
+            'form',
+            $data,
+            [
+                'form_detail',
+                'form_format',
+            ],
+            $response->getPage('template_root'),
+            $response->getPage('partials_root')
+        );
 
     //set content
     $response
