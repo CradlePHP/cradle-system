@@ -34,7 +34,7 @@ $this->on('system-model-create', function ($request, $response) {
 
     //
     // FIX: For import or in any part of the system
-    // if primary is set but doesn't have a value. 
+    // if primary is set but doesn't have a value.
     //
     if (isset($data[$schema->getPrimaryFieldName()])
     && empty($data[$schema->getPrimaryFieldName()])) {
@@ -242,7 +242,7 @@ $this->on('system-model-remove', function ($request, $response) {
     $uniques = $schema->getUniqueFieldNames();
     foreach ($uniques as $unique) {
         if (isset($data[$unique])) {
-            $modelRedis->removeDetail($data[$unique]);
+            $modelRedis->removeDetail($unique . '-' . $data[$unique]);
         }
     }
 
@@ -504,7 +504,7 @@ $this->on('system-model-update', function ($request, $response) {
     $uniques = $schema->getUniqueFieldNames();
     foreach ($uniques as $unique) {
         if (isset($data[$unique])) {
-            $modelRedis->removeDetail($data[$unique]);
+            $modelRedis->removeDetail($unique . '-' . $data[$unique]);
         }
     }
 
