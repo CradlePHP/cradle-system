@@ -705,7 +705,6 @@ $cradle->on('system-schema-get-elastic', function($request, $response) {
     return $response->setError(false)->setResults($results);
 });
 
-
 /**
  * System Schema update elastic schema
  *

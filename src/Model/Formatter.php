@@ -81,6 +81,9 @@ class Formatter
                     $data[$name] = json_encode($data[$name]);
                     break;
                 case 'tag':
+                case 'texts':
+                case 'textareas':
+                case 'wysiwygs':
                 case 'meta':
                 case 'checkboxes':
                 case 'multirange':

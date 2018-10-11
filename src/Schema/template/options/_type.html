@@ -310,6 +310,30 @@
     <option
         data-fieldset="attributes"
         data-format="json"
+        value="texts"
+        {{#when field.type '===' 'texts'}}selected{{/when}}
+    >
+        Text Fieldset
+    </option>
+    <option
+        data-fieldset="attributes"
+        data-format="json"
+        value="textareas"
+        {{#when field.type '===' 'textareas'}}selected{{/when}}
+    >
+        Textarea Fieldset
+    </option>
+    <option
+        data-fieldset="attributes"
+        data-format="json"
+        value="wysiwygs"
+        {{#when field.type '===' 'wysiwygs'}}selected{{/when}}
+    >
+        WYSIWYG Fieldset
+    </option>
+    <option
+        data-fieldset="attributes"
+        data-format="json"
         value="meta"
         {{#when field.type '===' 'meta'}}selected{{/when}}
     >

@@ -718,6 +718,152 @@
         {{/scope}}
     </div>
 {{/when}}
+{{#when field.type '===' 'texts'}}
+    <div
+        data-do="texts-field"
+        class="texts-field"
+        data-name="{{@key}}"
+        {{#each field.attributes}}
+            {{@key}}="{{this}}"
+        {{/each}}
+    >
+        {{#scope ../item @key}}
+            {{#each this}}
+                <div class="field-row input-group mb-3">
+                    <div class="input-group-prepend">
+                        <a
+                            class="input-group-text text-success move-up"
+                            href="javascript:void(0)"
+                        >
+                            <i class="fas fa-arrow-up"></i>
+                        </a>
+                    </div>
+                    <div class="input-group-prepend">
+                        <a
+                            class="input-group-text text-orange move-down"
+                            href="javascript:void(0)"
+                        >
+                            <i class="fas fa-arrow-down"></i>
+                        </a>
+                    </div>
+                    <input
+                        class="text-field form-control"
+                        name="{{../../@key}}[]"
+                        type="text"
+                        value="{{this}}"
+                    />
+                    <div class="input-group-append">
+                        <a
+                            class="input-group-text text-danger remove"
+                            href="javascript:void(0)"
+                        >
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+            {{/each}}
+        {{/scope}}
+        <a class="field-add btn btn-success" href="javascript:void(0)">
+            <i class="fas fa-plus"></i>
+            <span>{{_ 'Add'}}</span>
+        </a>
+    </div>
+{{/when}}
+{{#when field.type '===' 'textareas'}}
+    <div
+        data-do="textareas-field"
+        class="textareas-field"
+        data-name="{{@key}}"
+        {{#each field.attributes}}
+            {{@key}}="{{this}}"
+        {{/each}}
+    >
+        {{#scope ../item @key}}
+            {{#each this}}
+                <div class="field-row input-group mb-3">
+                    <div class="input-group-prepend">
+                        <a
+                            class="input-group-text text-success move-up"
+                            href="javascript:void(0)"
+                        >
+                            <i class="fas fa-arrow-up"></i>
+                        </a>
+                    </div>
+                    <div class="input-group-prepend">
+                        <a
+                            class="input-group-text text-orange move-down"
+                            href="javascript:void(0)"
+                        >
+                            <i class="fas fa-arrow-down"></i>
+                        </a>
+                    </div>
+                    <textarea
+                        class="text-field form-control"
+                        name="{{../../@key}}[]"
+                    >{{this}}</textarea>
+                    <div class="input-group-append">
+                        <a
+                            class="input-group-text text-danger remove"
+                            href="javascript:void(0)"
+                        >
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+            {{/each}}
+        {{/scope}}
+        <a class="field-add btn btn-success" href="javascript:void(0)">
+            <i class="fas fa-plus"></i>
+            <span>{{_ 'Add'}}</span>
+        </a>
+    </div>
+{{/when}}
+{{#when field.type '===' 'wysiwygs'}}
+    <div
+        data-do="wysiwygs-field"
+        class="wysiwygs-field"
+        data-name="{{@key}}"
+        {{#each field.attributes}}
+            {{@key}}="{{this}}"
+        {{/each}}
+    >
+        {{#scope ../item @key}}
+            {{#each this}}
+                <div class="field-row mb-3">
+                    <div class="btn-group mb-2">
+                        <a
+                            class="btn btn-danger remove"
+                            href="javascript:void(0)"
+                        >
+                            <i class="fas fa-times"></i>
+                        </a>
+                        <a
+                            class="btn btn-success move-up"
+                            href="javascript:void(0)"
+                        >
+                            <i class="fas fa-arrow-up"></i>
+                        </a>
+                        <a
+                            class="btn btn-orange move-down"
+                            href="javascript:void(0)"
+                        >
+                            <i class="fas fa-arrow-down"></i>
+                        </a>
+                    </div>
+                    <textarea
+                        data-do="wysiwyg"
+                        class="text-field form-control"
+                        name="{{../../@key}}[]"
+                    >{{this}}</textarea>
+                </div>
+            {{/each}}
+        {{/scope}}
+        <a class="field-add btn btn-success" href="javascript:void(0)">
+            <i class="fas fa-plus"></i>
+            <span>{{_ 'Add'}}</span>
+        </a>
+    </div>
+{{/when}}
 {{#when field.type '===' 'meta'}}
     <div
         data-do="meta-field"
@@ -727,39 +873,39 @@
             {{@key}}="{{this}}"
         {{/each}}
     >
-        <div class="meta-fields">
-            {{#scope ../item @key}}
-                {{#each this}}
-                    <div class="meta">
-                        <input
-                            class="meta-input key"
-                            placeholder="{{_ 'Name'}}"
-                            type="text"
-                            value="{{@key}}"
-                        />
-                        <input
-                            class="meta-input value"
-                            type="text"
-                            placeholder="{{_ 'Value'}}"
-                            value="{{this}}"
-                        />
-                        <input
-                            name="{{../../@key}}[{{@key}}]"
-                            type="hidden"
-                            value="{{this}}"
-                        />
+        {{#scope ../item @key}}
+            {{#each this}}
+                <div class="field-row input-group mb-3">
+                    <input
+                        class="meta-input key form-control"
+                        type="text"
+                        placeholder="{{_ 'Key'}}"
+                        value="{{@key}}"
+                    />
+                    <textarea
+                        class="meta-input value form-control"
+                        placeholder="{{_ 'Value'}}"
+                        rows="1"
+                    >{{this}}</textarea>
+                    <input
+                        type="hidden"
+                        name="{{../../@key}}[{{@key}}]"
+                        value="{{this}}"
+                    />
+                    <div class="input-group-append">
                         <a
-                            class="remove text-danger"
+                            class="input-group-text text-danger remove"
                             href="javascript:void(0)"
                         >
-                            <i class="fa fa-times"></i>
+                            <i class="fas fa-times"></i>
                         </a>
                     </div>
-                {{/each}}
-            {{/scope}}
-        </div>
-        <a class="text-success add-meta">
-            <i class="fa fa-plus"></i>
+                </div>
+            {{/each}}
+        {{/scope}}
+        <a class="field-add btn btn-success" href="javascript:void(0)">
+            <i class="fas fa-plus"></i>
+            <span>{{_ 'Add'}}</span>
         </a>
     </div>
 {{/when}}

@@ -256,6 +256,9 @@ class Schema extends Registry
                         'files',
                         'images',
                         'tag',
+                        'texts',
+                        'textareas',
+                        'wysiwygs',
                         'meta',
                         'checkboxes',
                         'multirange',
@@ -1002,6 +1005,15 @@ class Schema extends Registry
             'type' => 'JSON'
         ],
         'tag' => [
+            'type' => 'JSON'
+        ],
+        'texts' => [
+            'type' => 'JSON'
+        ],
+        'textareas' => [
+            'type' => 'JSON'
+        ],
+        'wysiwygs' => [
             'type' => 'JSON'
         ],
         'meta' => [

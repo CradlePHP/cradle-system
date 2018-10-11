@@ -83,6 +83,32 @@
             {{#when format '===' 'space'}}
                 <td>{{join value ' '}}</td>
             {{/when}}
+            {{#when format '===' 'nl'}}
+                <td>
+                    {{#each value}}
+                        {{this}}
+                        {{#unless @last}}<br />{{/unless}}
+                    {{/each}}
+                </td>
+            {{/when}}
+            {{#when format '===' 'ul'}}
+                <td>
+                    <ul>
+                        {{#each value}}
+                            <li>{{this}}</li>
+                        {{/each}}
+                    </ul>
+                </td>
+            {{/when}}
+            {{#when format '===' 'ol'}}
+                <td>
+                    <ol>
+                        {{#each value}}
+                            <li>{{this}}</li>
+                        {{/each}}
+                    </ol>
+                </td>
+            {{/when}}
             {{#when format '===' 'meta'}}
                 <td>
                     <ul class="meta-list">
