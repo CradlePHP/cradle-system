@@ -128,6 +128,9 @@
                     {{/each}}
                 </td>
             {{/when}}
+            {{#when format '===' 'jsonpretty'}}
+                <td>{{{json_pretty value}}}</td>
+            {{/when}}
             {{#when format '===' 'formula'}}
                 <td>
                     {{formula parameters ../detail}}
