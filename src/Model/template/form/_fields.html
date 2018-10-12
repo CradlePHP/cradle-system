@@ -932,7 +932,7 @@
         {{#each field.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
-    >{{json_encode ../item @key}}</textarea>
+    >{{{json_encode ../item @key}}}</textarea>
 {{/when}}
 {{#when field.type '===' 'multifield'}}
     {{#each field.schema.detail}}

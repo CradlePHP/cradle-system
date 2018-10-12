@@ -117,6 +117,33 @@ return function($request, $response) {
         return $options['inverse']();
     });
 
+    $handlebars->registerHelper('json_encode', function (...$args) {
+        $options = array_pop($args);
+        $value = array_shift($args);
+        foreach ($args as $arg) {
+            if (!isset($value[$arg])) {
+                $value = null;
+                break;
+            }
+
+            $value = $value[$arg];
+        }
+
+        if (!$value) {
+            return '';
+        }
+
+        if (!is_array($value) && !is_object($value)) {
+            return $value;
+        }
+
+        return json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    });
+
+    $handlebars->registerHelper('json_pretty', function ($value, $options) {
+        return nl2br(str_replace(' ', '&nbsp;', json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)));
+    });
+
     /**
      * Add Template Builder
      */
