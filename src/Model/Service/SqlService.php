@@ -164,7 +164,7 @@ class SqlService
         //get 1:0 relations
         $relations = $this->schema->getRelations(0);
         foreach ($relations as $table => $relation) {
-            $tbl = $this
+            $row = $this
                 ->resource
                 ->search($table)
                 ->innerJoinUsing($relation['name'], $relation['primary2'])
@@ -174,10 +174,10 @@ class SqlService
             $fields = Schema::i($relation['name'])->getJsonFieldNames();
 
             foreach ($fields as $field) {
-                if (isset($tbl[$field]) && $tbl[$field]) {
-                    $tbl[$field] = json_decode($tbl[$field], true);
+                if (isset($row[$field]) && trim($row[$field])) {
+                    $row[$field] = json_decode($row[$field], true);
                 } else {
-                    $tbl[$field] = [];
+                    $row[$field] = [];
                 }
             }
 
@@ -192,7 +192,7 @@ class SqlService
 
         foreach ($relations as $table => $relation) {
             $schema = $this->schema;
-            $tbl = $this
+            $rows = $this
                 ->resource
                 ->search($table)
                 ->when(
@@ -208,8 +208,26 @@ class SqlService
                         $this->innerJoinOn($relation['name'], $on);
                     },
                     //this is the normal way
-                    function () use (&$relation) {
+                    function () use (&$relation, &$fields) {
                         $this->innerJoinUsing($relation['name'], $relation['primary2']);
+
+                        $relationSchema = Schema::i($relation['name']);
+                        $relationRelations = $relationSchema->getRelations(1);
+
+                        foreach ($relationRelations as $table2 => $relation2) {
+                            $this
+                                ->innerJoinUsing(
+                                    $table2,
+                                    $relation2['primary1']
+                                )
+                                ->innerJoinUsing(
+                                    $relation2['name'],
+                                    $relation2['primary2']
+                                );
+
+                            $relatedJson = $relationSchema->getJsonFieldNames();
+                            $fields = array_merge($fields, $relatedJson);
+                        }
                     }
                 )
                 ->addFilter($relation['primary1'] . ' = %s', $id)
@@ -217,15 +235,75 @@ class SqlService
 
             $fields = Schema::i($relation['name'])->getJsonFieldNames();
 
-            foreach ($fields as $field) {
-                if (isset($tbl[$field]) && $tbl[$field]) {
-                    $tbl[$field] = json_decode($tbl[$field], true);
-                } else {
-                    $tbl[$field] = [];
+            foreach($rows as $i => $row) {
+                foreach ($fields as $field) {
+                    if (isset($row[$field]) && trim($row[$field])) {
+                        $row[$field] = json_decode($row[$field], true);
+                    } else {
+                        $row[$field] = [];
+                    }
                 }
+
+                //custom formats & formulas
+                foreach(Schema::i($relation['name'])->getFields() as $field) {
+                    if($field['detail']['format'] === 'formula') {
+                        $helper = cradle('global')
+                            ->handlebars()
+                            ->getHelper('formula');
+
+                        $row[$field['name']] = $helper(
+                            $field['detail']['parameters'],
+                            $row,
+                            false
+                        );
+
+                        continue;
+                    }
+
+                    if($field['detail']['format'] === 'custom') {
+                        $helper = cradle('global')
+                            ->handlebars()
+                            ->getHelper('compile');
+
+                        $row[$field['name']] = $helper(
+                            $field['detail']['parameters'],
+                            $row
+                        );
+
+                        continue;
+                    }
+                }
+
+                $rows[$i] = $row;
             }
 
-            $results[$relation['name']] = $tbl;
+            $results[$relation['name']] = $rows;
+        }
+
+        //custom formats & formulas
+        foreach($this->schema->getFields() as $field) {
+            if($field['detail']['format'] === 'formula') {
+                $helper = cradle('global')
+                    ->handlebars()
+                    ->getHelper('formula');
+
+                $results[$field['name']] = $helper(
+                    $field['detail']['parameters'],
+                    $results,
+                    false
+                );
+            }
+
+            if($field['detail']['format'] === 'custom') {
+                $helper = cradle('global')
+                    ->handlebars()
+                    ->getHelper('compile');
+
+                $results[$field['name']] = $helper(
+                    $field['detail']['parameters'],
+                    $results
+                );
+            }
         }
 
         return $results;
@@ -533,6 +611,36 @@ class SqlService
                     $rows[$i][$field] = json_decode($results[$field], true);
                 } else {
                     $rows[$i][$field] = [];
+                }
+            }
+
+            //custom formats & formulas
+            foreach($this->schema->getFields() as $field) {
+                if($field['detail']['format'] === 'formula') {
+                    $helper = cradle('global')
+                        ->handlebars()
+                        ->getHelper('formula');
+
+                    $rows[$i][$field['name']] = $helper(
+                        $field['detail']['parameters'],
+                        $results,
+                        false
+                    );
+
+                    continue;
+                }
+
+                if($field['detail']['format'] === 'custom') {
+                    $helper = cradle('global')
+                        ->handlebars()
+                        ->getHelper('compile');
+
+                    $rows[$i][$field['name']] = $helper(
+                        $field['detail']['parameters'],
+                        $results
+                    );
+
+                    continue;
                 }
             }
         }
