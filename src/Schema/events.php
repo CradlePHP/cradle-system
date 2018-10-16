@@ -94,13 +94,13 @@ $this->on('system-schema-create', function ($request, $response) {
     //create table
     $schema->service('sql')->create($data);
 
-    $path = $this->package('global')->path('config') . '/schema';
+    $path = $this->package('global')->path('schema');
 
     if (!is_dir($path)) {
         mkdir($path, 0777);
     }
 
-    $this->package('global')->config('schema/' . $table, $data);
+    $this->package('global')->schema($table, $data);
 
     //return response format
     $response->setError(false)->setResults($data);
@@ -139,7 +139,7 @@ $this->on('system-schema-detail', function ($request, $response) {
     //no preparation needed
     //----------------------------//
     // 4. Process Data
-    $results = $this->package('global')->config('schema/' . $id);
+    $results = $this->package('global')->schema($id);
 
     if (!$results) {
         return $response->setError(true, 'Not Found');
@@ -184,16 +184,10 @@ $this->on('system-schema-remove', function ($request, $response) {
         return $response->setError(true, $e->getMessage());
     }
 
-    $path = $this->package('global')->path('config')
-        . '/schema/'
-        . $table
-        . '.php';
+    $path = $this->package('global')->path('schema') . '/' . $table . '.php';
 
     if (file_exists($path)) {
-        $new = $this->package('global')->path('config')
-            . '/schema/_'
-            . $table
-            . '.php';
+        $new = $this->package('global')->path('schema') . '/_' . $table . '.php';
 
         rename($path, $new);
     }
@@ -238,16 +232,10 @@ $this->on('system-schema-restore', function ($request, $response) {
         return $response->setError(true, $e->getMessage());
     }
 
-    $path = $this->package('global')->path('config')
-        . '/schema/_'
-        . $table
-        . '.php';
+    $path = $this->package('global')->path('schema') . '/_' . $table . '.php';
 
     if (file_exists($path)) {
-        $new = $this->package('global')->path('config')
-            . '/schema/'
-            . $table
-            . '.php';
+        $new = $this->package('global')->path('schema') . '/' . $table . '.php';
 
         rename($path, $new);
     }
@@ -277,7 +265,7 @@ $this->on('system-schema-search', function ($request, $response) {
     //no preparation needed
     //----------------------------//
     // 4. Process Data
-    $path = $this->package('global')->path('config') . '/schema/';
+    $path = $this->package('global')->path('schema');
 
     if (!is_dir($path)) {
         mkdir($path, 0777);
@@ -302,7 +290,7 @@ $this->on('system-schema-search', function ($request, $response) {
             continue;
         }
 
-        $results[] = $this->package('global')->config('schema/' . substr($file, 0, -4));
+        $results[] = $this->package('global')->schema(substr($file, 0, -4));
     }
 
     //set response format
@@ -407,345 +395,8 @@ $this->on('system-schema-update', function ($request, $response) {
     //update table
     $systemSql->update($data);
 
-    $this->package('global')->config('schema/' . $table, $data);
+    $this->package('global')->schema($table, $data);
 
     //return response format
     $response->setError(false)->setResults($data);
-});
-
-/**
- * System Schema Create Elastic Mapping Job
- *
- * @param Request $request
- * @param Response $response
- */
-$this->on('system-schema-create-elastic', function ($request, $response) {
-    //----------------------------//
-    // 1. Get Data
-    $data = [];
-    if ($request->hasStage()) {
-        $data = $request->getStage();
-    }
-
-    // check for required parameters
-    if (!isset($data['name'])) {
-        return $response->setError(true, 'Invalid parameters.');
-    }
-
-    // check if model exists
-    $modelPath = sprintf($this->package('global')
-            ->path('config') . '/schema/%s.php',
-        $data['name']);
-
-    if (!file_exists($modelPath)) {
-        return $response->setError(true, 'Model doesn\'t exist.');
-    }
-
-    //----------------------------//
-    // 3. Prepare Data
-    //----------------------------//
-    // get model data
-    $data = include_once ($modelPath);
-
-    //----------------------------//
-    // 4. Process Data
-    //----------------------------//
-    $schema = Schema::i($data);
-    $table = $schema->getName();
-
-    //create elastic mappings
-    $schema->service('elastic')->createMap();
-
-    //return response format
-    $response->setError(false)->setResults($data);
-});
-
-/**
- * System Schema Create Elastic Mapping Job
- *
- * @param Request $request
- * @param Response $response
- */
-$this->on('system-schema-search-elastic', function ($request, $response) {
-
-    //----------------------------//
-    // 1. Get Data
-    $data = [];
-    if ($request->hasStage()) {
-        $data = $request->getStage();
-    }
-
-    //----------------------------//
-    // 2. Validate Data
-    //no validation needed
-    //----------------------------//
-    // 3. Prepare Data
-    //no preparation needed
-    //----------------------------//
-    // 4. Process Data
-    $path = $this->package('global')->path('config') . '/schema/elastic/';
-
-    $files = @scandir($path);
-
-    if (!$files) {
-        return $response->setError(true, 'No elastic schemas found.');
-    }
-
-    $active = 1;
-    if (isset($data['filter']['active'])) {
-        $active = $data['filter']['active'];
-    }
-
-    $results = [];
-    foreach ($files as $file) {
-        if (trim($file) == '.'
-            || trim($file) == '..'
-        ) {
-            continue;
-        }
-
-        if (file_exists(sprintf($path . '/%s/elastic.php', $file))) {
-
-            $model = $this->package('global')
-                ->config('admin/schema/%s.php', strtolower($file));
-
-            $model['name'] = $model['singular'] = strtolower($file);
-            $results[] = $model;
-        }
-
-    }
-
-    //set response format
-    $response->setError(false)->setResults([
-        'rows' => $results,
-        'total' => count($results)
-    ]);
-});
-
-/**
- * System Schema Map Elastic
- *
- * @param Request $request
- * @param Response $response
- */
-$cradle->on('system-schema-map-elastic', function ($request, $response) {
-
-    //----------------------------//
-    // 1. Get Data
-    $data = [];
-    if ($request->hasStage()) {
-        $data = $request->getStage();
-    }
-
-    //check for required parameters
-    if (!isset($data['name'])) {
-        return $response->setError(true, 'Invalid parameters.');
-    }
-
-    // check if model exists
-    $modelPath = sprintf($this->package('global')
-            ->path('config') . '/schema/%s.php',
-        $data['name']);
-
-    if (!file_exists($modelPath)) {
-        return $response->setError(true, 'Model doesn\'t exist.');
-    }
-
-    //----------------------------//
-    // 3. Prepare Data
-    //----------------------------//
-
-    //----------------------------//
-    // 4. Process Data
-    //----------------------------//
-    $schema = Schema::i($data['name']);
-
-    //map elastic
-
-
-    //create elastic mappings
-    $map = $schema->service('elastic')->map();
-
-    //check if mapping is successfull
-    if (!$map) {
-        return $response->setError(true, 'Something went wrong.');
-    }
-
-    $response->setError(false);
-});
-
-/**
- * System Schema populate elastic
- *
- * @param Request $request
- * @param Response $response
- */
-$cradle->on('system-schema-populate-elastic', function($request, $response) {
-    //----------------------------//
-    // 1. Get Data
-    $data = [];
-    if ($request->hasStage()) {
-        $data = $request->getStage();
-    }
-
-    // check for required fields
-    if (!isset($data['name'])) {
-        return $response->setError(true, 'Invalid parameters.');
-    }
-
-    // check if model exists
-    $modelPath = sprintf($this->package('global')
-            ->path('config') . '/schema/%s.php',
-        $data['name']);
-
-    if (!file_exists($modelPath)) {
-        return $response->setError(true, 'Model doesn\'t exist.');
-    }
-
-    //----------------------------//
-    // 3. Prepare Data
-    //----------------------------//
-
-    //----------------------------//
-    // 4. Process Data
-    //----------------------------//
-    $schema = Schema::i($data['name']);
-    $populate = $schema->service('elastic')->populate($data);
-    // check populate result
-    if (!$populate) {
-        return $response->setError(true, 'Something went wrong during elastic poulate');
-    }
-
-    $response->setError(false);
-});
-
-/**
- * System Schema populate elastic
- *
- * @param Request $request
- * @param Response $response
- */
-$cradle->on('system-schema-flush-elastic', function($request, $response) {
-    //----------------------------//
-    // 1. Get Data
-    $data = [];
-    if ($request->hasStage()) {
-        $data = $request->getStage();
-    }
-
-    // check for required fields
-    if (!isset($data['name'])) {
-        return $response->setError(true, 'Invalid parameters.');
-    }
-
-    // check if model exists
-    $modelPath = sprintf($this->package('global')
-            ->path('config') . '/schema/%s.php',
-        $data['name']);
-
-    if (!file_exists($modelPath)) {
-        return $response->setError(true, 'Model doesn\'t exist.');
-    }
-
-    //----------------------------//
-    // 3. Prepare Data
-    //----------------------------//
-
-    //----------------------------//
-    // 4. Process Data
-    //----------------------------//
-    $schema = Schema::i($data['name']);
-    $flush = $schema->service('elastic')->flush();
-
-    // intercept error
-    if (!$flush) {
-        return $response->setError(true, 'Something went wrong.');
-    }
-
-    return $response->setError(false);
-});
-
-/**
- * System Schema get elastic schema
- *
- * @param Request $request
- * @param Response $response
- */
-$cradle->on('system-schema-get-elastic', function($request, $response) {
-    //----------------------------//
-    // 1. Get Data
-    $data = [];
-    if ($request->hasStage()) {
-        $data = $request->getStage();
-    }
-
-    // check for required fields
-    if (!isset($data['name'])) {
-        return $response->setError(true, 'Invalid parameters.');
-    }
-
-    // check if model exists
-    $modelPath = sprintf($this->package('global')
-            ->path('config') . '/schema/elastic/%s/elastic.php',
-        ucwords($data['name']));
-
-    if (!file_exists($modelPath)) {
-        return $response->setError(true, 'Schema doesn\'t exist.');
-    }
-
-    //----------------------------//
-    // 3. Prepare Data
-    //----------------------------//
-
-    //----------------------------//
-    // 4. Process Data
-    //----------------------------//
-    $results = file_get_contents ($modelPath);
-
-    return $response->setError(false)->setResults($results);
-});
-
-/**
- * System Schema update elastic schema
- *
- * @param Request $request
- * @param Response $response
- */
-$cradle->on('system-schema-update-elastic', function($request, $response) {
-    //----------------------------//
-    // 1. Get Data
-    $data = [];
-    if ($request->hasStage()) {
-        $data = $request->getStage();
-    }
-
-    // check for required fields
-    if (!isset($data['name'])) {
-        return $response->setError(true, 'Invalid parameters.');
-    }
-
-    // check if code is set
-    if (!isset($data['code'])) {
-        return $response->setError(true, 'Invalid parameters.');
-    }
-
-    // check if model exists
-    $modelPath = sprintf($this->package('global')
-            ->path('config') . '/schema/elastic/%s/elastic.php',
-        ucwords($data['name']));
-
-    // check if file exist
-    if (!file_exists($modelPath)) {
-        // return error if not
-        return $response->setError(true, 'Schema doesn\'t exist.');
-    }
-
-    try {
-        // save code
-        file_put_contents ($modelPath, $data['code']);
-    } catch (\Throwable $e) {
-        return $response->setError(true, $e->getMessage());
-    }
-
-    return $response->setError(false);
 });

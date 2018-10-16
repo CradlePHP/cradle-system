@@ -51,21 +51,21 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
 
     /**
      * Create an elastic map
-     * 
+     *
      * @return void
      */
     public function createMap() {
         if(is_null($this->schema)) {
             throw SystemException::forNoSchema();
         }
-        
+
         // translate data first to sql
         $data = $this->schema->toSql();
-        
+
         // then translate it to elastic mapping
         $mapping = $this->schema->toElastic($data);
         // get schema path
-        $path = cradle()->package('global')->path('config') . '/schema/elastic';
+        $path = cradle()->package('global')->path('schema') . '/elastic';
         // if elastic dir doesn't exists
         // create elastic folder
         if(!is_dir($path)) {
@@ -75,7 +75,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         // if elastic schema dir doesn't exist
         // create elastic schema dir
         mkdir ($path . '/' . ucwords($data['name']));
-        
+
         // save mapping
         file_put_contents(
             $path . '/' . ucwords($data['name']) . '/elastic.php',
@@ -86,7 +86,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
 
     /**
      * Map Elastic Schema
-     * 
+     *
      * @return bool
      */
     public function map() {
@@ -96,9 +96,9 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         }
 
         $table = $this->schema->getName();
-        $path = cradle()->package('global')->path('config')
-              . sprintf('/schema/elastic/%s/elastic.php', ucwords($table));
-        
+        $path = cradle()->package('global')->path('schema')
+              . sprintf('/elastic/%s/elastic.php', ucwords($table));
+
         // if mapped file doesn't exist,
         // do nothing
         if (!file_exists($path)) {
@@ -106,8 +106,8 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         }
 
         $data = include_once($path);
-        
-        // try mapping 
+
+        // try mapping
         try {
             $this->resource->indices()->create(['index' => $table]);
             $this->resource->indices()->putMapping([
@@ -145,7 +145,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         if(is_null($this->schema)) {
             throw SystemException::forNoSchema();
         }
-        
+
         $exists = false;
         try {
             // check if index exist
@@ -155,7 +155,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
                     ['index' => $this->schema
                         ->getName()]
                 );
-            
+
         } catch (\Throwable $e) {
             // return false if something went wrong
             return false;
@@ -171,10 +171,10 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         $modelSql = $this->schema->model()->service('sql');
         $modelElastic = $this->schema->model()->service('elastic');
         $modelRedis = $this->schema->model()->service('redis');
-        
+
         // primary field
         $primary = $this->schema->getPrimaryFieldName();
-        
+
         // get data from sql
         // set range to 1 so we dont have to exhaus sql server by pulling just the total entry
         $data = $modelSql->search(['range' => 1]);
@@ -183,13 +183,13 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         if (isset ($data['total']) && is_numeric ($data['total'])) {
             $total = $data['total'];
         }
-        
+
         // set current to 0 if current is not set
         $current = 0;
         if (isset ($data['current']) && is_numeric ($data['current'])) {
             $current = $data['current'];
         }
-        
+
         $range = 10; // do 10 at a time
         for ($i = 0; $i < $total; $i++) {
             if ($i + $current > $total) {
@@ -203,15 +203,15 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
                     // end this
                     break;
                 }
-                
+
             }
-            
+
             // set request params
             $stage = ['start' => $current, 'range' => $current + $range];
             // get entries
             $entries = $modelSql->search($stage);
             $entries = $entries['rows'];
-            
+
             // loop thru entries
             foreach ($entries as $entry) {
                 $create = $modelElastic->create($entry[$primary]);
@@ -219,7 +219,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
                     // nothing to do
                     return false;
                 }
-                
+
             }
 
             // increment current
@@ -227,14 +227,14 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         }
 
         // dont forget to flush redis
-        
+
         $modelRedis->removeSearch();
         return true;
     }
-    
+
     /**
      * Flush Elastic Index
-     * 
+     *
      * @return bool
      */
     public function flush() {
@@ -252,7 +252,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
                         ->getName()
                     ]
                 );
-            
+
             return true;
         } catch(\Throwable $e) {
             return false;

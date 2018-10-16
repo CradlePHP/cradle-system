@@ -3,6 +3,59 @@
 use Cradle\Package\System\Schema;
 
 return function($request, $response) {
+    //set the schema path
+    $config = $this->package('global')->path('config');
+    $this->package('global')->path('schema', $config . '/schema')
+
+    /**
+     * A helper to manage the schema file system
+     */
+    ->addMethod('schema', function ($path, array $data = null) {
+        static $cache = [];
+
+        //determine file path
+        $config = $this->path('schema');
+        $file = $config . '/' . $path . '.php';
+
+        //is it already in memory?
+        if (!isset($cache[$path])) {
+            if (!file_exists($file)) {
+                $cache[$path] = [];
+            } else {
+                //get the data and cache
+                $cache[$path] = include($file);
+            }
+        }
+
+        if (is_null($data)) {
+            //return the data
+            return $cache[$path];
+        }
+
+        //they are trying to write
+        //if it is not a folder
+        if (!is_dir(dirname($file))) {
+            //make a folder
+            mkdir(dirname($file), 0777, true);
+        }
+
+        //if it is not a file
+        if (!file_exists($file)) {
+            //make the file
+            touch($file);
+            chmod($file, 0777);
+        }
+
+        $cache[$path] = $data;
+
+        // at any rate, update the config
+        $content = "<?php //-->\nreturn " . var_export($cache[$path], true) . ';';
+        file_put_contents($file, $content);
+
+        return $this;
+    });
+
+    //add helpers
     $handlebars = $this->package('global')->handlebars();
 
     $handlebars->registerHelper('relations', function (...$args) {
