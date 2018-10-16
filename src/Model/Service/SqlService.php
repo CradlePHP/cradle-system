@@ -181,7 +181,7 @@ class SqlService
                 }
             }
 
-            $results[$relation['name']] = $tbl;
+            $results[$relation['name']] = $row;
         }
 
         //get 1:N, N:N relations
