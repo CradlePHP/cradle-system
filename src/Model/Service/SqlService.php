@@ -471,7 +471,9 @@ class SqlService
                 continue;
             }
 
-            if (!isset($filter[$relation['primary2']])) {
+            if (!isset($filter[$relation['primary2']])
+              && !isset($in[$relation['primary2']])
+            ) {
                 continue;
             }
 
@@ -490,7 +492,9 @@ class SqlService
             }
 
             //if filter primary is not set
-            if (!isset($filter[$relation['primary1']])) {
+            if (!isset($filter[$relation['primary1']])
+              && !isset($in[$relation['primary1']])
+            ) {
                 continue;
             }
 
@@ -509,7 +513,9 @@ class SqlService
             }
 
             //if filter primary is not set
-            if (!isset($filter[$relation['primary1']])) {
+            if (!isset($filter[$relation['primary1']])
+              && !isset($in[$relation['primary1']])
+            ) {
                 continue;
             }
 
