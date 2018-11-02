@@ -181,7 +181,7 @@ $this->on('system-schema-remove', function ($request, $response) {
 
     try {
         //remove table
-        $results = $systemSql->remove($data, $restorable);
+        $results = $systemSql->remove($restorable);
     } catch (\Exception $e) {
         return $response->setError(true, $e->getMessage());
     }

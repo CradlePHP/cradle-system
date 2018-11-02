@@ -171,7 +171,6 @@ class SqlService
      */
     public function remove($restorable = true)
     {
-
         //translate model data to sql data
         if (is_null($this->schema)) {
             throw Exception::forNoSchema();

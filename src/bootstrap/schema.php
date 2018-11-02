@@ -16,7 +16,7 @@ return function($request, $response) {
     /**
      * A helper to manage the schema file system
      */
-    $package->addMethod('schema', function ($path, array $data = null) {
+    $package->addMethod('schema', function ($path, $data = null) {
         static $cache = [];
 
         //determine file path
@@ -31,6 +31,15 @@ return function($request, $response) {
                 //get the data and cache
                 $cache[$path] = include($file);
             }
+        }
+
+        //if data is false
+        if ($data === false) {
+            //they want to remove the cache
+            $data = $cache[$path];
+            unset($cache[$path]);
+            //return the data
+            return $data;
         }
 
         if (is_null($data)) {
