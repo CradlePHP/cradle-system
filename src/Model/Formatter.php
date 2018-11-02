@@ -8,9 +8,6 @@
 namespace Cradle\Package\System\Model;
 
 use Cradle\Package\System\Schema;
-
-use Cradle\Module\Utility\File;
-
 use Cradle\Helper\InstanceTrait;
 
 /**
@@ -43,13 +40,11 @@ class Formatter
     /**
      * Returns formatted data
      *
-     * @param *array      $data
-     * @param array|false $s3
-     * @param string|null $upload
+     * @param *array $data
      *
      * @return array
      */
-    public function formatData(array $data, $s3 = false, $upload = null)
+    public function formatData(array $data)
     {
         $fields = $this->schema->getFields();
         $table = $this->schema->getName();
@@ -66,18 +61,12 @@ class Formatter
                 case 'file':
                 case 'image':
                     //upload files
-                    //try cdn if enabled
-                    $data[$name] = File::base64ToS3($data[$name], $s3);
-                    //try being old school
-                    $data[$name] = File::base64ToUpload($data[$name], $upload);
+                    $data[$name] = $this->upload($data[$name]);
                     break;
                 case 'files':
                 case 'images':
                     //upload files
-                    //try cdn if enabled
-                    $data[$name] = File::base64ToS3($data[$name], $s3);
-                    //try being old school
-                    $data[$name] = File::base64ToUpload($data[$name], $upload);
+                    $data[$name] = $this->upload($data[$name]);
                     $data[$name] = json_encode($data[$name]);
                     break;
                 case 'tag':
@@ -160,5 +149,31 @@ class Formatter
         }
 
         return $data;
+    }
+
+    /**
+     * File Upload
+     *
+     * @param *array  $data
+     * @param *string $name
+     *
+     * @return string
+     */
+    public function upload($data)
+    {
+        $payload = cradle()->makePayload();
+        $payload['request']->setStage('data', $data);
+
+        cradle()->trigger(
+            'utility-file-upload',
+            $payload['request'],
+            $payload['response']
+        );
+
+        if(!$payload['response']->hasResults('data')) {
+            return $data;
+        }
+
+        return $payload['response']->getResults('data');
     }
 }

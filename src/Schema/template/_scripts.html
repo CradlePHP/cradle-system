@@ -823,7 +823,7 @@
                     var index = 0;
                     var name = template
                                 .replace('{INDEX}', trigger.getModelIndex())
-                                .replace('{INDEX}', index)
+                                .replace('{INDEX}', container.attr('data-index'))
                                 .replace('{INDEX}', index);
 
                     var option = $('#field-option-row-template')

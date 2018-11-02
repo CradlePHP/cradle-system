@@ -1,60 +1,14 @@
 <?php
+/**
+ * This file is part of a package designed for the CradlePHP Project.
+ *
+ * Copyright and license information can be found at LICENSE.txt
+ * distributed with this package.
+ */
 
 use Cradle\Package\System\Schema;
 
 return function($request, $response) {
-    //set the schema path
-    $config = $this->package('global')->path('config');
-    $this->package('global')->path('schema', $config . '/schema')
-
-    /**
-     * A helper to manage the schema file system
-     */
-    ->addMethod('schema', function ($path, array $data = null) {
-        static $cache = [];
-
-        //determine file path
-        $config = $this->path('schema');
-        $file = $config . '/' . $path . '.php';
-
-        //is it already in memory?
-        if (!isset($cache[$path])) {
-            if (!file_exists($file)) {
-                $cache[$path] = [];
-            } else {
-                //get the data and cache
-                $cache[$path] = include($file);
-            }
-        }
-
-        if (is_null($data)) {
-            //return the data
-            return $cache[$path];
-        }
-
-        //they are trying to write
-        //if it is not a folder
-        if (!is_dir(dirname($file))) {
-            //make a folder
-            mkdir(dirname($file), 0777, true);
-        }
-
-        //if it is not a file
-        if (!file_exists($file)) {
-            //make the file
-            touch($file);
-            chmod($file, 0777);
-        }
-
-        $cache[$path] = $data;
-
-        // at any rate, update the config
-        $content = "<?php //-->\nreturn " . var_export($cache[$path], true) . ';';
-        file_put_contents($file, $content);
-
-        return $this;
-    });
-
     //add helpers
     $handlebars = $this->package('global')->handlebars();
 
@@ -195,64 +149,5 @@ return function($request, $response) {
 
     $handlebars->registerHelper('json_pretty', function ($value, $options) {
         return nl2br(str_replace(' ', '&nbsp;', json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)));
-    });
-
-    /**
-     * Add Template Builder
-     */
-    $this->package('cradlephp/cradle-system')->addMethod('template', function (
-        $type,
-        $file,
-        array $data = [],
-        $partials = [],
-        $customFileRoot  = null,
-        $customPartialsRoot = null
-    ) {
-        // get the root directory
-        $root =  $customFileRoot;
-        $partialRoot = $customPartialsRoot;
-
-        // get the root directory
-        $type = ucwords($type);
-        $originalRoot =  sprintf('%s/%s/template/', __DIR__, $type);
-
-        if (!$customFileRoot) {
-            $root = $originalRoot;
-        }
-
-        if (!$customPartialsRoot) {
-            $partialRoot =  $originalRoot;
-        }
-
-        // check for partials
-        if (!is_array($partials)) {
-            $partials = [$partials];
-        }
-
-        $paths = [];
-
-        foreach ($partials as $partial) {
-            //Sample: product_comment => product/_comment
-            //Sample: flash => _flash
-            $path = str_replace('_', '/', $partial);
-            $last = strrpos($path, '/');
-
-            if($last !== false) {
-                $path = substr_replace($path, '/_', $last, 1);
-            }
-
-            $path = $path . '.html';
-
-            if (strpos($path, '_') === false) {
-                $path = '_' . $path;
-            }
-
-            $paths[$partial] = $partialRoot . $path;
-        }
-
-        $file = $root . $file . '.html';
-
-        //render
-        return cradle('global')->template($file, $data, $paths);
     });
 };

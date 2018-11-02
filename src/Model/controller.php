@@ -9,11 +9,6 @@
 use Cradle\Module\Utility\File;
 use Cradle\Package\System\Schema;
 
-use Cradle\Http\Request;
-use Cradle\Http\Response;
-
-//Back End Controllers
-
 /**
  * Render the System Model Search Page
  *
@@ -122,30 +117,25 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
         $data['valid_relations'][] = $relation['name'];
     }
 
-    // execute webhook distribution
-    try {
-        $uri = '/admin/system/model/' . $request->getStage('schema') . '/search';
-        $webhook = [
-            'uri' => $uri,
-            'method' => 'get',
-            'json_data' => json_encode($data)
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
-    }
     //----------------------------//
     // 2. Render Template
     //set the class name
     $class = 'page-admin-system-model-search page-admin';
 
+    $template = __DIR__ . '/template';
+    if (is_dir($response->getPage('template_root'))) {
+        $template = $response->getPage('template_root');
+    }
+
+    $partials = __DIR__ . '/template';
+    if (is_dir($response->getPage('partials_root'))) {
+        $partials = $response->getPage('partials_root');
+    }
+
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
         ->template(
-            'model',
             'search',
             $data,
             [
@@ -156,8 +146,8 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
                 'search_row_format',
                 'search_row_actions'
             ],
-            $response->getPage('template_root'),
-            $response->getPage('partials_root')
+            $template,
+            $partials
         );
 
     //set content
@@ -283,21 +273,6 @@ $this->get('/admin/system/model/:schema/create', function ($request, $response) 
         return $response->setJson($data);
     }
 
-    // execute webhook distribution
-    try {
-        $uri = '/admin/system/model/' . $request->getStage('schema') . '/create';
-        $webhook = [
-            'uri' => $uri,
-            'method' => 'get',
-            'json_data' => json_encode($data)
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
-    }
-
     //----------------------------//
     // 2. Render Template
     //set the class name
@@ -312,21 +287,28 @@ $this->get('/admin/system/model/:schema/create', function ($request, $response) 
         $data['schema']['singular']
     );
 
+    $template = __DIR__ . '/template';
+    if (is_dir($response->getPage('template_root'))) {
+        $template = $response->getPage('template_root');
+    }
+
+    $partials = __DIR__ . '/template';
+    if (is_dir($response->getPage('partials_root'))) {
+        $partials = $response->getPage('partials_root');
+    }
+
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
         ->template(
-            'model',
             'form',
             $data,
             [
                 'form_fields',
-                'form_detail',
-                'form_format',
                 'form_schema',
             ],
-            $response->getPage('template_root'),
-            $response->getPage('partials_root')
+            $template,
+            $partials
         );
 
     //set content
@@ -461,21 +443,6 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
 
     $data['redirect'] = urlencode($request->getServer('REQUEST_URI'));
 
-    // execute webhook distribution
-    try {
-        $uri = '/admin/system/model/'.$request->getStage('schema').'/update/:id';
-        $webhook = [
-            'uri' => $uri,
-            'method' => 'get',
-            'json_data' => json_encode($data)
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
-    }
-
     //----------------------------//
     // 2. Render Template
     //set the class name
@@ -490,21 +457,28 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
         $data['schema']['singular']
     );
 
+    $template = __DIR__ . '/template';
+    if (is_dir($response->getPage('template_root'))) {
+        $template = $response->getPage('template_root');
+    }
+
+    $partials = __DIR__ . '/template';
+    if (is_dir($response->getPage('partials_root'))) {
+        $partials = $response->getPage('partials_root');
+    }
+
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
         ->template(
-            'model',
             'form',
             $data,
             [
                 'form_fields',
-                'form_detail',
-                'form_format',
                 'form_schema',
             ],
-            $response->getPage('template_root'),
-            $response->getPage('partials_root')
+            $template,
+            $partials
         );
 
     //set content
@@ -523,7 +497,7 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
 });
 
 /**
- * Render the System Model Update Page
+ * Render the System Model Detail Page
  *
  * @param Request $request
  * @param Response $response
@@ -535,18 +509,10 @@ $this->get('/admin/system/model/:schema/detail/:id', function ($request, $respon
     $schema = Schema::i($request->getStage('schema'));
 
     //pass the item with only the post data
-    $data = ['item' => $request->getPost()];
+    $data = [];
 
     //also pass the schema to the template
     $data['schema'] = $schema->getAll();
-
-    //if this is a return back from processing
-    //this form and it's because of an error
-    if ($response->isError()) {
-        //pass the error messages to the template
-        $response->setFlash($response->getMessage(), 'error');
-        $data['errors'] = $response->getValidation();
-    }
 
     //table_id, 1 for example
     $request->setStage(
@@ -557,7 +523,12 @@ $this->get('/admin/system/model/:schema/detail/:id', function ($request, $respon
     //get the original table row
     $this->trigger('system-model-detail', $request, $response);
 
-    //can we update ?
+    //if we only want the raw data
+    if ($request->getStage('render') === 'false') {
+        return;
+    }
+
+    //can we view ?
     if ($response->isError()) {
         //redirect
         $redirect = sprintf(
@@ -577,58 +548,36 @@ $this->get('/admin/system/model/:schema/detail/:id', function ($request, $respon
 
     $data['detail'] = $response->getResults();
 
-    //if no item
-    if (empty($data['item'])) {
-        //pass the item to the template
-        $data['item'] = $data['detail'];
+    //add suggestion value for each relation
+    foreach ($data['schema']['relations'] as $name => $relation) {
+        if ($relation['many'] > 1) {
+            continue;
+        }
 
-        //add suggestion value for each relation
-        foreach ($data['schema']['relations'] as $name => $relation) {
-            if ($relation['many'] > 1) {
+        $suggestion = '_' . $relation['primary2'];
+
+        $suggestionData = $data['detail'];
+        if ($relation['many'] == 0) {
+            if (!isset($data['detail'][$relation['name']])) {
                 continue;
             }
 
-            $suggestion = '_' . $relation['primary2'];
+            $suggestionData = $data['detail'][$relation['name']];
 
-            $suggestionData = $data['item'];
-            if ($relation['many'] == 0) {
-                if (!isset($data['item'][$relation['name']])) {
-                    continue;
-                }
-
-                $suggestionData = $data['item'][$relation['name']];
-
-                if (!$suggestionData) {
-                    continue;
-                }
+            if (!$suggestionData) {
+                continue;
             }
+        }
 
-            try {
-                $data['item'][$suggestion] = Schema::i($relation['name'])
-                    ->getSuggestionFormat($suggestionData);
-            } catch (Exception $e) {
-            }
+        try {
+            $data['detail'][$suggestion] = Schema::i($relation['name'])
+                ->getSuggestionFormat($suggestionData);
+        } catch (Exception $e) {
         }
     }
 
-    //if we only want the raw data
-    if ($request->getStage('render') === 'false') {
-        return;
-    }
-
     //determine the suggestion
-    $data['detail']['suggestion'] = $schema->getSuggestionFormat($data['item']);
-
-    //add CSRF
-    $this->trigger('csrf-load', $request, $response);
-    $data['csrf'] = $response->getResults('csrf');
-
-    //if there are file fields
-    if (!empty($data['schema']['files'])) {
-        //add CDN
-        $config = $this->package('global')->service('s3-main');
-        $data['cdn_config'] = File::getS3Client($config);
-    }
+    $data['detail']['suggestion'] = $schema->getSuggestionFormat($data['detail']);
 
     //determine valid relations
     $data['valid_relations'] = [];
@@ -638,21 +587,6 @@ $this->get('/admin/system/model/:schema/detail/:id', function ($request, $respon
     }
 
     $data['redirect'] = urlencode($request->getServer('REQUEST_URI'));
-
-    // execute webhook distribution
-    try {
-        $uri = '/admin/system/model/'.$request->getStage('schema').'/detail/:id';
-        $webhook = [
-            'uri' => $uri,
-            'method' => 'get',
-            'json_data' => json_encode($data)
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
-    }
 
     //----------------------------//
     // 2. Render Template
@@ -665,27 +599,30 @@ $this->get('/admin/system/model/:schema/detail/:id', function ($request, $respon
     // get the suggestion title
     $suggestion = $data['schema']['suggestion'];
     $handlebars = cradle('global')->handlebars();
-    $compiled = $handlebars->compile($data['schema']['suggestion'])($data['item']);
+    $compiled = $handlebars->compile($data['schema']['suggestion'])($data['detail']);
 
     //determine the title
-    $data['title'] = $this->package('global')->translate(
-        '%s Detail',
-        $compiled
-    );
+    $data['title'] = $this->package('global')->translate($compiled);
+
+    $template = __DIR__ . '/template';
+    if (is_dir($response->getPage('template_root'))) {
+        $template = $response->getPage('template_root');
+    }
+
+    $partials = __DIR__ . '/template';
+    if (is_dir($response->getPage('partials_root'))) {
+        $partials = $response->getPage('partials_root');
+    }
 
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
         ->template(
-            'model',
-            'form',
+            'detail',
             $data,
-            [
-                'form_detail',
-                'form_format',
-            ],
-            $response->getPage('template_root'),
-            $response->getPage('partials_root')
+            [],
+            $template,
+            $partials
         );
 
     //set content
@@ -890,7 +827,7 @@ $this->post('/admin/system/model/:schema/create', function ($request, $response)
     //record logs
     $this->log(
         sprintf(
-            'New %s created',
+            'created new %s',
             $schema->getSingular()
         ),
         $request,
@@ -912,21 +849,6 @@ $this->post('/admin/system/model/:schema/create', function ($request, $response)
     //if we dont want to redirect
     if ($redirect === 'false') {
         return;
-    }
-
-    // execute webhook distribution
-    try {
-        $uri = '/admin/system/model/'.$request->getStage('schema').'/create';
-        $webhook = [
-            'uri' => $uri,
-            'method' => 'post',
-            'json_data' => json_encode($response->getResults())
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
     }
 
     //add a flash
@@ -1032,7 +954,7 @@ $this->post('/admin/system/model/:schema/update/:id', function ($request, $respo
     //record logs
     $this->log(
         sprintf(
-            '%s #%s updated',
+            'updated %s #%s',
             $schema->getSingular(),
             $request->getStage('id')
         ),
@@ -1055,21 +977,6 @@ $this->post('/admin/system/model/:schema/update/:id', function ($request, $respo
     //if we dont want to redirect
     if ($redirect === 'false') {
         return;
-    }
-
-    // execute webhook distribution
-    try {
-        $uri = '/admin/system/model/'.$request->getStage('schema').'/update/:id';
-        $webhook = [
-            'uri' => $uri,
-            'method' => 'post',
-            'json_data' => json_encode($response->getResults())
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
     }
 
     //add a flash
@@ -1109,7 +1016,7 @@ $this->get('/admin/system/model/:schema/remove/:id', function ($request, $respon
         //record logs
         $this->log(
             sprintf(
-                '%s #%s removed',
+                'removed %s #%s',
                 $schema->getSingular(),
                 $request->getStage('id')
             ),
@@ -1135,27 +1042,12 @@ $this->get('/admin/system/model/:schema/remove/:id', function ($request, $respon
         return;
     }
 
-    // execute webhook distribution
-    try {
-        $uri = '/admin/system/model/'.$request->getStage('schema').'/remove/:id';
-        $webhook = [
-            'uri' => $uri,
-            'method' => 'get',
-            'json_data' => json_encode($response->getResults())
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
-    }
-
     if ($response->isError()) {
         //add a flash
         $this->package('global')->flash($response->getMessage(), 'error');
     } else {
         //add a flash
-        $message = $this->package('global')->translate('%s was Removed', $schema->getSingular());
+        $message = sprintf('%s was Removed', $schema->getSingular());
         $this->package('global')->flash($message, 'success');
     }
 
@@ -1190,7 +1082,7 @@ $this->get('/admin/system/model/:schema/restore/:id', function ($request, $respo
         //record logs
         $this->log(
             sprintf(
-                '%s #%s restored',
+                'restored %s #%s',
                 $schema->getSingular(),
                 $request->getStage('id')
             ),
@@ -1216,27 +1108,12 @@ $this->get('/admin/system/model/:schema/restore/:id', function ($request, $respo
         return;
     }
 
-    // execute webhook distribution
-    try {
-        $uri = '/admin/system/model/'.$request->getStage('schema').'/restore/:id';
-        $webhook = [
-            'uri' => $uri,
-            'method' => 'get',
-            'json_data' => json_encode($response->getResults())
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
-    }
-
     if ($response->isError()) {
         //add a flash
         $this->package('global')->flash($response->getMessage(), 'error');
     } else {
         //add a flash
-        $message = $this->package('global')->translate('%s was Restored', $schema->getSingular());
+        $message = sprintf('%s was Restored', $schema->getSingular());
         $this->package('global')->flash($message, 'success');
     }
 
@@ -1317,7 +1194,7 @@ $this->post('/admin/system/model/:schema/import', function ($request, $response)
     //record logs
     $this->log(
         sprintf(
-            '%s was Imported',
+            'imported %s',
             $schema->getPlural()
         ),
         $request,
@@ -1325,27 +1202,10 @@ $this->post('/admin/system/model/:schema/import', function ($request, $response)
     );
 
     //add a flash
-    $message = $this->package('global')->translate(sprintf(
+    $message = $this->package('global')->translate(
         '%s was Imported',
         $schema->getPlural()
-    ), 'success');
-
-    if ($request->getStage('render') != 'false') {
-        // execute webhook distribution
-        try {
-            $uri = '/admin/system/model/'.$request->getStage('schema').'/import';
-            $webhook = [
-                'uri' => $uri,
-                'method' => 'post',
-                'json_data' => json_encode($response->getResults())
-            ];
-
-            $this
-                ->package('cradlephp/cradle-queue')
-                ->queue('webhook-distribution', $webhook);
-        } catch (Exception $e) {
-    }
-    }
+    );
 
     //Set JSON Content
     return $response->setContent(json_encode([
@@ -1749,13 +1609,29 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
         ->translate('%s Calendar', $data['schema']['plural']);
 
     $class = sprintf(
-            'page-admin-%s-calendar page-admin-calendar page-admin',
-            $data['schema']['name']
-        );
+        'page-admin-%s-calendar page-admin-calendar page-admin',
+        $data['schema']['name']
+    );
+
+    $template = __DIR__ . '/template';
+    if (is_dir($response->getPage('template_root'))) {
+        $template = $response->getPage('template_root');
+    }
+
+    $partials = __DIR__ . '/template';
+    if (is_dir($response->getPage('partials_root'))) {
+        $partials = $response->getPage('partials_root');
+    }
 
     $body = $this
         ->package('cradlephp/cradle-system')
-        ->template('model', 'calendar', $data);
+        ->template(
+            'calendar',
+            $data,
+            [],
+            $template,
+            $partials
+        );
 
     // set content
     $response
@@ -1770,371 +1646,4 @@ $this->get('/admin/system/model/:schema/calendar', function ($request, $response
 
     //Render blank page
     $this->trigger('admin-render-page', $request, $response);
-});
-
-//Front End Controllers
-
-/**
- * Render the System Model Search Page
- *
- * @param Request $request
- * @param Response $response
- */
-$this->get('/system/model/:schema/search', function ($request, $response) {
-    //----------------------------//
-    // get json data only
-    $request->setStage('render', 'false');
-
-    //now let the original search take over
-    $this->routeTo(
-        'get',
-        sprintf(
-            '/admin/system/model/%s/search',
-            $request->getStage('schema')
-        ),
-        $request,
-        $response
-    );
-
-    // if successful, execute webhook distribution
-    if (!$response->isError()) {
-        try {
-            $uri = '/system/model/'.$request->getStage('schema').'/search';
-            $webhook = [
-                'uri' => $uri,
-                'method' => 'get',
-                'json_data' => json_encode($response->getResults())
-            ];
-
-            $this
-                ->package('cradlephp/cradle-queue')
-                ->queue('webhook-distribution', $webhook);
-        } catch (Exception $e) {
-        }
-    }
-});
-
-/**
- * Render the System Model Create Page
- *
- * @param Request $request
- * @param Response $response
- */
-$this->get('/system/model/:schema/create', function ($request, $response) {
-    //----------------------------//
-    // get json data only
-    $request->setStage('render', 'false');
-
-    //now let the original create take over
-    $this->routeTo(
-        'get',
-        sprintf(
-            '/admin/system/model/%s/create',
-            $request->getStage('schema')
-        ),
-        $request,
-        $response
-    );
-
-    // if successful, execute webhook distribution
-    if (!$response->isError()) {
-        try {
-            $uri = '/system/model/'.$request->getStage('schema').'/create';
-            $webhook = [
-                'uri' => $uri,
-                'method' => 'get',
-                'json_data' => json_encode($response->getResults())
-            ];
-
-            $this
-                ->package('cradlephp/cradle-queue')
-                ->queue('webhook-distribution', $webhook);
-        } catch (Exception $e) {
-        }
-    }
-});
-
-/**
- * Render the System Model Update Page
- *
- * @param Request $request
- * @param Response $response
- */
-$this->get('/system/model/:schema/update/:id', function ($request, $response) {
-    //----------------------------//
-    // get json response data only
-    $request->setStage('render', 'false');
-
-    //now let the original update take over
-    $this->routeTo(
-        'get',
-        sprintf(
-            '/admin/system/model/%s/update/%s',
-            $request->getStage('schema'),
-            $request->getStage('id')
-        ),
-        $request,
-        $response
-    );
-
-    // if successful, execute webhook distribution
-    if (!$response->isError()) {
-        try {
-            $uri = '/system/model/'.$request->getStage('schema').'/update/:id';
-            $webhook = [
-                'uri' => $uri,
-                'method' => 'get',
-                'json_data' => json_encode($response->getResults())
-            ];
-
-            $this
-                ->package('cradlephp/cradle-queue')
-                ->queue('webhook-distribution', $webhook);
-        } catch (Exception $e) {
-        }
-    }
-});
-
-/**
- * Process the System Model Search Actions
- *
- * @param Request $request
- * @param Response $response
- */
-$this->post('/system/model/:schema/search', function ($request, $response) {
-    //----------------------------//
-    // get json response data only
-    $request->setStage('redirect_uri', 'false');
-
-    //now let the original post search take over
-    $this->routeTo(
-        'post',
-        sprintf(
-            '/admin/system/model/%s/search',
-            $request->getStage('schema')
-        ),
-        $request,
-        $response
-    );
-});
-
-/**
- * Process the System Model Create Page
- *
- * @param Request $request
- * @param Response $response
- */
-$this->post('/system/model/:schema/create', function ($request, $response) {
-    //----------------------------//
-    // get json response data only
-    $request->setStage('redirect_uri', 'false');
-
-    //now let the original post create take over
-    $this->routeTo(
-        'post',
-        sprintf(
-            '/admin/system/model/%s/create',
-            $request->getStage('schema')
-        ),
-        $request,
-        $response
-    );
-
-    // if successful, execute webhook distribution
-    if (!$response->isError()) {
-        try {
-            $uri = '/system/model/'.$request->getStage('schema').'/create';
-            $webhook = [
-                'uri' => $uri,
-                'method' => 'post',
-                'json_data' => json_encode($response->getResults())
-            ];
-
-            $this
-                ->package('cradlephp/cradle-queue')
-                ->queue('webhook-distribution', $webhook);
-        } catch (Exception $e) {
-        }
-    }
-});
-
-/**
- * Process the System Model Update Page
- *
- * @param Request $request
- * @param Response $response
- */
-$this->post('/system/model/:schema/update/:id', function ($request, $response) {
-    //----------------------------//
-    // get json response data only
-    $request->setStage('redirect_uri', 'false');
-
-    //now let the original post update take over
-    $this->routeTo(
-        'post',
-        sprintf(
-            '/admin/system/model/%s/update/%s',
-            $request->getStage('schema'),
-            $request->getStage('id')
-        ),
-        $request,
-        $response
-    );
-
-    // if successful, execute webhook distribution
-    if (!$response->isError()) {
-        try {
-            $uri = '/system/model/'.$request->getStage('schema').'/update/:id';
-            $webhook = [
-                'uri' => $uri,
-                'method' => 'post',
-                'json_data' => json_encode($response->getResults())
-            ];
-
-            $this
-                ->package('cradlephp/cradle-queue')
-                ->queue('webhook-distribution', $webhook);
-        } catch (Exception $e) {
-        }
-    }
-});
-
-/**
- * Process the System Model Remove
- *
- * @param Request $request
- * @param Response $response
- */
-$this->get('/system/model/:schema/remove/:id', function ($request, $response) {
-    //----------------------------//
-    // get json response data only
-    $request->setStage('redirect_uri', 'false');
-
-    //now let the original remove take over
-    $this->routeTo(
-        'get',
-        sprintf(
-            '/admin/system/model/%s/remove/%s',
-            $request->getStage('schema'),
-            $request->getStage('id')
-        ),
-        $request,
-        $response
-    );
-
-    // if successful, execute webhook distribution
-    if (!$response->isError()) {
-        try {
-            $uri = '/system/model/'.$request->getStage('schema').'/remove/:id';
-            $webhook = [
-                'uri' => $uri,
-                'method' => 'get',
-                'json_data' => json_encode($response->getResults())
-            ];
-
-            $this
-                ->package('cradlephp/cradle-queue')
-                ->queue('webhook-distribution', $webhook);
-        } catch (Exception $e) {
-        }
-    }
-});
-
-/**
- * Process the System Model Restore
- *
- * @param Request $request
- * @param Response $response
- */
-$this->get('/system/model/:schema/restore/:id', function ($request, $response) {
-    //----------------------------//
-    // get json response data only
-    $request->setStage('redirect_uri', 'false');
-
-    //now let the original restore take over
-    $this->routeTo(
-        'get',
-        sprintf(
-            '/admin/system/model/%s/restore/%s',
-            $request->getStage('schema'),
-            $request->getStage('id')
-        ),
-        $request,
-        $response
-    );
-
-    // if successful, execute webhook distribution
-    if (!$response->isError()) {
-        try {
-            $uri = '/system/model/'.$request->getStage('schema').'/restore/:id';
-            $webhook = [
-                'uri' => $uri,
-                'method' => 'get',
-                'json_data' => json_encode($response->getResults())
-            ];
-
-            $this
-                ->package('cradlephp/cradle-queue')
-                ->queue('webhook-distribution', $webhook);
-        } catch (Exception $e) {
-        }
-    }
-});
-
-/**
- * Process Object Import
- *
- * @param Request $request
- * @param Response $response
- */
-$this->post('/system/model/:schema/import', function ($request, $response) {
-    $request->setStage('render', 'false');
-    //----------------------------//
-    //trigger original import route
-    $this->routeTo(
-        'post',
-        sprintf(
-            '/admin/system/model/%s/import',
-            $request->getStage('schema')
-        ),
-        $request,
-        $response
-    );
-
-    // execute webhook distribution
-    try {
-        $uri = '/system/model/'.$request->getStage('schema').'/import';
-        $webhook = [
-            'uri' => $uri,
-            'method' => 'post',
-            'json_data' => json_encode($response->getResults())
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
-
-    }
-});
-
-/**
- * Process Object Export
- *
- * @param Request $request
- * @param Response $response
- */
-$this->get('/system/model/:schema/export/:type', function ($request, $response) {
-    //----------------------------//
-    //trigger original export route
-    $this->routeTo(
-        'get',
-        sprintf(
-            '/admin/system/model/%s/export/%s',
-            $request->getStage('schema'),
-            $request->getStage('type')
-        ),
-        $request,
-        $response
-    );
 });

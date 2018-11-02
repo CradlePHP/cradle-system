@@ -9,9 +9,6 @@
 use Cradle\Package\System\Schema\Validator;
 use Cradle\Package\System\Schema;
 
-use Cradle\Http\Request;
-use Cradle\Http\Response;
-
 /**
  * System Schema Create Job
  *
@@ -177,18 +174,24 @@ $this->on('system-schema-remove', function ($request, $response) {
     //this/these will be used a lot
     $systemSql = $schema->service('sql');
 
+    $restorable = true;
+    if($request->getStage('mode') === 'permanent') {
+        $restorable = false;
+    }
+
     try {
         //remove table
-        $results = $systemSql->remove($data);
+        $results = $systemSql->remove($data, $restorable);
     } catch (\Exception $e) {
         return $response->setError(true, $e->getMessage());
     }
 
     $path = $this->package('global')->path('schema') . '/' . $table . '.php';
 
-    if (file_exists($path)) {
+    if(!$restorable) {
+        unlink($path);
+    } else if (file_exists($path)) {
         $new = $this->package('global')->path('schema') . '/_' . $table . '.php';
-
         rename($path, $new);
     }
 

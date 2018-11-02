@@ -153,6 +153,10 @@ class SqlService
             return $results;
         }
 
+        //we need to update the real key and id
+        $key = $this->schema->getPrimaryFieldName();
+        $id = $results[$key];
+
         foreach ($fields as $field) {
             if (isset($results[$field]) && $results[$field]) {
                 $results[$field] = json_decode($results[$field], true);
@@ -404,10 +408,6 @@ class SqlService
             $span = $data['span'];
         }
 
-        if (isset($data['in_filter']) && is_array($data['in_filter'])) {
-            $in = $data['in_filter'];
-        }
-
         if (isset($data['range']) && is_numeric($data['range'])) {
             $range = $data['range'];
         }
@@ -429,57 +429,60 @@ class SqlService
             $filter[$active] = 1;
         }
 
+        $table = $this->schema->getName();
         $search = $this->resource
-            ->search($this->schema->getName())
-            ->setStart($start)
-            ->setRange($range);
+            ->search($table)
+            ->setStart($start);
+
+        if ($range) {
+            $search->setRange($range);
+        }
 
         // get json fields
         $fields = $this->schema->getJsonFieldNames();
 
-        //get 1:1 relations
-        $relations = $this->schema->getRelations(1);
-        foreach ($relations as $table => $relation) {
+        //consider forward relations
+        $relations = $this->schema->getRelations();
+        foreach ($relations as $joinTable => $relation) {
             //deal with post_post at a later time
-            if ($relation['name'] === $this->schema->getName()) {
+            if ($table === $relation['name']) {
                 continue;
             }
 
-            $search
-                ->innerJoinUsing(
-                    $table,
-                    $relation['primary1']
-                )
-                ->innerJoinUsing(
-                    $relation['name'],
-                    $relation['primary2']
-                );
+            //1:1
+            if ($relation['many'] == 1) {
+                $search
+                    ->innerJoinUsing(
+                        $joinTable,
+                        $relation['primary1']
+                    )
+                    ->innerJoinUsing(
+                        $relation['name'],
+                        $relation['primary2']
+                    );
+            //needs to have a filter to add the other kinds of joins
+            } else if (!isset($filter[$relation['primary2']])) {
+                continue;
+            //1:0, 1:N, N:N
+            } else {
+                $search
+                    ->innerJoinUsing(
+                        $joinTable,
+                        $relation['primary1']
+                    )
+                    ->innerJoinUsing(
+                        $relation['name'],
+                        $relation['primary2']
+                    );
+            }
 
             $relatedJson = Schema::i($relation['name'])->getJsonFieldNames();
             $fields = array_merge($fields, $relatedJson);
         }
 
-        //get N:N relations
-        $relations = $this->schema->getRelations(3);
-        foreach ($relations as $table => $relation) {
-            //deal with post_post at a later time
-            if ($relation['name'] === $this->schema->getName()) {
-                continue;
-            }
-
-            if (!isset($filter[$relation['primary2']])) {
-                continue;
-            }
-
-            $search->innerJoinUsing(
-                $table,
-                $relation['primary1']
-            );
-        }
-
-        //get 1:N reverse relations
-        $relations = $this->schema->getReverseRelations(2);
-        foreach ($relations as $table => $relation) {
+        //consider reverse relations
+        $relations = $this->schema->getReverseRelations();
+        foreach ($relations as $joinTable => $relation) {
             //deal with post_post at a later time
             if ($relation['source']['name'] === $relation['name']) {
                 continue;
@@ -490,29 +493,18 @@ class SqlService
                 continue;
             }
 
-            $search->innerJoinUsing(
-                $table,
-                $relation['primary2']
-            );
-        }
+            $search
+                ->innerJoinUsing(
+                    $joinTable,
+                    $relation['primary2']
+                )
+                ->innerJoinUsing(
+                    $relation['source']['name'],
+                    $relation['primary1']
+                );
 
-        //get N:N reverse relations
-        $relations = $this->schema->getReverseRelations(3);
-        foreach ($relations as $table => $relation) {
-            //deal with post_post at a later time
-            if ($relation['source']['name'] === $relation['name']) {
-                continue;
-            }
-
-            //if filter primary is not set
-            if (!isset($filter[$relation['primary1']])) {
-                continue;
-            }
-
-            $search->innerJoinUsing(
-                $table,
-                $relation['primary2']
-            );
+            $relatedJson = Schema::i($relation['source']['name'])->getJsonFieldNames();
+            $fields = array_merge($fields, $relatedJson);
         }
 
         //now deal with post_post

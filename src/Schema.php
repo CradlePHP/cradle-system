@@ -417,11 +417,15 @@ class Schema extends Registry
         $results = [];
         $name = $this->getName();
 
-        $response = Response::i()->load();
-        $request = Request::i()->load();
+        $payload = cradle()->makePayload();
 
-        cradle()->trigger('system-schema-search', $request, $response);
-        $rows = $response->getResults('rows');
+        cradle()->trigger(
+            'system-schema-search',
+            $payload['request'],
+            $payload['response']
+        );
+
+        $rows = $payload['response']->getResults('rows');
 
         if (empty($rows)) {
             return $results;
@@ -584,6 +588,12 @@ class Schema extends Registry
         $table = $this->data['name'];
         foreach ($this->data['fields'] as $field) {
             $name = $table . '_' . $field['name'];
+
+            if ($field['field']['type'] === 'uuid') {
+                $results[] = $name;
+                continue;
+            }
+
             if (!isset($field['validation'])) {
                 continue;
             }

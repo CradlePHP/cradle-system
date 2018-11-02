@@ -1,0 +1,273 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/admin">
+                <i class="fas fa-home"></i> {{_ 'Admin'}}
+            </a>
+        </li>
+        {{#if relation.suggestion}}
+            <li class="breadcrumb-item">
+                <a href="/admin/system/model/{{relation.schema.name}}/search">
+                    <i class="{{relation.schema.icon}}"></i> {{relation.schema.plural}}
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="/admin/system/model/{{relation.schema.name}}/update/{{scope relation.data relation.schema.primary}}">
+                    {{relation.suggestion}}
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="/admin/system/model/{{schema.name}}/search/{{relation.schema.name}}/{{scope relation.data relation.schema.primary}}">
+                    <i class="fas fa-{{schema.icon}}"></i> {{schema.plural}}
+                </a>
+            </li>
+        {{else}}
+            <li class="breadcrumb-item">
+                <a href="/admin/system/model/{{schema.name}}/search">
+                    <i class="fas fa-{{schema.icon}}"></i> {{schema.plural}}
+                </a>
+            </li>
+        {{/if}}
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="fas fa-eye"></i> {{title}}
+        </li>
+    </ol>
+</nav>
+
+<div class="main-padding">
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="box">
+                <div class="box-head box-default">
+                    <div class="box-title">{{detail.suggestion}}</div>
+                </div>
+                <div class="box-body box-padding">
+                    <table class="table table-striped">
+                        <tbody>
+                            {{#format schema detail 'detail'}}
+                                {{#otherwise format '===' 'hide'}}
+                                    <tr>
+                                        <td><strong>{{label}}</strong></td>
+                                        {{#when format '===' 'none'}}
+                                            <td>
+                                                {{#is_array value}}
+                                                    {{_ 'Array'}}
+                                                {{else}}
+                                                    {{~value~}}
+                                                {{/is_array}}
+                                            </td>
+                                        {{/when}}
+                                        {{#when format '===' 'lower'}}
+                                            <td>{{lower value}}</td>
+                                        {{/when}}
+                                        {{#when format '===' 'upper'}}
+                                            <td>{{upper value}}</td>
+                                        {{/when}}
+                                        {{#when format '===' 'capital'}}
+                                            <td>{{capital value}}</td>
+                                        {{/when}}
+                                        {{#when format '===' 'length'}}
+                                            <td>{{chars value parameters}}</td>
+                                        {{/when}}
+                                        {{#when format '===' 'words'}}
+                                            <td>{{words value parameters}}</td>
+                                        {{/when}}
+                                        {{#when format '===' 'html'}}
+                                            <td>{{{value}}}</td>
+                                        {{/when}}
+                                        {{#when format '===' 'markdown'}}
+                                            <td>{{{markdown value}}}</td>
+                                        {{/when}}
+                                        {{#when format '===' 'number'}}
+                                            <td>{{number value}}</td>
+                                        {{/when}}
+                                        {{#when format '===' 'price'}}
+                                            <td>{{price value}}</td>
+                                        {{/when}}
+                                        {{#when format '===' 'yes'}}
+                                            <td>{{#if value}}Yes{{else}}No{{/if}}</td>
+                                        {{/when}}
+                                        {{#when format '===' 'date'}}
+                                            <td>
+                                                {{#if value}}
+                                                    {{date value parameters}}
+                                                {{else}}
+                                                    &nbsp;
+                                                {{/if}}
+                                            </td>
+                                        {{/when}}
+                                        {{#when format '===' 'relative'}}
+                                            <td>
+                                                {{#if value}}
+                                                    {{relative value parameters}}
+                                                {{else}}
+                                                    &nbsp;
+                                                {{/if}}
+                                            </td>
+                                        {{/when}}
+                                        {{#when format '===' 'strip'}}
+                                            <td>{{{strip value parameters}}}</td>
+                                        {{/when}}
+                                        {{#when format '===' 'link'}}
+                                            <td><a href="{{compile parameters.0 ../detail}}">{{compile parameters.1 ../detail}}</a></td>
+                                        {{/when}}
+                                        {{#when format '===' 'image'}}
+                                            <td><img src="{{value}}" width="{{parameters.0}}" height="{{parameters.1}}" /></td>
+                                        {{/when}}
+                                        {{#when format '===' 'email'}}
+                                            <td><a href="mailto:{{value}}">{{compile parameters ../detail}}</a></td>
+                                        {{/when}}
+                                        {{#when format '===' 'phone'}}
+                                            <td><a href="tel:{{value}}">{{compile parameters ../detail}}</a></td>
+                                        {{/when}}
+                                        {{#when format '===' 'custom'}}
+                                            <td>{{{compile parameters ../detail}}}</td>
+                                        {{/when}}
+                                        {{#when format '===' 'comma'}}
+                                            <td>{{join value ','}}</td>
+                                        {{/when}}
+                                        {{#when format '===' 'space'}}
+                                            <td>{{join value ' '}}</td>
+                                        {{/when}}
+                                        {{#when format '===' 'nl'}}
+                                            <td>
+                                                {{#each value}}
+                                                    {{this}}
+                                                    {{#unless @last}}<br />{{/unless}}
+                                                {{/each}}
+                                            </td>
+                                        {{/when}}
+                                        {{#when format '===' 'ul'}}
+                                            <td>
+                                                <ul>
+                                                    {{#each value}}
+                                                        <li>{{this}}</li>
+                                                    {{/each}}
+                                                </ul>
+                                            </td>
+                                        {{/when}}
+                                        {{#when format '===' 'ol'}}
+                                            <td>
+                                                <ol>
+                                                    {{#each value}}
+                                                        <li>{{this}}</li>
+                                                    {{/each}}
+                                                </ol>
+                                            </td>
+                                        {{/when}}
+                                        {{#when format '===' 'meta'}}
+                                            <td>
+                                                <ul class="meta-list">
+                                                    {{#each value}}
+                                                        <li>
+                                                            <span class="key">{{@key}}</span> :
+                                                            <span class="value">{{this}}</span>
+                                                        </li>
+                                                    {{/each}}
+                                                </ul>
+                                            </td>
+                                        {{/when}}
+                                        {{#when format '===' 'tag'}}
+                                            <td>
+                                                {{#each value}}
+                                                    <div class="badge badge-orange">{{this}}</div>
+                                                {{/each}}
+                                            </td>
+                                        {{/when}}
+                                        {{#when format '===' 'jsonpretty'}}
+                                            <td>{{{json_pretty value}}}</td>
+                                        {{/when}}
+                                        {{#when format '===' 'formula'}}
+                                            <td>
+                                                {{formula parameters ../detail}}
+                                            </td>
+                                        {{/when}}
+                                    </tr>
+                                {{/otherwise}}
+                            {{/format}}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="box-foot box-light">
+                    <div class="box-left">
+                        <a
+                            href="/admin/system/model/{{schema.name}}/update/{{scope detail schema.primary}}?redirect_uri={{redirecturl}}"
+                            class="btn btn-grey"
+                        >
+                            <i class="fa fa-edit"></i> {{_ 'Edit %s' schema.singular}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{#if schema.relations.length}}
+            <div class="col-sm-4">
+                <div class="box">
+                    <div class="box-head box-light">
+                        <div class="box-title">{{_ 'Relations'}}</div>
+                    </div>
+                    <div class="box-body box-padding">
+                        <table class="table table-striped">
+                            <tbody>
+                                {{#relations schema.name 0}}
+                                    {{#has ../detail name}}
+                                        {{#scope ../detail name}}
+                                            <tr>
+                                                <td>{{../singular}}</td>
+                                                <td>
+                                                    <a href="/admin/system/model/{{../name}}/detail/{{scope this ../primary}}">
+                                                        {{suggest ../this this}}
+                                                    </a>
+                                                    &nbsp;&nbsp;
+                                                    <a
+                                                        class="text-pink remove"
+                                                        href="/admin/system/model/{{../../schema.name}}/{{scope ../../item ../../schema.primary}}/unlink/{{../name}}/{{scope this ../primary}}?redirect_uri={{../../redirect}}"
+                                                        title="Remove {{../singular}}"
+                                                    >
+                                                        <i class="fa fa-unlink"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {{/scope}}
+                                    {{/has}}
+                                {{/relations}}
+                                {{#relations schema.name 1}}
+                                    {{#has ../detail primary}}
+                                        <tr>
+                                            <td>{{singular}}</td>
+                                            <td>
+                                                <a href="/admin/system/model/{{name}}/detail/{{scope ../detail primary}}">
+                                                    {{suggest this ../detail}}
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {{/has}}
+                                {{/relations}}
+                                {{#relations schema.name 2}}
+                                    <tr>
+                                        <td>{{singular}}</td>
+                                        <td>
+                                            <a href="/admin/system/model/{{../schema.name}}/{{scope ../detail ../schema.primary}}/search/{{name}}">
+                                                {{_ 'View All %s' plural}}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {{/relations}}
+                                {{#relations schema.name 3}}
+                                    <tr>
+                                        <td>{{singular}}</td>
+                                        <td>
+                                            <a href="/admin/system/model/{{../schema.name}}/{{scope ../detail ../schema.primary}}/search/{{name}}">
+                                                {{_ 'View All %s' plural}}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {{/relations}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {{/if}}
+    </div>
+</div>

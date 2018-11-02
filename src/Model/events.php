@@ -9,9 +9,6 @@
 use Cradle\Package\System\Schema;
 use Cradle\Package\System\Exception;
 
-use Cradle\Http\Request;
-use Cradle\Http\Response;
-
 /**
  * System Model Create Job
  *
@@ -61,11 +58,7 @@ $this->on('system-model-create', function ($request, $response) {
     $data = $schema
         ->model()
         ->formatter()
-        ->formatData(
-            $data,
-            $this->package('global')->service('s3-main'),
-            $this->package('global')->path('upload')
-        );
+        ->formatData($data);
 
     //----------------------------//
     // 4. Process Data
@@ -418,11 +411,7 @@ $this->on('system-model-update', function ($request, $response) {
     $data = $schema
         ->model()
         ->formatter()
-        ->formatData(
-            $data,
-            $this->package('global')->service('s3-main'),
-            $this->package('global')->path('upload')
-        );
+        ->formatData($data);
 
     //----------------------------//
     // 4. Process Data
@@ -603,24 +592,32 @@ $this->on('system-model-import', function ($request, $response) {
             unset($row[$updated]);
         }
 
-        $rowRequest = Request::i()
+        $payload = $this->makePayload();
+
+        $payload['request']
             ->setStage($row)
             ->setStage('schema', $data['schema']);
 
-        $rowResponse = Response::i()->load();
+        $this->trigger(
+            'system-model-detail',
+            $payload['request'],
+            $payload['response']
+        );
 
-        $this->trigger('system-model-detail', $rowRequest, $rowResponse);
-
-        if ($rowResponse->hasResults()) {
+        if ($payload['response']->hasResults()) {
             // trigger single object update event
-            $this->trigger('system-model-update', $rowRequest, $rowResponse);
+            $this->trigger(
+                'system-model-update',
+                $payload['request'],
+                $payload['response']
+            );
 
             // check response if there is an error
-            if ($rowResponse->isError()) {
+            if ($payload['response']->isError()) {
                 $results['data'][$i] = [
                     'action' => 'update',
                     'row' => [],
-                    'error' => $rowResponse->getMessage()
+                    'error' => $payload['response']->getMessage()
                 ];
                 continue;
             }
@@ -628,7 +625,7 @@ $this->on('system-model-import', function ($request, $response) {
             //increment old counter
             $results['data'][$i] = [
                 'action' => 'update',
-                'row' => $rowResponse->getResults(),
+                'row' => $payload['response']->getResults(),
                 'error' => false
             ];
 
@@ -637,14 +634,18 @@ $this->on('system-model-import', function ($request, $response) {
         }
 
         // trigger single object update event
-        $this->trigger('system-model-create', $rowRequest, $rowResponse);
+        $this->trigger(
+            'system-model-create',
+            $payload['request'],
+            $payload['response']
+        );
 
         // check response if there is an error
-        if ($rowResponse->isError()) {
+        if ($payload['response']->isError()) {
             $results['data'][$i] = [
                 'action' => 'create',
                 'row' => [],
-                'error' => $rowResponse->getMessage()
+                'error' => $payload['response']->getMessage()
             ];
             continue;
         }
@@ -652,17 +653,16 @@ $this->on('system-model-import', function ($request, $response) {
         //increment old counter
         $results['data'][$i] = [
             'action' => 'create',
-            'row' => $rowResponse->getResults(),
+            'row' => $payload['response']->getResults(),
             'error' => false
         ];
 
         if (!empty($schema2)) {
             //for linking relation
-            $linkRequest = Request::i()
+            $payload = $this->makePayload();
+            $payload['request']
                 ->setStage('schema2', $schema->getName())
                 ->setStage('schema1', $schema2->getName());
-
-            $linkResponse = Response::i()->load();
 
             //so it must have been successful
             //lets link the tables now
@@ -675,12 +675,17 @@ $this->on('system-model-import', function ($request, $response) {
             }
 
             //set the stage to link
-            $linkRequest
-                ->setStage($primary1, $rowResponse->getResults($schema->getPrimaryFieldName()))
+            $payload['request']
+                ->setStage(
+                    $primary1,
+                    $payload['response']->getResults(
+                        $schema->getPrimaryFieldName()
+                    )
+                )
                 ->setStage($primary2, $request->getStage('id'));
 
             //now link it
-            $this->trigger('system-relation-link', $linkRequest, $linkResponse);
+            $this->trigger('system-relation-link', $payload['request'], $payload['response']);
         }
 
         $results['new'] ++;

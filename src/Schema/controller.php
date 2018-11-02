@@ -41,15 +41,24 @@ $this->get('/admin/system/schema/search', function ($request, $response) {
     $class = 'page-admin-system-schema-search page-admin';
     $data['title'] = $this->package('global')->translate('System Schemas');
 
+    $template = __DIR__ . '/template';
+    if (is_dir($response->getPage('template_root'))) {
+        $template = $response->getPage('template_root');
+    }
+
+    $partials = __DIR__ . '/template';
+    if (is_dir($response->getPage('partials_root'))) {
+        $partials = $response->getPage('partials_root');
+    }
+
     $body = $this
         ->package('cradlephp/cradle-system')
         ->template(
-            'schema',
             'search',
             $data,
             [],
-            $response->getPage('template_root'),
-            $response->getPage('partials_root')
+            $template,
+            $partials
         );
 
     //set content
@@ -61,20 +70,6 @@ $this->get('/admin/system/schema/search', function ($request, $response) {
     //if we only want the body
     if ($request->getStage('render') === 'body') {
         return;
-    }
-
-    // execute webhook distribution
-    try {
-        $webhook = [
-            'uri' => '/admin/system/schema/search',
-            'method' => 'get',
-            'json_data' => json_encode($data)
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
     }
 
     //render page
@@ -141,11 +136,20 @@ $this->get('/admin/system/schema/create', function ($request, $response) {
             return $option['inverse']();
         });
 
+    $template = __DIR__ . '/template';
+    if (is_dir($response->getPage('template_root'))) {
+        $template = $response->getPage('template_root');
+    }
+
+    $partials = __DIR__ . '/template';
+    if (is_dir($response->getPage('partials_root'))) {
+        $partials = $response->getPage('partials_root');
+    }
+
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
         ->template(
-            'schema',
             'form',
             $data,
             [
@@ -163,27 +167,13 @@ $this->get('/admin/system/schema/create', function ($request, $response) {
                 'options_validation',
                 'options_icon'
             ],
-            $response->getPage('template_root'),
-            $response->getPage('partials_root')
+            $template,
+            $partials
         );
 
     //if we only want the body
     if ($request->getStage('render') === 'body') {
         return;
-    }
-
-    // execute webhook distribution
-    try {
-        $webhook = [
-            'uri' => '/admin/system/schema/create',
-            'method' => 'get',
-            'json_data' => json_encode($data)
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
     }
 
     //set content
@@ -243,20 +233,6 @@ $this->get('/admin/system/schema/update/:name', function ($request, $response) {
         return;
     }
 
-    // execute webhook distribution
-    try {
-        $webhook = [
-            'uri' => '/admin/system/schema/update/:name',
-            'method' => 'get',
-            'json_data' => json_encode($data)
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
-    }
-
     //add CSRF
     $this->trigger('csrf-load', $request, $response);
     $data['csrf'] = $response->getResults('csrf');
@@ -283,11 +259,20 @@ $this->get('/admin/system/schema/update/:name', function ($request, $response) {
             return $option['inverse']();
         });
 
+    $template = __DIR__ . '/template';
+    if (is_dir($response->getPage('template_root'))) {
+        $template = $response->getPage('template_root');
+    }
+
+    $partials = __DIR__ . '/template';
+    if (is_dir($response->getPage('partials_root'))) {
+        $partials = $response->getPage('partials_root');
+    }
+
     //render the body
     $body = $this
         ->package('cradlephp/cradle-system')
         ->template(
-            'schema',
             'form',
             $data,
             [
@@ -305,8 +290,8 @@ $this->get('/admin/system/schema/update/:name', function ($request, $response) {
                 'options_validation',
                 'options_icon'
             ],
-            $response->getPage('template_root'),
-            $response->getPage('partials_root')
+            $template,
+            $partials
         );
 
     //if we only want the body
@@ -381,25 +366,11 @@ $this->post('/admin/system/schema/create', function ($request, $response) {
         return;
     }
 
-    // execute webhook distribution
-    try {
-        $webhook = [
-            'uri' => '/admin/system/schema/create',
-            'method' => 'post',
-            'json_data' => json_encode($response->getResults())
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
-    }
-
     //record logs
     $this->log(
         sprintf(
-            '%s schema created',
-            ucfirst($request->getStage('name'))
+            'created schema: %s',
+            $request->getStage('singular')
         ),
         $request,
         $response
@@ -473,8 +444,8 @@ $this->post('/admin/system/schema/update/:name', function ($request, $response) 
     //record logs
     $this->log(
         sprintf(
-            '%s schema updated',
-            ucfirst($request->getStage('name'))
+            'updated schema: %s',
+            $request->getStage('singular')
         ),
         $request,
         $response
@@ -492,20 +463,6 @@ $this->post('/admin/system/schema/update/:name', function ($request, $response) 
     //if we dont want to redirect
     if ($redirect === 'false') {
         return;
-    }
-
-    // execute webhook distribution
-    try {
-        $webhook = [
-            'uri' => '/admin/system/schema/update/:name',
-            'method' => 'post',
-            'json_data' => json_encode($response->getResults())
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
     }
 
     //it was good
@@ -546,20 +503,6 @@ $this->get('/admin/system/schema/remove/:name', function ($request, $response) {
         return;
     }
 
-    // execute webhook distribution
-    try {
-        $webhook = [
-            'uri' => '/admin/system/schema/remove/:name',
-            'method' => 'get',
-            'json_data' => json_encode($response->getResults())
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
-    }
-
     if ($response->isError()) {
         //add a flash
         $this->package('global')->flash($response->getMessage(), 'error');
@@ -571,8 +514,8 @@ $this->get('/admin/system/schema/remove/:name', function ($request, $response) {
         //record logs
         $this->log(
             sprintf(
-                '%s schema removed',
-                ucfirst($request->getStage('name'))
+                'removed schema: %s',
+                $request->getStage('name')
             ),
             $request,
             $response
@@ -612,20 +555,6 @@ $this->get('/admin/system/schema/restore/:name', function ($request, $response) 
         return;
     }
 
-    // execute webhook distribution
-    try {
-        $webhook = [
-            'uri' => '/admin/system/schema/restore/:name',
-            'method' => 'post',
-            'json_data' => json_encode($response->getResults())
-        ];
-
-        $this
-            ->package('cradlephp/cradle-queue')
-            ->queue('webhook-distribution', $webhook);
-    } catch (Exception $e) {
-    }
-
     if ($response->isError()) {
         //add a flash
         $this->package('global')->flash($response->getMessage(), 'error');
@@ -637,8 +566,8 @@ $this->get('/admin/system/schema/restore/:name', function ($request, $response) 
         //record logs
         $this->log(
             sprintf(
-                '%s schema restored',
-                ucfirst($request->getStage('name'))
+                'restored schema: %s',
+                $request->getStage('name')
             ),
             $request,
             $response
