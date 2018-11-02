@@ -459,8 +459,12 @@ class SqlService
             $fields = array_merge($fields, $relatedJson);
         }
 
-        //get N:N relations
-        $relations = $this->schema->getRelations(3);
+        //get 1:N, N:N relations
+        $relations = array_merge(
+            $this->schema->getRelations(2),
+            $this->schema->getRelations(3)
+        );
+
         foreach ($relations as $table => $relation) {
             //deal with post_post at a later time
             if ($relation['name'] === $this->schema->getName()) {
