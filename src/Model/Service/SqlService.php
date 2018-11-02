@@ -404,6 +404,10 @@ class SqlService
             $filter = $data['filter'];
         }
 
+        if (isset($data['in_filter']) && is_array($data['in_filter'])) {
+            $in = $data['in_filter'];
+        }
+
         if (isset($data['span']) && is_array($data['span'])) {
             $span = $data['span'];
         }
@@ -461,7 +465,9 @@ class SqlService
                         $relation['primary2']
                     );
             //needs to have a filter to add the other kinds of joins
-            } else if (!isset($filter[$relation['primary2']])) {
+            } else if (!isset($filter[$relation['primary2']])
+                && !isset($in[$relation['primary2']])
+            ) {
                 continue;
             //1:0, 1:N, N:N
             } else {
@@ -489,7 +495,9 @@ class SqlService
             }
 
             //if filter primary is not set
-            if (!isset($filter[$relation['primary1']])) {
+            if (!isset($filter[$relation['primary1']])
+                && !isset($in[$relation['primary1']])
+            ) {
                 continue;
             }
 
