@@ -540,6 +540,24 @@ class SqlService
         foreach ($filter as $column => $value) {
             if (preg_match('/^[a-zA-Z0-9-_]+$/', $column)) {
                 $search->addFilter($column . ' = %s', $value);
+                continue;
+            }
+
+            //by chance is it a json filter?
+            if (preg_match('/^[a-zA-Z0-9-_\.]+$/', $column)) {
+                $name = substr($column, 0, strpos($column, '.'));
+                $path = substr($column, strpos($column, '.'));
+                $path = preg_replace('/\.*([0-9]+)/', '[$1]', $path);
+
+                //it should be a json column type
+                if (!in_array($name, $this->schema->getJsonFieldNames())) {
+                    continue;
+                }
+
+                $column = sprintf('JSON_EXTRACT(%s, "$%s")', $name, $path);
+
+                $search->addFilter($column . ' = %s', $value);
+                continue;
             }
         }
 
@@ -600,7 +618,26 @@ class SqlService
 
         //add sorting
         foreach ($order as $sort => $direction) {
-            $search->addSort($sort, $direction);
+            if (preg_match('/^[a-zA-Z0-9-_]+$/', $sort)) {
+                $search->addSort($sort, $direction);
+                continue;
+            }
+
+            //by chance is it a json filter?
+            if (preg_match('/^[a-zA-Z0-9-_\.]+$/', $sort)) {
+                $name = substr($sort, 0, strpos($sort, '.'));
+                $path = substr($sort, strpos($sort, '.'));
+                $path = preg_replace('/\.*([0-9]+)/', '[$1]', $path);
+
+                //it should be a json column type
+                if (!in_array($name, $this->schema->getJsonFieldNames())) {
+                    continue;
+                }
+
+                $column = sprintf('JSON_EXTRACT(%s, "$%s")', $name, $path);
+                $search->addSort($column, $direction);
+                continue;
+            }
         }
 
         $rows = $search->getRows();

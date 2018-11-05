@@ -38,7 +38,7 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
     if (is_array($request->getStage('filter'))) {
         foreach ($request->getStage('filter') as $key => $value) {
             //if invalid key format or there is no value
-            if (!preg_match('/^[a-zA-Z0-9_]+$/', $key) || !strlen($value)) {
+            if (!preg_match('/^[a-zA-Z0-9_\.]+$/', $key) || !strlen($value)) {
                 $request->removeStage('filter', $key);
             }
         }
@@ -48,7 +48,7 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
     //we do this to prevent SQL injections
     if (is_array($request->getStage('order'))) {
         foreach ($request->getStage('order') as $key => $value) {
-            if (!preg_match('/^[a-zA-Z0-9_]+$/', $key)) {
+            if (!preg_match('/^[a-zA-Z0-9_\.]+$/', $key)) {
                 $request->removeStage('order', $key);
             }
         }
