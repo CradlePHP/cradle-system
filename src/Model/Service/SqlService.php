@@ -567,6 +567,20 @@ class SqlService
                 $search->addFilter($column . ' IN ("' . implode('", "', $values) . '")');
             }
         }
+        
+        // add json filters
+        foreach ($json as $column => $values) {
+            $or = [];
+            $where = [];
+
+            foreach ($values as $value) {
+                $where[] = "JSON_SEARCH(LOWER($column), 'one', %s) IS NOT NULL";
+                $or[] = '%' . strtolower($value) . '%';
+            }
+
+            array_unshift($or, '(' . implode(' OR ', $where) . ')');
+            call_user_func([$search, 'addFilter'], ...$or);
+        }
 
         //add spans
         foreach ($span as $column => $value) {
