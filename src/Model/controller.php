@@ -831,7 +831,10 @@ $this->post('/admin/system/model/:schema/create', function ($request, $response)
             $schema->getSingular()
         ),
         $request,
-        $response
+        $response,
+        'create',
+        $request->getStage('schema'),
+        $response->getResults($schema->getPrimaryFieldName())
     );
 
     //redirect
@@ -959,7 +962,10 @@ $this->post('/admin/system/model/:schema/update/:id', function ($request, $respo
             $request->getStage('id')
         ),
         $request,
-        $response
+        $response,
+        'update',
+        $request->getStage('schema'),
+        $request->getStage('id')
     );
 
     //redirect
@@ -1021,7 +1027,10 @@ $this->get('/admin/system/model/:schema/remove/:id', function ($request, $respon
                 $request->getStage('id')
             ),
             $request,
-            $response
+            $response,
+            'remove',
+            $request->getStage('schema'),
+            $request->getStage('id')
         );
     }
 
@@ -1087,7 +1096,10 @@ $this->get('/admin/system/model/:schema/restore/:id', function ($request, $respo
                 $request->getStage('id')
             ),
             $request,
-            $response
+            $response,
+            'restore',
+            $request->getStage('schema'),
+            $request->getStage('id')
         );
     }
 
@@ -1198,7 +1210,8 @@ $this->post('/admin/system/model/:schema/import', function ($request, $response)
             $schema->getPlural()
         ),
         $request,
-        $response
+        $response,
+        'import'
     );
 
     //add a flash

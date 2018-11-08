@@ -373,7 +373,10 @@ $this->post('/admin/system/schema/create', function ($request, $response) {
             $request->getStage('singular')
         ),
         $request,
-        $response
+        $response,
+        'create',
+        'schema',
+        $request->getStage('name')
     );
 
     //it was good
@@ -448,7 +451,10 @@ $this->post('/admin/system/schema/update/:name', function ($request, $response) 
             $request->getStage('singular')
         ),
         $request,
-        $response
+        $response,
+        'update',
+        'schema',
+        $request->getStage('name')
     );
 
     //redirect
@@ -518,7 +524,10 @@ $this->get('/admin/system/schema/remove/:name', function ($request, $response) {
                 $request->getStage('name')
             ),
             $request,
-            $response
+            $response,
+            'remove',
+            'schema',
+            $request->getStage('name')
         );
     }
 
@@ -570,7 +579,10 @@ $this->get('/admin/system/schema/restore/:name', function ($request, $response) 
                 $request->getStage('name')
             ),
             $request,
-            $response
+            $response,
+            'restore',
+            'schema',
+            $request->getStage('name')
         );
     }
 

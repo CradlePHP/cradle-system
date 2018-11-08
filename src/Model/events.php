@@ -241,6 +241,8 @@ $this->on('system-model-remove', function ($request, $response) {
 
     $modelRedis->removeSearch();
 
+    //add the schema to the results, so we know which table was changed
+    $results['schema'] = $request->getStage('schema');
     $response->setError(false)->setResults($results);
 });
 
@@ -295,6 +297,7 @@ $this->on('system-model-restore', function ($request, $response) {
     //invalidate cache
     $modelRedis->removeSearch();
 
+    $results['schema'] = $request->getStage('schema');
     $response->setError(false)->setResults($results);
 });
 
@@ -379,6 +382,9 @@ $this->on('system-model-update', function ($request, $response) {
     if ($response->isError()) {
         return;
     }
+
+    //get the original for later
+    $original = $response->getResults();
 
     //get data from stage
     $data = [];
@@ -498,6 +504,9 @@ $this->on('system-model-update', function ($request, $response) {
     }
 
     $modelRedis->removeSearch();
+
+    //add the original
+    $results['original'] = $original;
 
     //return response format
     $response->setError(false)->setResults($results);

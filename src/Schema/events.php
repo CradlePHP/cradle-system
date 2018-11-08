@@ -320,6 +320,9 @@ $this->on('system-schema-update', function ($request, $response) {
         return;
     }
 
+    //get the original for later
+    $original = $response->getResults();
+
     //get data from stage
     $data = [];
     if ($request->hasStage()) {
@@ -398,7 +401,11 @@ $this->on('system-schema-update', function ($request, $response) {
     //update table
     $systemSql->update($data);
 
+    //reset the cache
     $this->package('global')->schema($table, $data);
+
+    //add the original
+    $data['original'] = $original;
 
     //return response format
     $response->setError(false)->setResults($data);

@@ -948,7 +948,7 @@
                 break;
             case 'textarea':
                 var placeholder = option.attr('data-placeholder') || '';
-                var template = 'fields[{INDEX}][list][parameters]';
+                var template = 'fields[{INDEX}][detail][parameters]';
                 var textarea = $('#field-textarea-template')
                     .compile({
                         NAME: template.replace('{INDEX}', trigger.getModelIndex())
