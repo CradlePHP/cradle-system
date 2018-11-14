@@ -394,6 +394,7 @@ class SqlService
         $sum = null;
         $filter = [];
         $in = [];
+        $json = [];
         $span  = [];
         $range = 50;
         $start = 0;
@@ -406,6 +407,10 @@ class SqlService
 
         if (isset($data['in_filter']) && is_array($data['in_filter'])) {
             $in = $data['in_filter'];
+        }
+
+        if (isset($data['json_filter']) && is_array($data['json_filter'])) {
+            $json = $data['json_filter'];
         }
 
         if (isset($data['span']) && is_array($data['span'])) {
@@ -567,7 +572,7 @@ class SqlService
                 $search->addFilter($column . ' IN ("' . implode('", "', $values) . '")');
             }
         }
-        
+
         // add json filters
         foreach ($json as $column => $values) {
             $or = [];
