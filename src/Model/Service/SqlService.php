@@ -601,7 +601,7 @@ class SqlService
                 }
 
                 // maximum?
-                if (isset($value[1]) && !empty($value[0])) {
+                if (isset($value[1]) && !empty($value[1])) {
                     $search
                         ->addFilter($column . ' <= %s', $value[1]);
                 }
