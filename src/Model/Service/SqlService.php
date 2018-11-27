@@ -168,10 +168,28 @@ class SqlService
         //get 1:0 relations
         $relations = $this->schema->getRelations(0);
         foreach ($relations as $table => $relation) {
+            $schema = $this->schema;
+            
             $row = $this
                 ->resource
                 ->search($table)
-                ->innerJoinUsing($relation['name'], $relation['primary2'])
+                ->when(
+                    //we need to case for post_post for example
+                    $relation['name'] === $this->schema->getName(),
+                    //this is the post_post way
+                    function () use (&$schema, &$relation) {
+                        $on = sprintf(
+                            '%s = %s',
+                            $schema->getPrimaryFieldName(),
+                            $relation['primary2']
+                        );
+                        $this->innerJoinOn($relation['name'], $on);
+                    },
+                    //this is the normal way
+                    function () use (&$relation, &$fields) {
+                        $this->innerJoinUsing($relation['name'], $relation['primary2']);
+                    }
+                )
                 ->addFilter($relation['primary1'] . ' = %s', $id)
                 ->getRow();
 
