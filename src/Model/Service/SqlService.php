@@ -593,24 +593,7 @@ class SqlService
         //add like filters
         foreach ($like as $column => $value) {
             if (preg_match('/^[a-zA-Z0-9-_]+$/', $column)) {
-                $search->addFilter($column . ' LIKE %s', $value);
-                continue;
-            }
-
-            //by chance is it a json filter?
-            if (preg_match('/^[a-zA-Z0-9-_\.]+$/', $column)) {
-                $name = substr($column, 0, strpos($column, '.'));
-                $path = substr($column, strpos($column, '.'));
-                $path = preg_replace('/\.*([0-9]+)/', '[$1]', $path);
-
-                //it should be a json column type
-                if (!in_array($name, $this->schema->getJsonFieldNames())) {
-                    continue;
-                }
-
-                $column = sprintf('JSON_EXTRACT(%s, "$%s")', $name, $path);
-
-                $search->addFilter($column . ' = %s', $value);
+                $search->addFilter($column . ' LIKE %s', '%' . $value . '%');
                 continue;
             }
         }
