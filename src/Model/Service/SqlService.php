@@ -411,6 +411,7 @@ class SqlService
 
         $sum = null;
         $filter = [];
+        $like = [];
         $in = [];
         $json = [];
         $span  = [];
@@ -422,6 +423,11 @@ class SqlService
         if (isset($data['filter']) && is_array($data['filter'])) {
             $filter = $data['filter'];
         }
+        
+        if (isset($data['like_filter']) && is_array($data['like_filter'])) {
+            $like = $data['like_filter'];
+        }
+
 
         if (isset($data['in_filter']) && is_array($data['in_filter'])) {
             $in = $data['in_filter'];
@@ -583,6 +589,31 @@ class SqlService
                 continue;
             }
         }
+        
+        //add like filters
+        foreach ($like as $column => $value) {
+            if (preg_match('/^[a-zA-Z0-9-_]+$/', $column)) {
+                $search->addFilter($column . ' LIKE %s', $value);
+                continue;
+            }
+
+            //by chance is it a json filter?
+            if (preg_match('/^[a-zA-Z0-9-_\.]+$/', $column)) {
+                $name = substr($column, 0, strpos($column, '.'));
+                $path = substr($column, strpos($column, '.'));
+                $path = preg_replace('/\.*([0-9]+)/', '[$1]', $path);
+
+                //it should be a json column type
+                if (!in_array($name, $this->schema->getJsonFieldNames())) {
+                    continue;
+                }
+
+                $column = sprintf('JSON_EXTRACT(%s, "$%s")', $name, $path);
+
+                $search->addFilter($column . ' = %s', $value);
+                continue;
+            }
+        }
 
         // add in filters
         foreach ($in as $column => $values) {
@@ -593,6 +624,16 @@ class SqlService
 
         // add json filters
         foreach ($json as $column => $values) {
+            //it should be a json column type
+            if (!in_array($column, $this->schema->getJsonFieldNames())) {
+                continue;
+            }
+
+            // values should be array
+            if (!is_array($values)) {
+                $values = [$values];
+            }
+
             $or = [];
             $where = [];
 
