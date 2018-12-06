@@ -909,6 +909,8 @@
                         <td>
                             <a
                                 class="btn btn-danger remove"
+                                data-do="table-field-remove"
+                                data-on="click"
                                 href="javascript:void(0)"
                             >
                                 <i class="fas fa-times"></i>
@@ -929,10 +931,37 @@
                 {{/each}}
             </tbody>
         </table>
-        <a class="field-add btn btn-success" href="javascript:void(0)">
+        <a 
+            class="field-add btn btn-success" 
+            href="javascript:void(0)"
+            data-do="table-field-add"
+            data-on="click"
+        >
             <i class="fas fa-plus"></i>
             <span>{{_ 'Add Row'}}</span>
         </a>
+
+        <script type="text/x-template" id="table-field-template">
+            <tr>
+                <td>
+                    <a
+                    class="btn btn-danger remove"
+                    data-do="table-field-remove"
+                    data-on="click"
+                    href="javascript:void(0)"
+                    >
+                        <i class="fas fa-times"></i>
+                    </a>
+                </td>
+                <td class="input-template">
+                    <input
+                        class="input-column form-control"
+                        type="text"
+                        name="{NAME}[{INDEX}][{COLUMN}]"
+                    />
+                </td>
+            </tr>
+        </script>
     </div>
 {{/when}}
 {{#when config.type '===' 'multirange'}}

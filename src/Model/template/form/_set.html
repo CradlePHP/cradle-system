@@ -9,10 +9,10 @@
                 <label>{{label}}</label>
 
                 {{#each formats}}
-                    <div class="fieldset border mb-2 p-3" data-parent="{{../@key}}" data-index="{{@index}}">
+                    <div class="fieldset border mb-2 p-3">
                         <a 
                             href="javscript:void(0)" 
-                            class="text-danger float-right" 
+                            class="btn btn-sm btn-danger float-right" 
                             data-schema="{{../config.parameters}}"
                             data-do="fieldset-remove" 
                             data-on="click"
@@ -38,7 +38,7 @@
         </div>
     {{else}}
         <div class="
-            form-group
+            form-group mt-2
             {{#has ../../errors @path}} 
                 has-error
             {{else}}

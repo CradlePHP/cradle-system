@@ -289,9 +289,9 @@ return function($request, $response) {
                     //need to do this for table format
                     foreach($columns as $key => $column) {
                         //on each row
-                        foreach($rows as $index => $row) {
+                        foreach($rows as $index => $inner) {
                             //if it's set
-                            if (isset($row[$key])) {
+                            if (isset($inner[$key])) {
                                 continue;
                             }
 
@@ -307,7 +307,7 @@ return function($request, $response) {
                     }
 
                     //on each row
-                    foreach($rows as $index => $row) {
+                    foreach($rows as $index => $inner) {
                         //we should sort the rows based on column sorting
                         $rows[$index] = array_merge(
                             array_flip(array_keys($columns)), 
@@ -315,10 +315,10 @@ return function($request, $response) {
                         );
 
                         //get the formats
-                        $results = $getFormats($row, $type, $fieldset, false);
+                        $results = $getFormats($inner, $type, $fieldset, false);
 
                         //on each value
-                        foreach($row as $key => $value) {
+                        foreach($inner as $key => $value) {
                             //get the formatted value
                             $rows[$index][$key] = $results[$key]['value'];
                         }
@@ -326,6 +326,20 @@ return function($request, $response) {
 
                     //update the value
                     $value = $rows;
+                }
+
+                //FIX: for table columns need to sort out
+                //the values based on column order
+                if ($field['field']['type'] === 'table') {
+                    $columns = $field['field']['columns'];
+
+                    foreach($value as $index => $inner) {
+                        //we should sort the rows based on column sorting
+                        $value[$index] = array_merge(
+                            array_flip(array_values($columns)), 
+                            $value[$index]
+                        );
+                    }
                 }
                 
                 //prepare the template
@@ -341,7 +355,7 @@ return function($request, $response) {
 
                 //get the default value in case it's empty
                 if (is_null($value) || empty($value)) {
-                    // $value = $fields[$name]['default'];                    
+                    $value = $fields[$name]['default'];                    
                 }
 
                 //and prepare the results

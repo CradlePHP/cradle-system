@@ -62,8 +62,36 @@
     
     // Get the fieldset
     var fieldset = target.data('fieldset');
-    // Get the container
-    var container = target.parent().parent();
+
+    //collect parents
+    var parents = [];
+    //get the parents from source to top
+    var getParents = function(element) {
+      var parent = element.parent();
+      var type = parent[0].tagName;
+      var name = parent.data('reindex');
+
+      //fieldset? and has a reindex name?
+      if (type === 'FIELDSET' && name && name) {
+        var index = element.index() - 1;
+        //get the current element index from parent
+        parents.push({ 
+          name: name,
+          index: index < 0 ? 0 : index
+        });
+      }
+
+      //we should continue
+      if (type !== 'FORM') {
+        getParents(parent);
+      }
+    };
+
+    //start gathering the parents
+    getParents(target);
+    //reverse so we can start replacing from bottom to top
+    var parent = parents.reverse().shift();
+    var container = $('fieldset[data-reindex="' + parent.name + '"]');
 
     // Remove the target
     target.parent().remove();
@@ -71,10 +99,79 @@
     // Get all the inputs
     var inputs = container.find('[name]');
     // Re-index
+    reindex(inputs, true);
+  });
+
+  $(window).on('table-field-add-click', function(e, target) {
+    target = $(target);
+    
+    //get the name
+    var name = target.parent().data('name');
+    //get the columns
+    var columns = target.parent().data('columns').split('|');
+    //get the template
+    var template = target.parent().find('#table-field-template').html();
+    //determine the index
+    var index = target.parent().find('tbody').children('tr').length;
+
+    //parse the template
+    template = $(template);
+    //clone the input
+    var input = $('<div />')
+      .append(
+        template
+        .find('.input-template')
+        .removeAttr('class')
+        .remove()
+        .clone()
+      );
+    
+    //on each columns
+    for(var i in columns) {
+      //get the html
+      var html = input.html();
+      
+      //replace name
+      var re = new RegExp('{NAME}', 'g');
+      html = html.replace(re, name);
+      //replace index
+      re = new RegExp('{INDEX}', 'g');
+      html = html.replace(re, index);
+      //replace column
+      re = new RegExp('{COLUMN}', 'g');
+      html = html.replace(re, columns[i]);
+
+      template.append(html);
+    }
+
+    //active scripts
+    template = $(template).doon();
+    //append to body
+    target.parent().find('tbody').append(template);
+  });
+
+  $(window).on('table-field-remove-click', function(e, target) {
+    target = $(target);
+    
+    //get the container
+    var container = target
+      .parent()
+      .parent()
+      .parent();
+    
+    //remove
+    target
+      .parent()
+      .parent()
+      .remove();
+    
+    //get all inputs from container
+    var inputs = container.find('[name]');
+    //reindex
     reindex(inputs);
   });
 
-  var reindex = function(inputs) {
+  var reindex = function(inputs, filter) {
     // Get the input names
     var names = {};
     $.each(inputs, function(index, element) {
@@ -94,9 +191,13 @@
 
     // Get the re-index filters
     var filters = [];
-    $('[data-reindex]').map(function(index, element) {
-      filters.push($(element).data('reindex'));
-    });
+
+    // Filter?
+    if (filter) {
+      $('[data-reindex]').map(function(index, element) {
+        filters.push($(element).data('reindex'));
+      });
+    }
 
     // Re-index names
     var reindexed = arrange(names, filters);
@@ -104,6 +205,8 @@
     var serialized = serialize(reindexed);
     // Split by pairs
     serialized = serialized.split('&');
+
+    console.log(names);
 
     // On each serialized pairs
     for(var i in serialized) {
@@ -144,7 +247,7 @@
       // If it's a string but it's an object
       if (isNaN(parseInt(key)) && type === '[object Object]' && key !== '{INDEX}') {
         // If it's not fieldset
-        if (filters.indexOf(key) === -1) {
+        if (filters.length && filters.indexOf(key) === -1) {
           continue;
         }
         
