@@ -77,7 +77,8 @@ class Formatter
                 case 'checkboxes':
                 case 'multirange':
                 case 'multiselect':
-                case 'multifield':
+                case 'table':
+                case 'fieldset':
                     //if it's an array already
                     if(is_array($data[$name]) || is_object($data[$name])) {
                         $data[$name] = json_encode($data[$name]);

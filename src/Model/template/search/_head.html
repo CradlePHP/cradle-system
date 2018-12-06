@@ -9,7 +9,7 @@
         </label>
     </th>
     <th>Actions</th>
-    <th>
+    <th class="text-right">
         <a href="?{{sorturl 'order' schema.primary}}">
             ID
             {{{sortcaret 'order' schema.primary}}}
@@ -23,14 +23,24 @@
     {{#each schema.fields}}
         {{#in ../schema.listable @key}}
             {{#in ../schema.sortable @key}}
-                <th>
+                <th
+                    {{#in 'number,price,formula' list.format}}
+                        class="text-right"
+                    {{/in}}
+                >
                     <a href="?{{sorturl 'order' @key}}">
                         {{label}}
                         {{{sortcaret 'order' @key}}}
                     </a>
                 </th>
             {{else}}
-                <th>{{label}}</th>
+                <th
+                    {{#in 'number,price,formula' list.format}}
+                        class="text-right"
+                    {{/in}}
+                >
+                    {{label}}
+                </th>
             {{/in}}
         {{/in}}
     {{/each}}

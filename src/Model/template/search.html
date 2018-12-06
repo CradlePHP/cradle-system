@@ -87,9 +87,9 @@
                     </div>
                 </div>
                 {{#when filter.active '===' '0'}}
-                    <input 
-                        name="filter[{{schema.active}}]" 
-                        type="hidden" 
+                    <input
+                        name="filter[{{schema.active}}]"
+                        type="hidden"
                         value = "0"
                     />
                 {{/when}}
@@ -116,7 +116,7 @@
                                 <td class="table-actions">
                                     {{> search_row_actions}}
                                 </td>
-                                <td>{{scope this ../schema.primary}}</td>
+                                <td class="text-right">{{scope this ../schema.primary}}</td>
                                 {{#each ../schema.relations}}
                                     {{#when many '==' 1}}
                                         <td>
@@ -129,7 +129,15 @@
                                         </td>
                                     {{/when}}
                                 {{/each}}
-                                {{> search_row_format}}
+                                {{#format 'list' ../schema.name this}}
+                                    {{#each formats}}
+                                        {{#in 'number,price,formula' config.format}}
+                                            <td class="text-right">{{{value}}}</td>
+                                        {{else}}
+                                            <td>{{{value}}}</td>
+                                        {{/in}}
+                                    {{/each}}
+                                {{/format}}
                             </tr>
                         {{/each}}
                     </tbody>

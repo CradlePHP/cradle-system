@@ -12,7 +12,7 @@
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/schema/search', function ($request, $response) {
+$this->get('/admin/system/fieldset/search', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     if (!$request->hasStage()) {
@@ -20,7 +20,7 @@ $this->get('/admin/system/schema/search', function ($request, $response) {
     }
 
     //trigger job
-    $this->trigger('system-schema-search', $request, $response);
+    $this->trigger('system-fieldset-search', $request, $response);
 
     //if we only want the raw data
     if ($request->getStage('render') === 'false') {
@@ -33,13 +33,13 @@ $this->get('/admin/system/schema/search', function ($request, $response) {
         //filter and sort on the template
         $request->getStage(),
         //this is from the search event
-        $response->getResults()
+        $response->getResults() ? $response->getResults() : []
     );
 
     //----------------------------//
     // 2. Render Template
-    $class = 'page-admin-system-schema-search page-admin';
-    $data['title'] = $this->package('global')->translate('System Schemas');
+    $class = 'page-admin-system-fieldset-search page-admin';
+    $data['title'] = $this->package('global')->translate('System Fieldsets');
 
     $template = __DIR__ . '/template';
     if (is_dir($response->getPage('template_root'))) {
@@ -82,7 +82,7 @@ $this->get('/admin/system/schema/search', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/schema/create', function ($request, $response) {
+$this->get('/admin/system/fieldset/create', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     $data = ['item' => $request->getPost()];
@@ -97,14 +97,14 @@ $this->get('/admin/system/schema/create', function ($request, $response) {
 
     //for ?copy=1 functionality
     if (empty($data['item']) && $request->hasStage('copy')) {
-        $request->setStage('schema', $request->getStage('copy'));
-        $this->trigger('system-schema-detail', $request, $response);
+        $request->setStage('fieldset', $request->getStage('copy'));
+        $this->trigger('system-fieldset-detail', $request, $response);
 
         //can we update ?
         if ($response->isError()) {
             //add a flash
             $this->package('global')->flash($response->getMessage(), 'error');
-            return $this->package('global')->redirect('/admin/system/schema/search');
+            return $this->package('global')->redirect('/admin/system/fieldset/search');
         }
 
         $data['item'] = $response->getResults();
@@ -117,13 +117,13 @@ $this->get('/admin/system/schema/create', function ($request, $response) {
     //----------------------------//
     // 2. Render Template
     //set the class name
-    $class = 'page-admin-system-schema-create page-admin';
+    $class = 'page-admin-system-fieldset-create page-admin';
 
     //determine the action
     $data['action'] = 'create';
 
     //determine the title
-    $data['title'] = $this->package('global')->translate('Create System Schema');
+    $data['title'] = $this->package('global')->translate('Create System Fieldset');
 
     //add custom page helpers
     $this->package('global')
@@ -191,7 +191,7 @@ $this->get('/admin/system/schema/create', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/schema/update/:name', function ($request, $response) {
+$this->get('/admin/system/fieldset/update/:name', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     //pass the item with only the post data
@@ -207,13 +207,13 @@ $this->get('/admin/system/schema/update/:name', function ($request, $response) {
 
     //if no item
     if (empty($data['item'])) {
-        //get the original schema row
-        $this->trigger('system-schema-detail', $request, $response);
+        //get the original fieldset row
+        $this->trigger('system-fieldset-detail', $request, $response);
 
         //can we update ?
         if ($response->isError()) {
             //redirect
-            $redirect = '/admin/system/schema/search';
+            $redirect = '/admin/system/fieldset/search';
 
             //this is for flexibility
             if ($request->hasStage('redirect_uri')) {
@@ -240,13 +240,13 @@ $this->get('/admin/system/schema/update/:name', function ($request, $response) {
     //----------------------------//
     // 2. Render Template
     //set the class name
-    $class = 'page-admin-system-schema-update page-admin';
+    $class = 'page-admin-system-fieldset-update page-admin';
 
     //determine the action
     $data['action'] = 'update';
 
     //determine the title
-    $data['title'] = $this->package('global')->translate('Updating System Schema');
+    $data['title'] = $this->package('global')->translate('Updating System Fieldset');
 
     //add custom page helpers
     $this->package('global')
@@ -315,7 +315,7 @@ $this->get('/admin/system/schema/update/:name', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->post('/admin/system/schema/create', function ($request, $response) {
+$this->post('/admin/system/fieldset/create', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     //if detail has no value make it null
@@ -335,14 +335,14 @@ $this->post('/admin/system/schema/create', function ($request, $response) {
 
     //----------------------------//
     // 2. Process Request
-    $this->trigger('system-schema-create', $request, $response);
+    $this->trigger('system-fieldset-create', $request, $response);
 
     //----------------------------//
     // 3. Interpret Results
     //if the event returned an error
     if ($response->isError()) {
         //determine route
-        $route = '/admin/system/schema/create';
+        $route = '/admin/system/fieldset/create';
 
         //this is for flexibility
         if ($request->hasStage('route')) {
@@ -353,7 +353,7 @@ $this->post('/admin/system/schema/create', function ($request, $response) {
     }
 
     //redirect
-    $redirect = '/admin/system/schema/search';
+    $redirect = '/admin/system/fieldset/search';
 
     //if there is a specified redirect
     if ($request->getStage('redirect_uri')) {
@@ -369,19 +369,19 @@ $this->post('/admin/system/schema/create', function ($request, $response) {
     //record logs
     $this->log(
         sprintf(
-            'created schema: %s',
+            'created fieldset: %s',
             $request->getStage('singular')
         ),
         $request,
         $response,
         'create',
-        'schema',
+        'fieldset',
         $request->getStage('name')
     );
 
     //it was good
     //add a flash
-    $this->package('global')->flash('System Schema was Created', 'success');
+    $this->package('global')->flash('System Fieldset was Created', 'success');
 
     //redirect
     $this->package('global')->redirect($redirect);
@@ -393,7 +393,7 @@ $this->post('/admin/system/schema/create', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->post('/admin/system/schema/update/:name', function ($request, $response) {
+$this->post('/admin/system/fieldset/update/:name', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
 
@@ -423,7 +423,7 @@ $this->post('/admin/system/schema/update/:name', function ($request, $response) 
 
     //----------------------------//
     // 2. Process Request
-    $this->trigger('system-schema-update', $request, $response);
+    $this->trigger('system-fieldset-update', $request, $response);
 
     //----------------------------//
     // 3. Interpret Results
@@ -431,7 +431,7 @@ $this->post('/admin/system/schema/update/:name', function ($request, $response) 
     if ($response->isError()) {
         //determine route
         $route = sprintf(
-            '/admin/system/schema/update/%s',
+            '/admin/system/fieldset/update/%s',
             $request->getStage('name')
         );
 
@@ -447,18 +447,18 @@ $this->post('/admin/system/schema/update/:name', function ($request, $response) 
     //record logs
     $this->log(
         sprintf(
-            'updated schema: %s',
+            'updated fieldset: %s',
             $request->getStage('singular')
         ),
         $request,
         $response,
         'update',
-        'schema',
+        'fieldset',
         $request->getStage('name')
     );
 
     //redirect
-    $redirect = '/admin/system/schema/search';
+    $redirect = '/admin/system/fieldset/search';
 
     //if there is a specified redirect
     if ($request->getStage('redirect_uri')) {
@@ -473,7 +473,7 @@ $this->post('/admin/system/schema/update/:name', function ($request, $response) 
 
     //it was good
     //add a flash
-    $this->package('global')->flash('System Schema was Updated', 'success');
+    $this->package('global')->flash('System Fieldset was Updated', 'success');
 
     //redirect
     $this->package('global')->redirect($redirect);
@@ -485,18 +485,18 @@ $this->post('/admin/system/schema/update/:name', function ($request, $response) 
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/schema/remove/:name', function ($request, $response) {
+$this->get('/admin/system/fieldset/remove/:name', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     // no data to preapre
     //----------------------------//
     // 2. Process Request
-    $this->trigger('system-schema-remove', $request, $response);
+    $this->trigger('system-fieldset-remove', $request, $response);
 
     //----------------------------//
     // 3. Interpret Results
     //redirect
-    $redirect = '/admin/system/schema/search';
+    $redirect = '/admin/system/fieldset/search';
 
     //if there is a specified redirect
     if ($request->getStage('redirect_uri')) {
@@ -514,19 +514,19 @@ $this->get('/admin/system/schema/remove/:name', function ($request, $response) {
         $this->package('global')->flash($response->getMessage(), 'error');
     } else {
         //add a flash
-        $message = $this->package('global')->translate('System Schema was Removed');
+        $message = $this->package('global')->translate('System Fieldset was Removed');
         $this->package('global')->flash($message, 'success');
 
         //record logs
         $this->log(
             sprintf(
-                'removed schema: %s',
+                'removed fieldset: %s',
                 $request->getStage('name')
             ),
             $request,
             $response,
             'remove',
-            'schema',
+            'fieldset',
             $request->getStage('name')
         );
     }
@@ -540,18 +540,18 @@ $this->get('/admin/system/schema/remove/:name', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/schema/restore/:name', function ($request, $response) {
+$this->get('/admin/system/fieldset/restore/:name', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     // no data to preapre
     //----------------------------//
     // 2. Process Request
-    $this->trigger('system-schema-restore', $request, $response);
+    $this->trigger('system-fieldset-restore', $request, $response);
 
     //----------------------------//
     // 3. Interpret Results
     //redirect
-    $redirect = '/admin/system/schema/search';
+    $redirect = '/admin/system/fieldset/search';
 
     //if there is a specified redirect
     if ($request->getStage('redirect_uri')) {
@@ -569,19 +569,19 @@ $this->get('/admin/system/schema/restore/:name', function ($request, $response) 
         $this->package('global')->flash($response->getMessage(), 'error');
     } else {
         //add a flash
-        $message = $this->package('global')->translate('System Schema was Restored');
+        $message = $this->package('global')->translate('System Fieldset was Restored');
         $this->package('global')->flash($message, 'success');
 
         //record logs
         $this->log(
             sprintf(
-                'restored schema: %s',
+                'restored fieldset: %s',
                 $request->getStage('name')
             ),
             $request,
             $response,
             'restore',
-            'schema',
+            'fieldset',
             $request->getStage('name')
         );
     }

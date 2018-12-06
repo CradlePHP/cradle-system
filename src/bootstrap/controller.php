@@ -9,5 +9,6 @@
 return function($request, $response) {
     include_once dirname(__DIR__) . '/Model/controller.php';
     include_once dirname(__DIR__) . '/Relation/controller.php';
+    include_once dirname(__DIR__) . '/Fieldset/controller.php';
     include_once dirname(__DIR__) . '/Schema/controller.php';
 };

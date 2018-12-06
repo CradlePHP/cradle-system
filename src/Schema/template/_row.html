@@ -1,9 +1,7 @@
-<tr class="model-field{{#if disable}} field-disabled{{/if}}" data-index="{{@index}}">
-    <td class="model-action" nowrap="nowrap" valign="middle">
+<tr class="schema-field-row" data-index="{{@index}}" data-do="schema-field-row">
+    <td class="schema-field-action" nowrap="nowrap" valign="middle">
         <a
-            class="field-copy-trigger text-purple"
-            data-do="modal-copy"
-            data-on="click"
+            class="schema-field-copy-trigger text-purple"
             title="{{_ 'Copy %s' name}}"
             href="javascript:void(0)"
         >
@@ -13,28 +11,20 @@
             <i class="fas fa-lock fa-fw"></i>
         {{else}}
             <a
-                class="field-edit-trigger text-warning"
-                data-do="modal-open"
-                data-on="click"
+                class="schema-field-update-trigger text-warning"
                 href="javascript:void(0)"
             >
                 <i class="fas fa-edit fa-fw"></i>
             </a>
         {{/if}}
         <a
-            class="field-move-up-trigger"
-            data-do="move-up"
-            data-on="click"
-            data-level="2"
+            class="schema-field-move-up-trigger"
             href="javascript:void(0)"
         >
             <i class="fas fa-arrow-up fa-fw"></i>
         </a>
         <a
-            class="field-move-down-trigger"
-            data-do="move-down"
-            data-on="click"
-            data-level="2"
+            class="schema-field-move-down-trigger"
             href="javascript:void(0)"
         >
             <i class="fas fa-arrow-down fa-fw"></i>
@@ -43,25 +33,22 @@
             <i class="fas fa-lock fa-fw"></i>
         {{else}}
             <a
-                class="field-remove-trigger text-danger"
-                data-do="field-remove"
-                data-on="click"
-                data-level="2"
+                class="schema-field-remove-trigger text-danger"
                 href="javascript:void(0)"
             >
                 <i class="fas fa-times fa-fw"></i>
             </a>
         {{/if}}
 
-        {{> update}}
+        {{> modal}}
     </td>
-    <td class="field-name-value">{{name}}</td>
-    <td class="field-label-value">{{label}}</td>
-    <td class="field-type-value">{{field.type}}</td>
-    <td class="field-list-value">{{list.format}}</td>
-    <td class="field-detail-value">{{detail.format}}</td>
-    <td class="field-default-value">{{#if default}}{{default}}{{else}}--{{/if}}</td>
-    <td class="field-searchable-value">{{#if searchable}}Yes{{else}}No{{/if}}</td>
-    <td class="field-filterable-value">{{#if filterable}}Yes{{else}}No{{/if}}</td>
-    <td class="field-sortable-value">{{#if sortable}}Yes{{else}}No{{/if}}</td>
+    <td class="schema-field-name-value">{{name}}</td>
+    <td class="schema-field-label-value">{{label}}</td>
+    <td class="schema-field-type-value">{{field.type}}</td>
+    <td class="schema-field-list-value">{{list.format}}</td>
+    <td class="schema-field-detail-value">{{detail.format}}</td>
+    <td class="schema-field-default-value">{{#if default}}{{default}}{{else}}--{{/if}}</td>
+    <td class="schema-field-searchable-value">{{#if searchable}}Yes{{else}}No{{/if}}</td>
+    <td class="schema-field-filterable-value">{{#if filterable}}Yes{{else}}No{{/if}}</td>
+    <td class="schema-field-sortable-value">{{#if sortable}}Yes{{else}}No{{/if}}</td>
 </tr>

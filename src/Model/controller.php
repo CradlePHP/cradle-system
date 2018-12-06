@@ -304,8 +304,9 @@ $this->get('/admin/system/model/:schema/create', function ($request, $response) 
             'form',
             $data,
             [
-                'form_fields',
-                'form_schema',
+                'scripts',
+                'form_set',
+                'form_set-template'
             ],
             $template,
             $partials
@@ -474,8 +475,9 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
             'form',
             $data,
             [
-                'form_fields',
-                'form_schema',
+                'scripts',
+                'form_set',
+                'form_set-template'
             ],
             $template,
             $partials

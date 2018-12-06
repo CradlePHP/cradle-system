@@ -7,6 +7,7 @@
  */
 namespace Cradle\Package\System\Model;
 
+use Cradle\Package\System\Fieldset;
 use Cradle\Package\System\Schema;
 use Cradle\Package\System\Model\Service as ModelService;
 
@@ -46,16 +47,53 @@ class Validator
      *
      * @param *array $data
      * @param array  $errors
+     * @param Fieldset $fieldset
      *
      * @return array
      */
-    public function getCreateErrors(array $data, array $errors = [])
+    public function getCreateErrors(array $data, array &$errors = [], $fieldset = null)
     {
-        $object = [];
-        $fields = $this->schema->getFields();
-        $table = $this->schema->getName();
+        $schema = $this->schema;
+
+        if ($fieldset) {
+            $schema = $fieldset;
+        }
+
+        $fields = $schema->getFields();
+        $table = $schema->getName();
         foreach ($fields as $field) {
             $name = $table . '_' . $field['name'];
+
+            if ($field['field']['type'] === 'fieldset' && isset($data[$name])) {
+                foreach($data[$name] as $index => $row) {
+                    if (!isset($errors[$name][$index])) {
+                        $errors[$name][$index] = [];
+                    }
+
+                    $errors[$name][$index] = $this->getCreateErrors(
+                        $row,
+                        $errors[$name][$index],
+                        Fieldset::i($field['field']['parameters'])
+                    );
+                    
+                    self::getOptionalErrors(
+                        $row, 
+                        $errors[$name][$index],
+                        Fieldset::i($field['field']['parameters'])
+                    );
+
+                    if (empty($errors[$name][$index])) {
+                        unset($errors[$name][$index]);
+                    }
+                }
+
+                if (empty($errors[$name])) {
+                    unset($errors[$name]);
+                }
+
+                continue;
+            }
+
             if (isset($field['validation'])) {
                 foreach ($field['validation'] as $validation) {
                     if ($validation['method'] === 'required'
@@ -82,24 +120,65 @@ class Validator
     }
 
     /**
-     * Returns Create Errors
+     * Returns Update Errors
      *
      * @param *array $data
      * @param array  $errors
+     * @param Fieldset $fieldset
      *
      * @return array
      */
-    public function getUpdateErrors(array $data, array $errors = [])
+    public function getUpdateErrors(array $data, array &$errors = [], $fieldset = null)
     {
-        $fields = $this->schema->getFields();
-        $table = $this->schema->getName();
-        $primary = $this->schema->getPrimaryFieldName();
+        $schema = $this->schema;
 
-        if (!isset($data[$primary]) || !is_numeric($data[$primary])) {
+        if (!is_null($fieldset)) {
+            $schema = $fieldset;
+        }
+
+        $fields = $schema->getFields();
+        $table = $schema->getName();
+        $primary = $schema->getPrimaryFieldName();
+
+        if ((!isset($data[$primary]) || !is_numeric($data[$primary])) && !is_null($primary)) {
             $errors[$primary] = 'Invalid ID';
         }
 
         foreach ($fields as $name => $field) {
+            if ($field['field']['type'] === 'fieldset') {
+                if (!isset($data[$name])) {
+                    continue;
+                }
+
+                foreach($data[$name] as $index => $row) {
+                    if (!isset($errors[$name][$index])) {
+                        $errors[$name][$index] = [];
+                    }
+
+                    $errors[$name][$index] = $this->getUpdateErrors(
+                        $row,
+                        $errors[$name][$index],
+                        Fieldset::i($field['field']['parameters'])
+                    );
+                    
+                    self::getOptionalErrors(
+                        $row, 
+                        $errors[$name][$index],
+                        Fieldset::i($field['field']['parameters'])
+                    );
+
+                    if (empty($errors[$name][$index])) {
+                        unset($errors[$name][$index]);
+                    }
+                }
+
+                if (empty($errors[$name])) {
+                    unset($errors[$name]);
+                }
+
+                continue;
+            }
+
             if (!isset($field['validation'])) {
                 continue;
             }
@@ -115,24 +194,28 @@ class Validator
         }
 
         return self::getOptionalErrors($data, $errors);
-
-        return $errors;
     }
 
     /**
      * Returns Optional Errors
      *
-     * @param *array $object
      * @param *array $data
      * @param array  $errors
+     * @param Fieldset $fieldset
      *
      * @return array
      */
-    public function getOptionalErrors(array $data, array $errors = [])
+    public function getOptionalErrors(array $data, array &$errors = [], $fieldset = null)
     {
-        $fields = $this->schema->getFields();
-        $table = $this->schema->getName();
-        $primary = $this->schema->getPrimaryFieldName();
+        $schema = $this->schema;
+
+        if (!is_null($fieldset)) {
+            $schema = $fieldset;
+        }
+
+        $fields = $schema->getFields();
+        $table = $schema->getName();
+        $primary = $schema->getPrimaryFieldName();
 
         foreach ($fields as $field) {
             $name = $table . '_' . $field['name'];

@@ -1,7 +1,7 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="/admin/system/schema/search">
+            <a href="/admin/system/fieldset/search">
                 <i class="fas fa-home"></i> Admin
             </a>
         </li>
@@ -33,8 +33,8 @@
         </div>
 
         <div class="float-right">
-            <a class="btn btn-success" href="/admin/system/schema/create?redirect_uri={{redirecturl}}">
-                <i class="fas fa-plus"></i> {{_ 'Create Schema'}}
+            <a class="btn btn-success" href="/admin/system/fieldset/create?redirect_uri={{redirecturl}}">
+                <i class="fas fa-plus"></i> {{_ 'Create Fieldset'}}
             </a>
         </div>
     </div>
@@ -47,8 +47,7 @@
                 <thead>
                     <tr>
                         <th>{{_ 'Actions'}}</th>
-                        <th>{{_ 'Schema'}}</th>
-                        <th>{{_ 'Relations'}}</th>
+                        <th>{{_ 'Fieldset'}}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,54 +56,26 @@
                             <td>
                                 <a
                                     class="text-purple"
-                                    href="/admin/system/schema/create?copy={{name}}&redirect_uri={{redirecturl}}"
-                                    title="{{_ 'Copy %s' ../schema.singular}}"
+                                    href="/admin/system/fieldset/create?copy={{name}}&redirect_uri={{redirecturl}}"
+                                    title="{{_ 'Copy %s' label}}"
                                 >
                                     <i class="fa fa-copy"></i>
                                 </a>
                                 {{#if ../filter.active}}
-                                    <a class="text-info" title="Edit" href="/admin/system/schema/update/{{name}}?redirect_uri={{redirecturl}}">
+                                    <a class="text-info" title="Edit" href="/admin/system/fieldset/update/{{name}}?redirect_uri={{redirecturl}}">
                                     <i class="fas fa-edit"></i></a>
                                     {{#if disable}}
                                         <i class="fas fa-lock fa-fw"></i>
                                     {{else}}
-                                        <a class="text-danger" title="{{_ 'Remove'}}" href="/admin/system/schema/remove/{{name}}?redirect={{redirecturl}}"
+                                        <a class="text-danger" title="{{_ 'Remove'}}" href="/admin/system/fieldset/remove/{{name}}?redirect={{redirecturl}}"
                                         class="text-danger remove"><i class="fas fa-times"></i></a>
                                     {{/if}}
                                 {{else}}
-                                    <a title="{{_ 'Restore'}}" href="/admin/system/schema/restore/{{name}}?redirect_uri={{redirecturl}}" class="text-success restore">
+                                    <a title="{{_ 'Restore'}}" href="/admin/system/fieldset/restore/{{name}}?redirect_uri={{redirecturl}}" class="text-success restore">
                                     <i class="fas fa-external-link-alt"></i></a>
                                 {{/if}}
                             </td>
-                            <td>
-                                <a href="/admin/system/model/{{name}}/search"><i class="{{icon}}"></i> {{capital singular}}</a>
-                                <p>{{detail}}</p>
-                            </td>
-                            <td nowrap>
-                                {{#if relations.length}}
-                                    {{#each relations}}
-                                        <div class="relation">
-                                            <i class="fas fa-arrow-right"></i>
-                                            {{#when many '==' 0}}
-                                                <span>1:0</span>
-                                            {{/when}}
-                                            {{#when many '==' 1}}
-                                                <span>1:1</span>
-                                            {{/when}}
-                                            {{#when many '==' 2}}
-                                                <span>1:N</span>
-                                            {{/when}}
-                                            {{#when many '==' 3}}
-                                                <span>N:N</span>
-                                            {{/when}}
-                                            <i class="fas fa-arrow-right"></i>
-                                            {{name}}
-                                        </div>
-                                    {{/each}}
-                                {{else}}
-                                    &nbsp;
-                                {{/if}}
-                            </td>
+                            <td>{{capital singular}}</td>
                         </tr>
                     {{/each}}
                 </tbody>

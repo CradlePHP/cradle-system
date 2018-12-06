@@ -8,6 +8,7 @@
 require_once __DIR__ . '/src/Schema/events.php';
 require_once __DIR__ . '/src/Relation/events.php';
 require_once __DIR__ . '/src/Model/events.php';
+require_once __DIR__ . '/src/Fieldset/events.php';
 
 //bootstrap
 $this
@@ -15,4 +16,5 @@ $this
     ->preprocess(include __DIR__ . '/src/bootstrap/helpers.php')
     ->preprocess(include __DIR__ . '/src/bootstrap/template.php')
     ->preprocess(include __DIR__ . '/src/bootstrap/files.php')
+    ->preprocess(include __DIR__ . '/src/bootstrap/fieldset.php')
     ->preprocess(include __DIR__ . '/src/bootstrap/controller.php');

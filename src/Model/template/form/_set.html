@@ -1,0 +1,63 @@
+{{#each formats}}
+    {{#if fieldset}}
+        <div class="fieldsets mb-3">
+            <fieldset 
+                class="form-group"
+                data-fieldset="{{config.parameters}}" 
+                data-reindex="{{@key}}"
+            >
+                <label>{{label}}</label>
+
+                {{#each formats}}
+                    <div class="fieldset border mb-2 p-3" data-parent="{{../@key}}" data-index="{{@index}}">
+                        <a 
+                            href="javscript:void(0)" 
+                            class="text-danger float-right" 
+                            data-schema="{{../config.parameters}}"
+                            data-do="fieldset-remove" 
+                            data-on="click"
+                        >
+                            <i class="fa fa-times"></i>
+                        </a>
+                        {{{partial 'form_set' this}}}
+                    </div>
+                {{/each}}
+                
+                <div>
+                    <a 
+                        class="btn btn-success fieldset-add" 
+                        data-do="fieldset-add" 
+                        data-on="click"
+                        data-fieldset="{{config.parameters}}"
+                    >
+                        <i class="fas fa-plus"></i>
+                        {{_ 'Add'}} {{label}}
+                    </a>
+                </div>
+            </fieldset>
+        </div>
+    {{else}}
+        <div class="
+            form-group
+            {{#has ../../errors @path}} 
+                has-error
+            {{else}}
+                {{#response 'json'}}
+                    {{#scope validation ../@validation}} has-error{{/scope}}
+                {{/response}}
+            {{/has}}
+        ">
+            <label class="control-label">{{label}}</label>
+            <div class="form-{{config.type}}">
+                {{{value}}}
+                {{#has ../../errors @path}}
+                    <span class="help-text">{{scope ../../errors @path}}</span>
+                {{else}}
+                    {{#response 'json'}}
+                        {{#scope validation ../@validation}}{{this}}{{/scope}}
+                    {{/response}}
+                {{/has}}
+            </div>
+        </div>
+    {{/if}}
+{{/each}}

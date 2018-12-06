@@ -97,40 +97,6 @@
                             />
                         </div>
                     </div>
-
-                    <div class="form-group  form-group-indexes">
-                        <div>
-                            <label class="checkbox checkbox-2">
-                                <input
-                                    class="field-searchable"
-                                    name="fields[{INDEX}][searchable]"
-                                    type="checkbox"
-                                    value="1"
-                                />
-                                <span>{{_ 'Searchable'}}</span>
-                            </label>
-                            <br />
-                            <label class="checkbox checkbox-2">
-                                <input
-                                    class="field-filterable"
-                                    name="fields[{INDEX}][filterable]"
-                                    type="checkbox"
-                                    value="1"
-                                />
-                                <span>{{_ 'Filterable'}}</span>
-                            </label>
-                            <br />
-                            <label class="checkbox checkbox-2">
-                                <input
-                                    class="field-sortable"
-                                    name="fields[{INDEX}][sortable]"
-                                    type="checkbox"
-                                    value="1"
-                                />
-                                <span>{{_ 'Sortable'}}</span>
-                            </label>
-                        </div>
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button
@@ -156,48 +122,45 @@
 </script>
 
 <script id="field-row-template" type="text/x-template">
-    <tr class="schema-field-row" data-index="{INDEX}" data-do="schema-field-row">
-        <td class="schema-field-action" nowrap="nowrap" valign="middle">
+    <tr class="fieldset-field-row" data-index="{INDEX}" data-do="fieldset-field-row">
+        <td class="fieldset-field-action" nowrap="nowrap" valign="middle">
             <a
-                class="schema-field-copy-trigger text-purple"
+                class="fieldset-field-copy-trigger text-purple"
                 href="javascript:void(0)"
             >
                 <i class="fas fa-copy fa-fw"></i>
             </a>
             <a
-                class="schema-field-update-trigger text-warning"
+                class="fieldset-field-update-trigger text-warning"
                 href="javascript:void(0)"
             >
                 <i class="fas fa-edit fa-fw"></i>
             </a>
             <a
-                class="schema-field-move-up-trigger"
+                class="fieldset-field-move-up-trigger"
                 href="javascript:void(0)"
             >
                 <i class="fas fa-arrow-up fa-fw"></i>
             </a>
             <a
-                class="schema-field-move-down-trigger"
+                class="fieldset-field-move-down-trigger"
                 href="javascript:void(0)"
             >
                 <i class="fas fa-arrow-down fa-fw"></i>
             </a>
             <a
-                class="schema-field-remove-trigger text-danger"
+                class="fieldset-field-remove-trigger text-danger"
                 href="javascript:void(0)"
             >
                 <i class="fas fa-times fa-fw"></i>
             </a>
         </td>
-        <td class="schema-field-name-value"></td>
-        <td class="schema-field-label-value"></td>
-        <td class="schema-field-type-value"></td>
-        <td class="schema-field-list-value"></td>
-        <td class="schema-field-detail-value"></td>
-        <td class="schema-field-default-value"></td>
-        <td class="schema-field-searchable-value"></td>
-        <td class="schema-field-filterable-value"></td>
-        <td class="schema-field-sortable-value"></td>
+        <td class="fieldset-field-name-value"></td>
+        <td class="fieldset-field-label-value"></td>
+        <td class="fieldset-field-type-value"></td>
+        <td class="fieldset-field-list-value"></td>
+        <td class="fieldset-field-detail-value"></td>
+        <td class="fieldset-field-default-value"></td>
     </tr>
 </script>
 
@@ -315,30 +278,5 @@
 <script id="fieldset-textarea-template" type="text/x-template">
     <div class="fieldset-textarea input-fieldset mt-2" data-do="fieldset-textarea">
         <textarea class="form-control required"></textarea>
-    </div>
-</script>
-
-<script id="relation-row-template" type="text/x-template">
-    <div class="relation-row" data-index="{INDEX}" data-name-format="relations[{INDEX}]">
-        <a class="remove text-danger" href="javascript:void(0)">
-            <i class="fas fa-times"></i>
-        </a>
-        <strong class="relation-singular">
-            {SINGULAR}
-        </strong>
-        <i class="fas fa-arrow-right"></i>
-        <select class="form-control relation-many" name="{NAME}[many]">
-            <option value="0">1:0</option>
-            <option value="1">1:1</option>
-            <option value="2">1:N</option>
-            <option value="3">N:N</option>
-        </select>
-        <i class="fas fa-arrow-right"></i>
-        <input
-            class="form-control relation-name"
-            name="{NAME}[name]"
-            placeholder="{{_ 'Enter Schema Keyword'}}"
-            type="text"
-        />
     </div>
 </script>

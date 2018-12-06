@@ -21,6 +21,7 @@
 </nav>
 
 {{> styles}}
+
 <div class="main-padding">
     <h3 class="main-title">{{title}}</h3>
     <form class="box" enctype="multipart/form-data" method="post">
@@ -148,53 +149,52 @@
 
             <div class="form-group">
                 <label class="control-label">{{_ 'Fields'}}</label>
-                <div>
-                    <div id="schema-fields" class="schema-fields" data-name="fields">
-                        <div class="table-overflow">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>{{_ 'Action'}}</th>
-                                        <th>{{_ 'Keyword'}}</th>
-                                        <th>{{_ 'Label'}}</th>
-                                        <th>{{_ 'Field'}}</th>
-                                        <th>{{_ 'List Format'}}</th>
-                                        <th>{{_ 'Detail Format'}}</th>
-                                        <th>{{_ 'Default'}}</th>
-                                        <th>{{_ 'Searchable'}}</th>
-                                        <th>{{_ 'Filterable'}}</th>
-                                        <th>{{_ 'Sortable'}}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{#each item.fields}}
-                                        {{> row}}
-                                    {{/each}}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {{#if errors.fields}}
-                            <div class="d-block invalid-feedback">
-                                {{errors.fields}}
-                            </div><br/>
-                        {{/if}}
-                        <button
-                            class="field-add btn btn-info"
-                            data-do="field-add"
-                            data-on="click"
-                            data-target="#schema-fields tbody"
-                            type="button"
-                        >
-                            {{_ 'Add Field'}}
-                        </button>
+                <div class="schema-fields" data-do="schema-fields">
+                    <div class="table-overflow">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>{{_ 'Action'}}</th>
+                                    <th>{{_ 'Keyword'}}</th>
+                                    <th>{{_ 'Label'}}</th>
+                                    <th>{{_ 'Field'}}</th>
+                                    <th>{{_ 'List Format'}}</th>
+                                    <th>{{_ 'Detail Format'}}</th>
+                                    <th>{{_ 'Default'}}</th>
+                                    <th>{{_ 'Searchable'}}</th>
+                                    <th>{{_ 'Filterable'}}</th>
+                                    <th>{{_ 'Sortable'}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each item.fields}}
+                                    {{> row}}
+                                {{/each}}
+                            </tbody>
+                        </table>
                     </div>
+
+                    {{#if errors.fields}}
+                        <div class="d-block invalid-feedback">
+                            {{errors.fields}}
+                        </div><br/>
+                    {{/if}}
+                    <button
+                        class="field-add btn btn-info"
+                        type="button"
+                    >
+                        <i class="fas fa-plus"></i>
+                        {{_ 'Add Field'}}
+                    </button>
                 </div>
             </div>
 
             <div class="form-group{{#if errors.relations}} has-error{{/if}}">
                 <label class="control-label">{{_ 'Relations'}}</label>
-                <div>
+                <div
+                    data-do="schema-relations"
+                    data-name-format="relations[{INDEX}]"
+                >
                     {{#each item.relations}}
                         <div class="relation-row" data-index="{{@index}}">
                             {{#if disable}}
@@ -295,12 +295,9 @@
 
                     <button
                         class="relation-add btn btn-info"
-                        data-default="??"
-                        data-do="relation-add"
-                        data-name="relations[{INDEX}]"
-                        data-on="click"
                         type="button"
                     >
+                        <i class="fas fa-plus"></i>
                         {{_ 'Add Relation'}}
                     </button>
                 </div>

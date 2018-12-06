@@ -3,11 +3,11 @@
 
     //----------------------------//
     // Field Table Events
-    $(window).on('schema-fields-init', function(e, target) {
+    $(window).on('fieldset-fields-init', function(e, target) {
         //add field
         $('button.field-add', target).click(function() {
             var target = $(this).attr('data-target');
-            var index = $('tr.schema-field-row', target).length;
+            var index = $('tr.fieldset-field-row', target).length;
 
             $('#modal-template')
                 .compile({ INDEX: index })
@@ -21,12 +21,12 @@
         });
     });
 
-    $(window).on('schema-field-row-init', function(e, target) {
+    $(window).on('fieldset-field-row-init', function(e, target) {
         target = $(target);
 
         //copy row
-        $('a.schema-field-copy-trigger', target).click(function() {
-            var index = $('tr.schema-field-row', target).length;
+        $('a.fieldset-field-copy-trigger', target).click(function() {
+            var index = $('tr.fieldset-field-row', target).length;
             var modal = $(this).siblings('div.modal').eq(0);
 
             copy = modal
@@ -56,7 +56,7 @@
         });
 
         //update row
-        $('a.schema-field-update-trigger', target).click(function() {
+        $('a.fieldset-field-update-trigger', target).click(function() {
             var modal = $(this).siblings('div.modal').eq(0);
 
             modal.modal({
@@ -68,7 +68,7 @@
         });
 
         //move up row
-        $('a.schema-field-move-up-trigger', target).click(function() {
+        $('a.fieldset-field-move-up-trigger', target).click(function() {
             if(target.attr('data-index') == 0) {
                 return;
             }
@@ -86,13 +86,13 @@
                 .attr('data-index', after)
                 .data('index', after);
 
-            $(window).trigger('schema-field-row-reindex', target);
-            $(window).trigger('schema-field-row-reindex', previous);
+            $(window).trigger('fieldset-field-row-reindex', target);
+            $(window).trigger('fieldset-field-row-reindex', previous);
         });
 
         //move down row
-        $('a.schema-field-move-down-trigger', target).click(function() {
-            var last = target.parent().find('tr.schema-field-row').length - 1;
+        $('a.fieldset-field-move-down-trigger', target).click(function() {
+            var last = target.parent().find('tr.fieldset-field-row').length - 1;
 
             if(target.attr('data-index') == last) {
                 return;
@@ -111,25 +111,25 @@
                 .attr('data-index', after)
                 .data('index', after);
 
-            $(window).trigger('schema-field-row-reindex', target);
-            $(window).trigger('schema-field-row-reindex', next);
+            $(window).trigger('fieldset-field-row-reindex', target);
+            $(window).trigger('fieldset-field-row-reindex', next);
         });
 
         //remove row
-        $('a.schema-field-remove-trigger', target).click(function() {
+        $('a.fieldset-field-remove-trigger', target).click(function() {
             target.remove();
 
-            target.parent().find('tr.schema-field-row').each(function(i) {
+            target.parent().find('tr.fieldset-field-row').each(function(i) {
                 $(this)
                     .attr('data-index', i)
                     .data('index', i);
 
-                $(window).trigger('schema-field-row-reindex', $(this));
+                $(window).trigger('fieldset-field-row-reindex', $(this));
             });
         });
     });
 
-    $(window).on('schema-field-row-reindex', function(e, target) {
+    $(window).on('fieldset-field-row-reindex', function(e, target) {
         var index = $(target).data('index');
 
         var names = {
@@ -140,9 +140,6 @@
             list: 'fields[{INDEX}][list][format]'.replace('{INDEX}', index),
             detail: 'fields[{INDEX}][detail][format]'.replace('{INDEX}', index),
             value: 'fields[{INDEX}][default]'.replace('{INDEX}', index),
-            searchable: 'fields[{INDEX}][searchable]'.replace('{INDEX}', index),
-            filterable: 'fields[{INDEX}][filterable]'.replace('{INDEX}', index),
-            sortable: 'fields[{INDEX}][sortable]'.replace('{INDEX}', index),
             validation: 'fields[{INDEX}][validation][{INDEX}][method]'.replace('{INDEX}', index)
         };
 
@@ -154,9 +151,6 @@
         $('select.field-list', target).attr('name', names.list);
         $('select.field-detail', target).attr('name', names.detail);
         $('input.field-default', target).attr('name', names.value);
-        $('input.field-searchable', target).attr('name', names.searchable);
-        $('input.field-filterable', target).attr('name', names.filterable);
-        $('input.field-sortable', target).attr('name', names.sortable);
 
         $('div.validation-row', target).each(function() {
             var names = {
@@ -201,9 +195,6 @@
             var value = option.attr('data-default');
             var label = option.attr('data-label');
             var name = option.attr('data-name');
-            var searchable = option.attr('data-searchable');
-            var filterable = option.attr('data-filterable');
-            var sortable = option.attr('data-sortable');
             var index = $(this).getModelIndex();
 
             var validation = option.attr('data-validation');
@@ -211,9 +202,6 @@
             //reset
             $('select.field-list optgroup', target).show();
             $('select.field-detail optgroup', target).show();
-            $('input.field-searchable', target).attr('disabled', false);
-            $('input.field-filterable', target).attr('disabled', false);
-            $('input.field-sortable', target).attr('disabled', false);
 
             //remove all fieldsets
             select.parent().find('div.input-fieldset').remove();
@@ -293,15 +281,6 @@
                 }
             });
 
-            //determine index
-            ['searchable', 'filterable', 'sortable'].forEach(function(index) {
-                if(indexes.indexOf(index) === -1) {
-                    $('input.field-' + index, target)
-                        .attr('checked', false)
-                        .attr('disabled', true);
-                }
-            });
-
             //determine label
             if(label && label.length) {
                 $('input.field-label', target).val(label);
@@ -332,45 +311,6 @@
                 $('div.form-group-default', target).hide();
             } else {
                 $('div.form-group-default', target).show();
-            }
-
-            //determine searchable
-            if(searchable && searchable.length) {
-                if(searchable == 1) {
-                    $('input.field-searchable', target).prop('checked', true);
-                } else {
-                    $('input.field-searchable', target).prop('checked', false);
-                }
-
-                $('input.field-searchable', target).parent().hide();
-            } else {
-                $('input.field-searchable', target).parent().show();
-            }
-
-            //determine filterable
-            if(filterable && filterable.length) {
-                if(filterable == 1) {
-                    $('input.field-filterable', target).prop('checked', true);
-                } else {
-                    $('input.field-filterable', target).prop('checked', false);
-                }
-
-                $('input.field-filterable', target).parent().hide();
-            } else {
-                $('input.field-filterable', target).parent().show();
-            }
-
-            //determine sortable
-            if(sortable && sortable.length) {
-                if(sortable == 1) {
-                    $('input.field-sortable', target).prop('checked', true);
-                } else {
-                    $('input.field-sortable', target).prop('checked', false);
-                }
-
-                $('input.field-sortable', target).parent().hide();
-            } else {
-                $('input.field-sortable', target).parent().show();
             }
         });
 
@@ -595,48 +535,39 @@
         modal.modal('hide');
 
         if(modal.hasClass('modal-create')) {
-            var target = $('div.schema-fields tbody');
+            var target = $('div.fieldset-fields tbody');
             var index = $('div.modal-body', modal).attr('data-index');
 
             $('#field-row-template')
                 .compile({ INDEX: index })
                 .appendTo(target)
                 .doon()
-                .find('td.schema-field-action')
+                .find('td.fieldset-field-action')
                 .append(modal
                     .removeClass('modal-create')
                     .addClass('modal-update')
                 );
         }
 
-        var row = $(trigger).parents('tr.schema-field-row').eq(0);
+        var row = $(trigger).parents('tr.fieldset-field-row').eq(0);
 
         var name = $('input.field-name', modal).val();
-        $('td.schema-field-name-value', row).html(name);
+        $('td.fieldset-field-name-value', row).html(name);
 
         var label = $('input.field-label', modal).val();
-        $('td.schema-field-label-value', row).html(label);
+        $('td.fieldset-field-label-value', row).html(label);
 
         var type = $('select.field-type', modal).val();
-        $('td.schema-field-type-value', row).html(type);
+        $('td.fieldset-field-type-value', row).html(type);
 
         var list = $('select.field-list', modal).val();
-        $('td.schema-field-list-value', row).html(list);
+        $('td.fieldset-field-list-value', row).html(list);
 
         var detail = $('select.field-detail', modal).val();
-        $('td.schema-field-detail-value', row).html(detail);
+        $('td.fieldset-field-detail-value', row).html(detail);
 
         var value = $('input.field-default', modal).val();
-        $('td.schema-field-default-value', row).html(value.length ? value: '--');
-
-        var searchable = $('input.field-searchable', modal)[0].checked;
-        $('td.schema-field-searchable-value', row).html(searchable ? 'Yes': 'No');
-
-        var filterable = $('input.field-filterable', modal)[0].checked;
-        $('td.schema-field-filterable-value', row).html(filterable ? 'Yes': 'No');
-
-        var sortable = $('input.field-sortable', modal)[0].checked;
-        $('td.schema-field-sortable-value', row).html(sortable ? 'Yes': 'No');
+        $('td.fieldset-field-default-value', row).html(value.length ? value: '--');
 
         copy = null;
 
@@ -1082,11 +1013,6 @@
         });
     });
 
-    // fieldset - fieldset fields
-    $(window).on('fieldset-fieldset-init', function(e, target) {
-
-    });
-
     // fieldset - slugger
     $(window).on('slugger-init', function(e, target) {
         if (!$(target).hasClass('field-name')) {
@@ -1118,79 +1044,13 @@
             if(name.val() === 'updated' && type !== 'updated') {
                 var value = name.val();
 
-                $('div.schema-fields table input.field-name').not(name).each(function() {
+                $('div.fieldset-fields table input.field-name').not(name).each(function() {
                     if($(this).val() === value) {
                         message = '<div class="error-message">Keyword already exists.</div>';
                         name.addClass('is-error').after(message);
                     }
                 });
             }
-        });
-    });
-
-    //----------------------------//
-    // Relation Events
-    $(window).on('schema-relations-init', function(e, target) {
-        target = $(target);
-        //init
-        var init = function(row) {
-            //remove relation
-            $('a.remove', row).click(function() {
-                row.remove();
-                //reindex
-                $('div.relation-row', target).each(function(i) {
-                    $(this)
-                        .attr('data-index', i)
-                        .data('index', i);
-
-                    var name = target
-                        .attr('data-name-format')
-                        .replace('{INDEX}', i);
-
-                    $('select.relation-many', this).attr('name', name + '[many]');
-                    $('input.relation-name', this).attr('name', name + '[name]');
-                });
-            });
-        };
-
-        //for each relation
-        $('div.relation-row', target).each(function() {
-            //init
-            init(this);
-        });
-
-        //add relation
-        $('button.relation-add', target).click(function() {
-            var last = $('div.relation-row:last', target);
-
-            var index = 0;
-            if(last.length) {
-                index = parseInt(last.attr('data-index')) + 1;
-            }
-
-            var name = target
-                .attr('data-name-format')
-                .replace('{INDEX}', index);
-
-            var singular = $('input.schema-singular').val() || '??';
-
-            var row = $('#relation-row-template')
-                .compile({
-                    SINGULAR: singular,
-                    NAME: name,
-                    INDEX: index
-                });
-
-            $(this).before(row);
-
-            init(row);
-
-        });
-
-        //update singular value in relations
-        //when the singular changes
-        $('input.schema-singular').change(function() {
-            $('strong.relation-singular', target).html($(this).val() || '??');
         });
     });
 
@@ -1213,7 +1073,7 @@
             var index = $(this).parents('div.modal-body').data('index');
 
             if(typeof index === 'undefined') {
-                index = this.parents('tr.schema-field-row').data('index');
+                index = this.parents('tr.fieldset-field-row').data('index');
             }
 
             return index;

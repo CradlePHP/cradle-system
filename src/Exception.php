@@ -20,13 +20,29 @@ use Exception as BaseException;
  */
 class Exception extends BaseException
 {
+
     /**
-     * @const string ERROR_NO_MODEL Error template
+     * @const string ERROR_FIELDSET_NOT_FOUND Error template
+     */
+    const ERROR_FIELDSET_NOT_FOUND = 'Could not find fieldset %s.';
+
+    /**
+     * @const string ERROR_FIELDSET_EXISTS
+     */
+    const ERROR_FIELDSET_EXISTS = 'Unable to restore %s, fieldset already exists.';
+
+    /**
+     * @const string ERROR_FIELDSET_ARCHIVE_EXISTS
+     */
+    const ERROR_FIELDSET_ARCHIVE_EXISTS = 'Unable to archive %s, an archive of the fieldset already exists.';
+
+    /**
+     * @const string ERROR_NO_SCHEMA Error template
      */
     const ERROR_NO_SCHEMA = 'Schema is not loaded';
 
     /**
-     * @const string ERROR_CONFIG_NOT_FOUND Error template
+     * @const string ERROR_SCHEMA_NOT_FOUND Error template
      */
     const ERROR_SCHEMA_NOT_FOUND = 'Could not find schema %s.';
 
@@ -44,6 +60,46 @@ class Exception extends BaseException
      * @const string ERROR_SCHEMA_NO_RELATION
      */
     const ERROR_SCHEMA_NO_RELATION = '%s has no relation to %s';
+
+    /**
+     * Create a new exception for missing fieldset
+     *
+     * @param *string $name
+     *
+     * @return Exception
+     */
+    public static function forFieldsetNotFound($name): Exception
+    {
+        $message = sprintf(static::ERROR_FIELDSET_NOT_FOUND, $name);
+        return new static($message);
+    }
+
+    /**
+     * Create a new exception if fieldset already exists
+     *
+     * @param *string $name
+     *
+     * @return Exception
+     */
+    public static function forFieldsetAlreadyExists(string $name)
+    {
+        $message = sprintf(static::ERROR_FIELDSET_EXISTS, $name);
+        return new static($message);
+    }
+
+    /**
+     * Create a new exception if an archived of the
+     * given fieldset already exists.
+     *
+     * @param *string $name
+     *
+     * @return Exception
+     */
+    public static function forFieldsetArchiveExists(string $name)
+    {
+        $message = sprintf(static::ERROR_FIELDSET_ARCHIVE_EXISTS, $name);
+        return new static($message);
+    }
 
     /**
      * Create a new exception for missing Schema
@@ -66,7 +122,7 @@ class Exception extends BaseException
     }
 
     /**
-     * Create a new exception for missing config
+     * Create a new exception for missing Schema
      *
      * @param *string $name
      *

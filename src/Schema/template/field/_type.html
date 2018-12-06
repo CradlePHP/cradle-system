@@ -1,0 +1,161 @@
+<div class="form-group form-group-type">
+    <label class="control-label">{{_ 'Type'}}</label>
+    <div>
+        <select
+            class="field-type form-control"
+            name="fields[{{@index}}][field][type]"
+        >
+            {{> options_type}}
+        </select>
+
+        {{#in 'select,multiselect,checkboxes,radios' field.type}}
+            <div
+                class="fieldset-options input-fieldset"
+                data-do="fieldset-options"
+                data-name="fields[{{@index}}][field][options][{INDEX}]"
+                data-name-format="fields[{INDEX}][field][options][{INDEX}]"
+                data-placeholder-key="{{_ 'Key'}}"
+                data-placeholder-value="{{_ 'Value'}}"
+                data-placeholder-add="{{_ 'Add Option'}}"
+            >
+                {{#each field.options}}
+                    <div class="field-row input-group mt-2 required" data-index="{{@index}}">
+                        <input
+                            class="input-key form-control"
+                            name="fields[{{../@index}}][field][options][{{@index}}][key]"
+                            type="text"
+                            placeholder="{{_ 'Key'}}"
+                            value="{{key}}"
+                        />
+                        <input
+                            class="input-value form-control"
+                            name="fields[{{../@index}}][field][options][{{@index}}][value]"
+                            type="text"
+                            placeholder="{{_ 'Value'}}"
+                            value="{{value}}"
+                        />
+                        <div class="input-group-append">
+                            <a
+                                class="input-group-text text-danger remove"
+                                href="javascript:void(0)"
+                            >
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                {{/each}}
+                <a class="field-add btn btn-success mt-2" href="javascript:void(0)">
+                    <i class="fas fa-plus"></i>
+                    <span>{{_ 'Add Option'}}</span>
+                </a>
+            </div>
+        {{/in}}
+
+        {{#in 'table' field.type}}
+            <div
+                class="fieldset-textlist input-fieldset"
+                data-do="fieldset-textlist"
+                data-name="fields[{{@index}}][field][columns]"
+                data-name-format="fields[{INDEX}][field][columns]"
+                data-placeholder-value="{{_ 'Label'}}"
+                data-placeholder-add="{{_ 'Add Column'}}"
+            >
+                {{#each field.columns}}
+                    <div class="field-row input-group mt-2">
+                        <input
+                            class="text-field form-control required"
+                            type="text"
+                            name="fields[{{../@index}}][field][columns][]"
+                            value="{{this}}"
+                            placeholder="{{_ 'Label'}}"
+                        />
+                        <div class="input-group-append">
+                            <a
+                                class="input-group-text text-danger remove"
+                                href="javascript:void(0)"
+                            >
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                {{/each}}
+                <a
+                    class="field-add btn btn-success mt-2"
+                    href="javascript:void(0)"
+                >
+                    <i class="fas fa-plus"></i>
+                    <span>{{_ 'Add Column'}}</span>
+                </a>
+            </div>
+        {{/in}}
+
+        {{#in 'fieldset' field.type}}
+            <div
+                class="fieldset-text input-fieldset mt-2"
+                data-do="fieldset-text"
+                data-name="fields[{{@index}}][field][parameters]"
+                data-name-format="fields[{INDEX}][field][parameters]"
+                {{#when list.format '===' 'fieldset'}}
+                    data-placeholder="{{_ 'Keyword'}}"
+                {{/when}}
+            >
+                <input
+                    class="form-control required"
+                    type="text"
+                    {{#when list.format '===' 'fieldset'}}
+                        placeholder="{{_ 'Keyword'}}"
+                    {{/when}}
+                    name="fields[{{@index}}][field][parameters]"
+                    value="{{field.parameters}}"
+                />
+            </div>
+        {{/in}}
+
+
+        {{#when field.type '!==' 'none'}}
+            <div
+                class="fieldset-attributes input-fieldset"
+                data-do="fieldset-attributes"
+                data-name="fields[{{@index}}][field][attributes]"
+                data-name-format="fields[{INDEX}][field][attributes]"
+                data-placeholder-key="{{_ 'Attribute'}}"
+                data-placeholder-value="{{_ 'Value'}}"
+                data-placeholder-add="{{_ 'Add Attribute'}}"
+            >
+                {{#each field.attributes}}
+                    <div class="field-row input-group mt-2 required">
+                        <input
+                            class="input-key form-control"
+                            type="text"
+                            placeholder="{{_ 'Attribute'}}"
+                            value="{{@key}}"
+                        />
+                        <input
+                            class="input-value form-control"
+                            type="text"
+                            placeholder="{{_ 'Value'}}"
+                            value="{{this}}"
+                        />
+                        <input
+                            type="hidden"
+                            name="fields[{{../@index}}][field][attributes][{{@key}}]"
+                            value="{{this}}"
+                        />
+                        <div class="input-group-append">
+                            <a
+                                class="input-group-text text-danger remove"
+                                href="javascript:void(0)"
+                            >
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                {{/each}}
+                <a class="field-add btn btn-success mt-2" href="javascript:void(0)">
+                    <i class="fas fa-plus"></i>
+                    <span>{{_ 'Add Attribute'}}</span>
+                </a>
+            </div>
+        {{/when}}
+    </div>
+</div>

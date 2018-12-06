@@ -25,7 +25,7 @@ use Cradle\Http\Response;
  * @author   John Doe <john@acme.com>
  * @standard PSR-2
  */
-class Schema extends Registry
+class Schema extends Fieldset
 {
     /**
      * Sets up the schema
@@ -128,32 +128,6 @@ class Schema extends Registry
     }
 
     /**
-     * Returns detailable fields
-     *
-     * @return string
-     */
-    public function getDetailableFieldNames()
-    {
-        $results = [];
-        if (!isset($this->data['fields']) || empty($this->data['fields'])) {
-            return $results;
-        }
-
-        $table = $this->data['name'];
-        foreach ($this->data['fields'] as $field) {
-            $name = $table . '_' . $field['name'];
-
-            if (isset($field['detail']['format'])
-                && $field['detail']['format'] !== 'hide'
-            ) {
-                $results[] = $name;
-            }
-        }
-
-        return $results;
-    }
-
-    /**
      * Returns filterable fields
      *
      * @return array
@@ -169,131 +143,6 @@ class Schema extends Registry
         foreach ($this->data['fields'] as $field) {
             $name = $table . '_' . $field['name'];
             if (isset($field['filterable']) && $field['filterable']) {
-                $results[] = $name;
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Returns All fields
-     *
-     * @return array
-     */
-    public function getFields()
-    {
-        $results = [];
-        if (!isset($this->data['fields'])
-            || empty($this->data['fields'])
-        ) {
-            return $results;
-        }
-
-        $table = $this->data['name'];
-        foreach ($this->data['fields'] as $field) {
-            $name = $table . '_' . $field['name'];
-            $results[$name] = $field;
-        }
-
-        return $results;
-    }
-
-    /**
-     * Returns All files
-     *
-     * @return array
-     */
-    public function getFileFieldNames()
-    {
-        $results = [];
-        if (!isset($this->data['fields'])
-            || empty($this->data['fields'])
-        ) {
-            return $results;
-        }
-
-        $table = $this->data['name'];
-        foreach ($this->data['fields'] as $field) {
-            $name = $table . '_' . $field['name'];
-
-            if (in_array(
-                $field['field']['type'],
-                [
-                        'file',
-                        'image',
-                        'files',
-                        'images'
-                    ]
-            )
-            ) {
-                $results[] = $name;
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Returns JSON fields
-     *
-     * @return array
-     */
-    public function getJsonFieldNames()
-    {
-        $results = [];
-        if (!isset($this->data['fields']) || empty($this->data['fields'])) {
-            return $results;
-        }
-
-        $table = $this->data['name'];
-        foreach ($this->data['fields'] as $field) {
-            $name = $table . '_' . $field['name'];
-
-            if (in_array(
-                $field['field']['type'],
-                [
-                        'files',
-                        'images',
-                        'tag',
-                        'texts',
-                        'textareas',
-                        'wysiwygs',
-                        'meta',
-                        'checkboxes',
-                        'multirange',
-                        'rawjson',
-                        'multiselect',
-                        'multifield'
-                    ]
-            )
-            ) {
-                $results[] = $name;
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Returns listable fields
-     *
-     * @return string
-     */
-    public function getListableFieldNames()
-    {
-        $results = [];
-        if (!isset($this->data['fields']) || empty($this->data['fields'])) {
-            return $results;
-        }
-
-        $table = $this->data['name'];
-        foreach ($this->data['fields'] as $field) {
-            $name = $table . '_' . $field['name'];
-
-            if (isset($field['list']['format'])
-                && $field['list']['format'] !== 'hide'
-            ) {
                 $results[] = $name;
             }
         }
@@ -377,35 +226,6 @@ class Schema extends Registry
     }
 
     /**
-     * Returns a list of required fields
-     *
-     * @return array
-     */
-    public function getRequiredFieldNames()
-    {
-        $results = [];
-        if (!isset($this->data['fields']) || empty($this->data['fields'])) {
-            return $results;
-        }
-
-        $table = $this->data['name'];
-        foreach ($this->data['fields'] as $field) {
-            $name = $table . '_' . $field['name'];
-            if (!isset($field['validation'])) {
-                continue;
-            }
-
-            foreach ($field['validation'] as $validation) {
-                if ($validation['method'] === 'required') {
-                    $results[] = $name;
-                }
-            }
-        }
-
-        return $results;
-    }
-
-    /**
      * Returns reverse relational data
      *
      * @param int $many
@@ -476,37 +296,6 @@ class Schema extends Registry
     }
 
     /**
-     * Returns slug fields
-     *
-     * @param string|false $primary
-     *
-     * @return array
-     */
-    public function getSlugableFieldNames($primary = false)
-    {
-        $results = [];
-        if ($primary) {
-            $results[] = $primary;
-        }
-
-        if (!isset($this->data['fields']) || empty($this->data['fields'])) {
-            return $results;
-        }
-
-        $table = $this->data['name'];
-        foreach ($this->data['fields'] as $field) {
-            $name = $table . '_' . $field['name'];
-            if (isset($field['type'])) {
-                if ($field['type'] === 'slug') {
-                    $results[] = $name;
-                }
-            }
-        }
-
-        return $results;
-    }
-
-    /**
      * Based on the data will generate a suggestion format
      *
      * @param array
@@ -566,64 +355,6 @@ class Schema extends Registry
         foreach ($this->data['fields'] as $field) {
             $name = $table . '_' . $field['name'];
             if (isset($field['sortable']) && $field['sortable']) {
-                $results[] = $name;
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Returns a list of unique fields
-     *
-     * @return array
-     */
-    public function getUniqueFieldNames()
-    {
-        $results = [ $this->getPrimaryFieldName() ];
-        if (!isset($this->data['fields']) || empty($this->data['fields'])) {
-            return $results;
-        }
-
-        $table = $this->data['name'];
-        foreach ($this->data['fields'] as $field) {
-            $name = $table . '_' . $field['name'];
-
-            if ($field['field']['type'] === 'uuid') {
-                $results[] = $name;
-                continue;
-            }
-
-            if (!isset($field['validation'])) {
-                continue;
-            }
-
-            foreach ($field['validation'] as $validation) {
-                if ($validation['method'] === 'unique') {
-                    $results[] = $name;
-                }
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Returns uuid fields
-     *
-     * @return string|false
-     */
-    public function getUuidFieldNames()
-    {
-        $results = [];
-        if (!isset($this->data['fields']) || empty($this->data['fields'])) {
-            return $results;
-        }
-
-        $table = $this->data['name'];
-        foreach ($this->data['fields'] as $field) {
-            $name = $table . '_' . $field['name'];
-            if ($field['field']['type'] === 'uuid') {
                 $results[] = $name;
             }
         }
@@ -810,90 +541,6 @@ class Schema extends Registry
     }
 
     /**
-     * Transforms to elastic data
-     *
-     * @return array
-     */
-    public function toElastic($data) {
-        // check table name
-        if (!isset($data['name'])) {
-            return;
-        }
-
-        $map = [];
-        $map[$data['primary']] = ['type' => 'integer'];
-        foreach ($data['columns'] as $field => $meta) {
-            switch (strtolower($meta['type'])) {
-                case 'datetime' :
-                case 'date' :
-                    $map[$field] = [
-                        'type'=> 'date',
-                        'format' => 'yyyy-MM-dd HH:mm:ss'];
-
-                    break;
-                case 'int' :
-                case 'smallint':
-                    $map[$field] = ['type' => 'integer'];
-                    break;
-                case 'float' :
-                    $map[$field] = ['type' => 'float'];
-                    break;
-                case 'json' :
-                    $map[$field] = ['type' => 'object'];
-                    break;
-                default :
-                    $map[$field] = ['type' => 'string'];
-                    if (isset($meta['index']) && $meta['index'] == 1) {
-                        $map[$field]['fields'] = ['keyword' => [
-                            'type' => 'keyword']];
-                    }
-
-                    break;
-            }
-
-        }
-
-        foreach ($data['relations'] as $table => $fields) {
-            // set primary for relational table
-            $map[$fields['name'] . '_id'] = ['type' => 'integer'];
-            // loop through fields
-            foreach($fields['fields'] as $field => $meta) {
-
-                switch (strtolower($meta['field']['type'])) {
-                    case 'datetime' :
-                    case 'date' :
-                        $map[$field] = [
-                            'type'=> 'date',
-                            'format' => 'yyyy-MM-dd HH:mm:ss'];
-
-                        break;
-                    case 'int' :
-                    case 'smallint':
-                        $map[$field] = ['type' => 'integer'];
-                        break;
-                    case 'float' :
-                        $map[$field] = ['type' => 'float'];
-                        break;
-                    case 'json' :
-                        $map[$field] = ['type' => 'object'];
-                        break;
-                    default :
-                        $map[$field] = ['type' => 'string'];
-                        if (isset($meta['index']) && $meta['index'] == 1) {
-                            $map[$field]['fields'] = ['keyword' => [
-                                'type' => 'keyword']];
-                        }
-
-                        break;
-                }
-            }
-
-        }
-
-        return [$data['name'] => $map];
-    }
-
-    /**
      * @var array $fieldTyles
      */
     protected static $fieldTypes = [
@@ -1035,7 +682,10 @@ class Schema extends Registry
         'rawjson' => [
             'type' => 'JSON'
         ],
-        'multifield' => [
+        'fieldset' => [
+            'type' => 'JSON'
+        ],
+        'table' => [
             'type' => 'JSON'
         ],
         'uuid' => [

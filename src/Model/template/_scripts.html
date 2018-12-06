@@ -1,0 +1,215 @@
+<script type="text/javascript">
+(function($) {
+  $(window).on('fieldset-add-click', function(e, target) {
+    target = $(target);
+    
+    //get the fieldset
+    var fieldset = target.data('fieldset');
+    //get the reindex name
+    var reindex = target.parent().parent().data('reindex');
+    //get the template
+    var template = $('#fieldset-template-' + fieldset).html();
+
+    //collect parents
+    var parents = [];
+    //get the parents from source to top
+    var getParents = function(element) {
+      var parent = element.parent();
+      var type = parent[0].tagName;
+      var name = parent.data('reindex');
+
+      //fieldset? and has a reindex name?
+      if (type === 'FIELDSET' && name && name) {
+        var index = element.index() - 1;
+        //get the current element index from parent
+        parents.push({ 
+          name: name,
+          index: index < 0 ? 0 : index
+        });
+      }
+
+      //we should continue
+      if (type !== 'FORM') {
+        getParents(parent);
+      }
+    };
+
+    //start gathering the parents
+    getParents(target);
+    //reverse so we can start replacing from bottom to top
+    parents = parents.reverse();
+
+    console.log(parents);
+
+    //replace indexes based off of parents
+    for(var i in parents) {
+      var index = parseInt(i) + 1;
+      var namespace = '{ROOT_' + index + '}';
+      var re = new RegExp(namespace, 'g');
+      template = template.replace(re, parents[i].index);
+      
+      namespace = 'ROOT_' + index;
+      re = new RegExp(namespace, 'g');
+      template = template.replace(re, parents[i].name);
+    }
+
+    //insert and activate scripts
+    $(template).insertBefore(target.parent()).doon();
+  });
+
+  $(window).on('fieldset-remove-click', function(e, target) {
+    target = $(target);
+    
+    // Get the fieldset
+    var fieldset = target.data('fieldset');
+    // Get the container
+    var container = target.parent().parent();
+
+    // Remove the target
+    target.parent().remove();
+    
+    // Get all the inputs
+    var inputs = container.find('[name]');
+    // Re-index
+    reindex(inputs);
+  });
+
+  var reindex = function(inputs) {
+    // Get the input names
+    var names = {};
+    $.each(inputs, function(index, element) {
+      // Get the original name
+      var original = $(element).attr('name');
+      // Convert to dot e.g a.b.c
+      var name = original
+        .replace(/\[|\]/g, '.')
+        .replace(/\.\./g, '.');
+
+      // Trim trailing dots
+      name = name.substr(0, name.length - 1);
+
+      // Convert to object
+      dotToObject(name, original, names);
+    });
+
+    // Get the re-index filters
+    var filters = [];
+    $('[data-reindex]').map(function(index, element) {
+      filters.push($(element).data('reindex'));
+    });
+
+    // Re-index names
+    var reindexed = arrange(names, filters);
+    // Serialized it so we can build something like a[b][c]
+    var serialized = serialize(reindexed);
+    // Split by pairs
+    serialized = serialized.split('&');
+
+    // On each serialized pairs
+    for(var i in serialized) {
+      // Get the parts key & value
+      var parts = serialized[i].split('=');
+      
+      // Iterate on each input elements
+      $.each(inputs, function(index, element) {
+        // Get the name
+        var name = $(element).attr('name');
+        
+        // Has matched the original name?
+        if (name === parts[1]) {
+          // Replace it with the re-indexed name
+          $(element).attr('name', parts[0]);
+        }
+      });
+    }
+  };
+
+  var arrange = function(object, filters) {
+    // Re-arranged object
+    var rearranged = {};
+    // Get all the keys
+    var keys = Object.keys(object);
+    // Current index
+    var index = 0;
+
+    // On each keys
+    for(var i in keys) {
+      // Get the current key
+      var key = keys[i];
+      // Get the current value
+      var current = object[keys[i]];
+      // Get the type
+      var type = Object.prototype.toString.call(current);
+      
+      // If it's a string but it's an object
+      if (isNaN(parseInt(key)) && type === '[object Object]' && key !== '{INDEX}') {
+        // If it's not fieldset
+        if (filters.indexOf(key) === -1) {
+          continue;
+        }
+        
+        // Recurse object
+        rearranged[key] = arrange(current, filters);
+        continue;
+
+      // If it's a number and it's an object, re-index
+      } else if ((!isNaN(parseInt(key)) || key === '{INDEX}') && type === '[object Object]') {
+        // Re-index the object
+        rearranged[index] = arrange(current, filters);
+        index++;
+      } else {
+        // Just set the value
+        rearranged[key] = current;
+      }
+    }
+
+    return rearranged;
+  };
+
+  var dotToObject = function(path, value, object) {
+    // Get the parts
+    var parts = path.split('.'), part;
+    var last = parts.pop();
+
+    // On each part
+    while(part = parts.shift()) {
+      // Create if doesnt exists
+      if(typeof object[part] != 'object') {
+        object[part] = {};
+      }
+
+      // Update pointer
+      object = object[part];
+    }
+
+    // Set value
+    object[last] = value;
+  };
+
+  var serialize = function(object, prefix) {
+    var string = [], property;
+
+    // On each property
+    for (property in object) {
+      if (object.hasOwnProperty(property)) {
+        // Figure out the key
+        var key = prefix ? 
+          prefix + '[' + property + ']' : 
+          property;
+        
+        // Get the value
+        var value = object[property];
+        
+        // Push or recurse the pair
+        string.push(
+          (value !== null && typeof value === 'object') ?
+          serialize(value, key) :
+          key + '=' + value
+        );
+      }
+    }
+    
+    return string.join('&');
+  };
+})(jQuery);
+</script>
