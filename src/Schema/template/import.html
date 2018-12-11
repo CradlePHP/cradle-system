@@ -1,0 +1,111 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/admin/system/schema/search">
+                <i class="fas fa-home"></i> {{_ 'Admin'}}
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="/admin/system/schema/search">
+                <i class="fas fa-database"></i> {{_ 'System Schemas'}}
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="fas fa-upload"></i> {{title}}
+        </li>
+    </ol>
+</nav>
+
+<div class="main-padding">
+    <h3 class="main-title">{{title}}</h3>
+    <form class="box" enctype="multipart/form-data" method="post">
+        <div class="box-body box-padding">
+
+            {{#if errors.length}}
+                <div class="alert alert-danger">
+                    <p>There are some errors with the imported schema/s.</p>
+                    <ul>
+                        {{#each errors}}
+                            <li>
+                                <strong>{{@key}}</strong> - {{message}}
+
+                                <ul>
+                                    {{#each validation}}
+                                        <li>{{@key}} - {{this}}</li>
+                                    {{/each}}
+                                </ul>
+                            </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            {{/if}}
+
+            <div class="form-group">
+                <label class="control-label">Schema (*.json, *.zip)</label>
+                <table
+                    class="table table-striped file-field mt-0"
+                    data-do="file-field"
+                    data-name="schema"
+                >
+                    <thead>
+                        <tr>
+                            <th>{{_ 'Preview'}}</th>
+                            <th>{{_ 'Name'}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#if item.schema}}
+                            <tr class="file-field-none" style="display:none;">
+                                <td colspan="5">
+                                    <div class="alert alert-info">{{_ 'No File Selected'}}</div>
+                                </td>
+                            </tr>
+                            <tr class="file-field-item" data-index="0">
+                                <td class="file-field-preview">
+                                    {{#fileinfo item.schema}}
+                                        {{#in 'jpg,jpeg,png,gif' extension}}
+                                            <div class="file-field-preview-container">
+                                                <img src="{{../this}}" height="50" />
+                                            </div>
+                                        {{else}}
+                                            <div class="file-field-preview-container">
+                                                <i class="fas fa-file text-info"></i>
+                                                <span class="file-field-extension">{{extension}}</span>
+                                            </div>
+                                        {{/in}}
+                                    {{/fileinfo}}
+                                </td>
+                                <td class="file-field-name">
+                                    {{item.schema}}
+                                    <input name="schema" type="hidden" value="" />
+                                </td>
+                            </tr>
+                        {{else}}
+                            <tr class="file-field-none">
+                                <td colspan="5">
+                                    <div class="alert alert-info">{{_ 'No File Selected'}}</div>
+                                </td>
+                            </tr>
+                        {{/if}}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5">
+                                <button
+                                    class="file-field-upload btn btn-info"
+                                    type="button"
+                                >
+                                    {{_ 'Choose File'}}
+                                </button>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <div class="clear form-group">
+                <button type="submit" class="btn btn-primary">{{_ 'Submit'}}</button>
+            </div>
+        </div>
+    </form>
+</div>
