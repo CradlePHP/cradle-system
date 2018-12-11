@@ -330,7 +330,7 @@ return function($request, $response) {
 
                 //FIX: for table columns need to sort out
                 //the values based on column order
-                if ($field['field']['type'] === 'table') {
+                if ($field['field']['type'] === 'table' && !empty($value)) {
                     $columns = $field['field']['columns'];
 
                     foreach($value as $index => $inner) {
