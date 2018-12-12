@@ -182,24 +182,13 @@ return function($request, $response) {
                 //determine the key name
                 $key = $name;
 
-                //template only?
-                if ($blank) {
-                    $key = 'ROOT_' . ($index + 1);
-                }
-
                 if (!is_null($root)) {
                     $key = sprintf('%s[%s][%s]', $root, $index, $name);
                 }
 
                 // if blank template
                 if (!is_null($root) && $blank) {
-                    //we need to do some pattern so we can uniquely re-use the templates
-                    $key = sprintf('%s[{%s_%s}][ROOT_%s]', $root, $parent, $index, $index + 1);
-
-                    // if it's not a fieldset, just set the name
-                    if ($type === 'field' && $field[$type]['type'] !== 'fieldset') {
-                        $key = sprintf('%s[{%s_%s}][%s]', $root, $parent, $index, $name);
-                    }
+                    $key = sprintf('{ROOT}[%s]', $name);
                 }
 
                 //determine the value
@@ -244,6 +233,7 @@ return function($request, $response) {
                     };
 
                     $formats[$name] = [
+                        '@key' => $name,
                         'fieldset' => true,
                         'label' => $fields[$name]['label'],
                         'raw' => $value,
@@ -409,16 +399,16 @@ return function($request, $response) {
                     }
 
                     //set the fieldset to root
-                    $output[$field['config']['parameters']] = $field;
+                    $output[$name] = $field;
 
                     //on each formats
-                    foreach($output[$field['config']['parameters']]['formats'] as $index => $format) {
+                    foreach($output[$name]['formats'] as $index => $format) {
                         if (!isset($format['fieldset'])) {
                             continue;
                         }
 
                         //clear out the formats to avoid the formats showing upon initial rendering of the template
-                        unset($output[$field['config']['parameters']]['formats'][$index]['formats']);
+                        unset($output[$name]['formats'][$index]['formats']);
                     }
 
                     //recursively put the formats on the root

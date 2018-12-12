@@ -8,7 +8,7 @@
     //get the reindex name
     var reindex = target.parent().parent().data('reindex');
     //get the template
-    var template = $('#fieldset-template-' + fieldset).html();
+    var template = $('script#fieldset-template-' + fieldset).html();
 
     //collect parents
     var parents = [];
@@ -19,7 +19,7 @@
       var name = parent.data('reindex');
 
       //fieldset? and has a reindex name?
-      if (type === 'FIELDSET' && name && name) {
+      if (type === 'FIELDSET' && name) {
         var index = element.index() - 1;
         //get the current element index from parent
         parents.push({ 
@@ -40,18 +40,23 @@
     parents = parents.reverse();
 
     console.log(parents);
+    
+    //root name
+    var root = '';
 
-    //replace indexes based off of parents
+    //based on parents let's determine
+    // the root name root1[index][root2][index]
     for(var i in parents) {
-      var index = parseInt(i) + 1;
-      var namespace = '{ROOT_' + index + '}';
-      var re = new RegExp(namespace, 'g');
-      template = template.replace(re, parents[i].index);
-      
-      namespace = 'ROOT_' + index;
-      re = new RegExp(namespace, 'g');
-      template = template.replace(re, parents[i].name);
+      if (i == 0) {
+        root += parents[i].name + '[' + parents[i].index + ']';
+        continue;
+      }
+
+      root += '[' + parents[i].name + '][' + parents[i].index + ']';
     }
+
+    //replace all root template
+    template = template.replace(new RegExp('{ROOT}', 'g'), root);
 
     //insert and activate scripts
     $(template).insertBefore(target.parent()).doon();

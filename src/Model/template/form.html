@@ -169,7 +169,9 @@
             {{/relations}}
 
             {{#format 'field' schema.name item}}
-                {{> form_set}}
+                {{#each formats}}
+                    {{> form_set}}
+                {{/each}}
 
                 {{{partial 'form_set-template' templates}}}
             {{/format}}
