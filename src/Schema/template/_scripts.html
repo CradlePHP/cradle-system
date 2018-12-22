@@ -526,8 +526,6 @@
 
             row.doon();
         });
-
-        $(target).formlog()
     });
 
     $(window).on('modal-cancel-click', function(e, trigger) {
@@ -551,8 +549,6 @@
 
     $(window).on('modal-save-click', function(e, trigger) {
         var modal = $(trigger).parents('div.modal').eq(0);
-
-        $(modal).formlog()
 
         $('.is-error', modal).removeClass('is-error');
         $('div.error-message', modal).remove();
@@ -1080,11 +1076,6 @@
                 $('input', this).attr('name', target.data('name') + '[]');
             });
         });
-    });
-
-    // fieldset - fieldset fields
-    $(window).on('fieldset-fieldset-init', function(e, target) {
-
     });
 
     // fieldset - slugger
