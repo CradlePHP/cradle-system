@@ -30,8 +30,8 @@ class Validator
      */
     public static function getCreateErrors(array $data, array $errors = [])
     {
-        if (!isset($data['Singular']) || empty($data['Singular'])) {
-            $errors['Singular'] = 'Singular is required';
+        if (!isset($data['singular']) || empty($data['singular'])) {
+            $errors['singular'] = 'Singular is required';
         }
 
         if (!isset($data['plural']) || empty($data['plural'])) {
