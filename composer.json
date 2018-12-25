@@ -20,9 +20,8 @@
         "satooshi/php-coveralls": "2.0.0"
     },
     "require": {
-        "cradlephp/framework": "2.*",
-        "cradlephp/handlebars": "1.*",
-        "cradlephp/storm": "1.*"
+        "cradlephp/storm": "1.*",
+        "cradlephp/cradle-admin": "0.*"
     },
     "autoload": {
         "psr-4": {
