@@ -462,8 +462,17 @@ class Schema extends Fieldset
                         $numbers = explode('.', '' . $field['field']['attributes']['max']);
                         $format['length'] = strlen($numbers[0]);
                     }
+
+                    //if there's a step and there's a decimal
+                    if (isset($field['field']['attributes']['step'])
+                        && strpos('' . $field['field']['attributes']['step'], '.') !== false
+                    ) {
+                        $format['type'] = 'FLOAT';
+                    }
+                }
+
                 //if it's a float
-                } else if ($format['type'] === 'FLOAT') {
+                if ($format['type'] === 'FLOAT') {
                     $integers = $decimals = 0;
                     //if there's a max
                     if (isset($field['field']['attributes']['max'])
@@ -472,7 +481,10 @@ class Schema extends Fieldset
                         //determine the initial integer and decimal
                         $numbers = explode('.', '' . $field['field']['attributes']['max']);
                         $integers = strlen($numbers[0]);
-                        $decimals = strlen($numbers[1]);
+
+                        if (isset($numbers[1])) {
+                            $decimals = strlen($numbers[1]);
+                        }
                     }
 
                     //if there's a step
@@ -482,7 +494,10 @@ class Schema extends Fieldset
                         $numbers = explode('.', '' . $field['field']['attributes']['step']);
                         //choose the larger of each integer and decimal
                         $integers = max($integers, strlen($numbers[0]));
-                        $decimals = max($decimals, strlen($numbers[1]));
+
+                        if (isset($numbers[1])) {
+                            $decimals = max($decimals, strlen($numbers[1]));
+                        }
                     }
 
                     //if decimals is still 0
@@ -664,13 +679,13 @@ class Schema extends Fieldset
         'tag' => [
             'type' => 'JSON'
         ],
-        'texts' => [
+        'textlist' => [
             'type' => 'JSON'
         ],
-        'textareas' => [
+        'textarealist' => [
             'type' => 'JSON'
         ],
-        'wysiwygs' => [
+        'wysiwyglist' => [
             'type' => 'JSON'
         ],
         'meta' => [
