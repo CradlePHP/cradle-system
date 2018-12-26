@@ -71,19 +71,11 @@ class Validator
                         $errors[$name][$index] = [];
                     }
 
-                    $errors[$name][$index] = $this
-                        ->getCreateErrors(
-                            $row,
-                            $errors[$name][$index],
-                            Fieldset::i($field['field']['parameters'])
-                        );
-
-                    $errors[$name][$index] = $this
-                        ->getOptionalErrors(
-                            $row,
-                            $errors[$name][$index],
-                            Fieldset::i($field['field']['parameters'])
-                        );
+                    $errors[$name][$index] = $this->getCreateErrors(
+                        $row,
+                        $errors[$name][$index],
+                        Fieldset::i($field['field']['parameters'])
+                    );
 
                     if (empty($errors[$name][$index])) {
                         unset($errors[$name][$index]);
@@ -126,7 +118,7 @@ class Validator
             }
         }
 
-        return self::getOptionalErrors($data, $errors);
+        return $this->getOptionalErrors($data, $errors, $fieldset);
     }
 
     /**
@@ -171,12 +163,6 @@ class Validator
                         Fieldset::i($field['field']['parameters'])
                     );
 
-                    self::getOptionalErrors(
-                        $row,
-                        $errors[$name][$index],
-                        Fieldset::i($field['field']['parameters'])
-                    );
-
                     if (empty($errors[$name][$index])) {
                         unset($errors[$name][$index]);
                     }
@@ -203,7 +189,7 @@ class Validator
             }
         }
 
-        return self::getOptionalErrors($data, $errors);
+        return $this->getOptionalErrors($data, $errors, $fieldset);
     }
 
     /**
