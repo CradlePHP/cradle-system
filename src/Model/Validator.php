@@ -12,6 +12,7 @@ use Cradle\Package\System\Schema;
 use Cradle\Package\System\Model\Service as ModelService;
 
 use Cradle\Module\Utility\Validator as UtilityValidator;
+use Cradle\Package\System\Fieldset\Validator as FieldsetValidator;
 
 use Cradle\Helper\InstanceTrait;
 
@@ -70,17 +71,19 @@ class Validator
                         $errors[$name][$index] = [];
                     }
 
-                    $errors[$name][$index] = $this->getCreateErrors(
-                        $row,
-                        $errors[$name][$index],
-                        Fieldset::i($field['field']['parameters'])
-                    );
-                    
-                    self::getOptionalErrors(
-                        $row, 
-                        $errors[$name][$index],
-                        Fieldset::i($field['field']['parameters'])
-                    );
+                    $errors[$name][$index] = $this
+                        ->getCreateErrors(
+                            $row,
+                            $errors[$name][$index],
+                            Fieldset::i($field['field']['parameters'])
+                        );
+
+                    $errors[$name][$index] = $this
+                        ->getOptionalErrors(
+                            $row,
+                            $errors[$name][$index],
+                            Fieldset::i($field['field']['parameters'])
+                        );
 
                     if (empty($errors[$name][$index])) {
                         unset($errors[$name][$index]);
@@ -97,7 +100,14 @@ class Validator
             if (isset($field['validation'])) {
                 foreach ($field['validation'] as $validation) {
                     if ($validation['method'] === 'required'
-                        && (!isset($data[$name]) || empty($data[$name]))
+                        && (
+                            !isset($data[$name])
+                            || (
+                                is_array($data[$name])
+                                && empty($data[$name])
+                            )
+                            || !strlen('' . $data[$name])
+                        )
                     ) {
                         $errors[$name] = $validation['message'];
                     }
@@ -160,9 +170,9 @@ class Validator
                         $errors[$name][$index],
                         Fieldset::i($field['field']['parameters'])
                     );
-                    
+
                     self::getOptionalErrors(
-                        $row, 
+                        $row,
                         $errors[$name][$index],
                         Fieldset::i($field['field']['parameters'])
                     );

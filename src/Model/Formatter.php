@@ -153,6 +153,55 @@ class Formatter
     }
 
     /**
+     * Returns formatted data
+     *
+     * @param *array $data
+     *
+     * @return array
+     */
+    public function expandData(array $data)
+    {
+        $fields = $this->schema->getFields();
+        $table = $this->schema->getName();
+
+        foreach ($fields as $field) {
+            $name = $table . '_' . $field['name'];
+
+            //if there's no data
+            //or already is an array
+            //or not a JSON type
+            if (!isset($data[$name])
+                || is_array($data[$name])
+                || !in_array(
+                    $field['field']['type'],
+                    [
+                        'multiselect',
+                        'checkboxes',
+                        'files',
+                        'images',
+                        'tag',
+                        'textlist',
+                        'textarealist',
+                        'wysiwyglist',
+                        'meta',
+                        'multirange',
+                        'rawjson',
+                        'fieldset',
+                        'table'
+                    ]
+                )
+            ) {
+                //no need to expand
+                continue;
+            }
+
+            $data[$name] = json_decode($data[$name], true);
+        }
+
+        return $data;
+    }
+
+    /**
      * File Upload
      *
      * @param *array  $data

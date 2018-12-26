@@ -34,7 +34,8 @@ $this->on('system-model-create', function ($request, $response) {
     // if primary is set but doesn't have a value.
     //
     if (isset($data[$schema->getPrimaryFieldName()])
-    && empty($data[$schema->getPrimaryFieldName()])) {
+        && empty($data[$schema->getPrimaryFieldName()])
+    ) {
         // remove the field instead
         unset($data[$schema->getPrimaryFieldName()]);
     }
@@ -92,6 +93,12 @@ $this->on('system-model-create', function ($request, $response) {
 
     //invalidate cache
     $modelRedis->removeSearch();
+
+    //fix the results and put back the arrays
+    $results = $schema
+        ->model()
+        ->formatter()
+        ->expandData($results);
 
     //return response format
     $response->setError(false)->setResults($results);
@@ -504,6 +511,12 @@ $this->on('system-model-update', function ($request, $response) {
     }
 
     $modelRedis->removeSearch();
+
+    //fix the results and put back the arrays
+    $results = $schema
+        ->model()
+        ->formatter()
+        ->expandData($results);
 
     //add the original
     $results['original'] = $original;

@@ -6,6 +6,7 @@
  * distributed with this package.
  */
 
+use Cradle\Data\Registry;
 use Cradle\Package\System\Fieldset;
 use Cradle\Package\System\Schema;
 
@@ -52,35 +53,6 @@ return function($request, $response) {
         return Schema::i($schema)->getSuggestionFormat($row);
     });
 
-    //deprecated
-    $handlebars->registerHelper('format', function ($schema, $row, $type, $options) {
-        $schema = Schema::i($schema);
-        $fields = $schema->getFields();
-
-        if ($type !== 'list') {
-            $type = 'detail';
-        }
-
-        $formats = [];
-        foreach ($fields as $name => $field) {
-            $format = $field[$type];
-            $format['name'] = $name;
-            $format['label'] = $field['label'];
-
-            if (!isset($row[$name])) {
-                $format['value'] = null;
-            } else {
-                $format['value'] = $row[$name];
-            }
-
-            $format['this'] = $format;
-
-            $formats[] = $options['fn']($format);
-        }
-
-        return implode('', $formats);
-    });
-
     $handlebars->registerHelper('format', function (
         $type,
         $schema,
@@ -91,7 +63,7 @@ return function($request, $response) {
         static $schemas = [];
         static $fieldsets = [];
         static $templates = [];
- 
+
         //cache the templates
         if (empty($templates)) {
             $templates['detail'] = file_get_contents(
@@ -217,11 +189,11 @@ return function($request, $response) {
 
                     //get the fields
                     $fieldset = $fieldsets[$fieldset]->getFields();
-                    
+
                     //map each rows and get format
                     $map = function($row, $index) use (
-                        $getFormats, 
-                        $type, 
+                        $getFormats,
+                        $type,
                         $fieldset,
                         $key,
                         $blank,
@@ -236,10 +208,11 @@ return function($request, $response) {
                         '@key' => $name,
                         'fieldset' => true,
                         'label' => $fields[$name]['label'],
+                        'type' => $field['field']['type'],
                         'raw' => $value,
                         'config' => $fields[$name][$type],
                         //recursive call
-                        'formats' => $blank ? 
+                        'formats' => $blank ?
                             $getFormats($row, $type, $fieldset, $blank, $key, $index + 1, 'ROOT') :
                             array_map($map, $value, array_keys($value))
                     ];
@@ -247,9 +220,10 @@ return function($request, $response) {
                     continue;
                 }
 
-                if (($type === 'list' || $type === 'detail') 
-                && $field['field']['type'] === 'fieldset'
-                && $field[$type]['format'] !== 'jsonpretty') {
+                if (($type === 'list' || $type === 'detail')
+                    && $field['field']['type'] === 'fieldset'
+                    && $field[$type]['format'] !== 'jsonpretty'
+                ) {
                     //make sure value is an array by default
                     if(is_null($value)) {
                         $value = [];
@@ -300,7 +274,7 @@ return function($request, $response) {
                     foreach($rows as $index => $inner) {
                         //we should sort the rows based on column sorting
                         $rows[$index] = array_merge(
-                            array_flip(array_keys($columns)), 
+                            array_flip(array_keys($columns)),
                             $rows[$index]
                         );
 
@@ -326,12 +300,12 @@ return function($request, $response) {
                     foreach($value as $index => $inner) {
                         //we should sort the rows based on column sorting
                         $value[$index] = array_merge(
-                            array_flip(array_values($columns)), 
+                            array_flip(array_values($columns)),
                             $value[$index]
                         );
                     }
                 }
-                
+
                 //prepare the template
                 $template = cradle('global')
                     ->handlebars()
@@ -345,7 +319,7 @@ return function($request, $response) {
 
                 //get the default value in case it's empty
                 if (is_null($value) || empty($value)) {
-                    $value = $fields[$name]['default'];                    
+                    $value = $fields[$name]['default'];
                 }
 
                 //and prepare the results
@@ -354,6 +328,7 @@ return function($request, $response) {
                     //need this to access recursive errors from response
                     '@validation' => $validation,
                     'label' => $fields[$name]['label'],
+                    'type' => $field['field']['type'],
                     'raw' => $value,
                     'config' => $fields[$name][$type],
                     'value' => trim($template([
@@ -424,7 +399,7 @@ return function($request, $response) {
 
         //if only one format
         if (isset($formats[$name])) {
-            return $formats[$name];
+            return $options['fn']($formats[$name]);
         }
 
         return $options['fn']([ 'formats' => $formats, 'templates' => $fieldsetTemplates ]);
@@ -500,5 +475,30 @@ return function($request, $response) {
 
     $handlebars->registerHelper('json_pretty', function ($value, $options) {
         return nl2br(str_replace(' ', '&nbsp;', json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)));
+    });
+
+    $handlebars->registerHelper('scopedot', function ($array, $dot, $options) {
+        if (!is_array($array)) {
+            return $options['inverse']();
+        }
+
+        $scope = Registry::i($array)->getDot($dot);
+
+        if (is_null($scope)) {
+            return $options['inverse']();
+        }
+
+        if (!is_array($scope)) {
+            $scope = ['this' => $scope];
+            $results = $options['fn']($scope);
+            if (!$results) {
+                return $scope['this'];
+            }
+
+            return $results;
+        }
+
+        $scope['this'] = $scope;
+        return $options['fn']($scope);
     });
 };

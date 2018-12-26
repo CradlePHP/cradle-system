@@ -1,19 +1,19 @@
 {{#if fieldset}}
     <div class="fieldsets mb-3">
-        <fieldset 
+        <fieldset
             class="form-group"
-            data-fieldset="{{config.parameters}}" 
+            data-fieldset="{{config.parameters}}"
             data-reindex="{{@key}}"
         >
             <label>{{label}}</label>
 
             {{#each formats}}
                 <div class="fieldset border mb-2 p-3">
-                    <a 
-                        href="javscript:void(0)" 
-                        class="btn btn-sm btn-danger float-right" 
+                    <a
+                        href="javscript:void(0)"
+                        class="btn btn-sm btn-danger float-right"
                         data-schema="{{../config.parameters}}"
-                        data-do="fieldset-remove" 
+                        data-do="fieldset-remove"
                         data-on="click"
                     >
                         <i class="fa fa-times"></i>
@@ -24,11 +24,11 @@
                     {{/each}}
                 </div>
             {{/each}}
-            
+
             <div>
-                <a 
-                    class="btn btn-success fieldset-add" 
-                    data-do="fieldset-add" 
+                <a
+                    class="btn btn-success fieldset-add"
+                    data-do="fieldset-add"
                     data-on="click"
                     data-fieldset="{{config.parameters}}"
                 >
@@ -41,11 +41,11 @@
 {{else}}
     <div class="
         form-group mt-2
-        {{#has ../../errors @path}} 
+        {{#has ../../errors @path}}
             has-error
         {{else}}
             {{#response 'json'}}
-                {{#scope validation ../@validation}} has-error{{/scope}}
+                {{#scopedot validation ../@validation}} has-error{{/scopedot}}
             {{/response}}
         {{/has}}
     ">
@@ -56,7 +56,7 @@
                 <span class="help-text">{{scope ../../errors @path}}</span>
             {{else}}
                 {{#response 'json'}}
-                    {{#scope validation ../@validation}}{{this}}{{/scope}}
+                    {{#scopedot validation ../@validation}}{{this}}{{/scopedot}}
                 {{/response}}
             {{/has}}
         </div>
