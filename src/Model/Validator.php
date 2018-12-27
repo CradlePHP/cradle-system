@@ -98,7 +98,10 @@ class Validator
                                 is_array($data[$name])
                                 && empty($data[$name])
                             )
-                            || !strlen('' . $data[$name])
+                            || (
+                                !is_array($data[$name])
+                                && !strlen('' . $data[$name])
+                            )
                         )
                     ) {
                         $errors[$name] = $validation['message'];
