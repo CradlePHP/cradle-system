@@ -1,7 +1,7 @@
 {{#when config.type '===' 'text'}}
     <input
-        autocomplete="{{name}}"
-        class="form-control"
+        autocomplete="{{@name}}"
+        class="form-control system-form-control"
         name="{{@key}}"
         type="text"
         value="{{this}}"
@@ -13,7 +13,7 @@
 {{#when config.type '===' 'email'}}
     <input
         autocomplete="email"
-        class="form-control"
+        class="form-control system-form-control"
         name="{{@key}}"
         type="email"
         value="{{this}}"
@@ -25,7 +25,7 @@
 {{#when config.type '===' 'password'}}
     <input
         autocomplete="password"
-        class="form-control"
+        class="form-control system-form-control"
         name="{{@key}}"
         type="password"
         {{#each config.attributes}}
@@ -36,7 +36,7 @@
 {{#when config.type '===' 'search'}}
     <input
         autocomplete="search"
-        class="form-control"
+        class="form-control system-form-control"
         name="{{@key}}"
         type="search"
         value="{{this}}"
@@ -48,7 +48,7 @@
 {{#when config.type '===' 'url'}}
     <input
         autocomplete="url"
-        class="form-control"
+        class="form-control system-form-control"
         name="{{@key}}"
         type="url"
         value="{{this}}"
@@ -60,7 +60,7 @@
 {{#when config.type '===' 'color'}}
     <input
         autocomplete="color"
-        class="form-control"
+        class="form-control system-form-control"
         name="{{@key}}"
         type="color"
         value="{{this}}"
@@ -71,8 +71,8 @@
 {{/when}}
 {{#when config.type '===' 'mask'}}
     <input
-        autocomplete="{{name}}"
-        class="form-control"
+        autocomplete="{{@name}}"
+        class="form-control system-form-control"
         data-do="mask-field"
         name="{{@key}}"
         type="text"
@@ -84,8 +84,8 @@
 {{/when}}
 {{#when config.type '===' 'slug'}}
     <input
-        autocomplete="{{name}}"
-        class="form-control"
+        autocomplete="{{@name}}"
+        class="form-control system-form-control"
         data-do="slugger"
         name="{{@key}}"
         type="text"
@@ -97,7 +97,7 @@
 {{/when}}
 {{#when config.type '===' 'textarea'}}
     <textarea
-        class="form-control"
+        class="form-control system-form-control"
         name="{{@key}}"
         {{#each config.attributes}}
             {{@key}}="{{this}}"
@@ -106,7 +106,7 @@
 {{/when}}
 {{#when config.type '===' 'wysiwyg'}}
     <textarea
-        class="form-control"
+        class="form-control system-form-control"
         data-do="wysiwyg"
         name="{{@key}}"
         {{#each config.attributes}}
@@ -116,7 +116,7 @@
 {{/when}}
 {{#when config.type '===' 'markdown'}}
     <textarea
-        class="form-control"
+        class="form-control system-form-control"
         data-do="markdown-editor"
         name="{{@key}}"
         {{#each config.attributes}}
@@ -126,7 +126,7 @@
 {{/when}}
 {{#when config.type '===' 'code'}}
     <textarea
-        class="form-control hidden"
+        class="form-control hidden system-form-control"
         data-do="code-editor"
         name="{{@key}}"
         {{#each config.attributes}}
@@ -137,7 +137,7 @@
 {{#when config.type '===' 'number'}}
     <input
         autocomplete="{{name}}"
-        class="form-control"
+        class="form-control system-form-control"
         name="{{@key}}"
         type="number"
         value="{{this}}"
@@ -149,7 +149,7 @@
 {{#when config.type '===' 'small'}}
     <input
         autocomplete="{{name}}"
-        class="form-control"
+        class="form-control system-form-control"
         max="9"
         min="0"
         name="{{@key}}"
@@ -163,7 +163,7 @@
 {{/when}}
 {{#when config.type '===' 'range'}}
     <input
-        class="irs-hidden-input"
+        class="irs-hidden-input system-form-control"
         data-do="multirange-field"
         name="{{@key}}"
         tabindex="-1"
@@ -177,7 +177,7 @@
 {{#when config.type '===' 'float'}}
     <input
         autocomplete="{{name}}"
-        class="form-control"
+        class="form-control system-form-control"
         name="{{@key}}"
         type="number"
         value="{{this}}"
@@ -189,7 +189,7 @@
 {{#when config.type '===' 'price'}}
     <input
         autocomplete="{{name}}"
-        class="form-control"
+        class="form-control system-form-control"
         name="{{@key}}"
         step="0.01"
         type="number"
@@ -203,7 +203,7 @@
     <input
         aria-haspopup="true"
         aria-expanded="false"
-        class="form-control date"
+        class="form-control date system-form-control"
         data-do="date-field"
         name="{{@key}}"
         type="text"
@@ -217,7 +217,7 @@
     <input
         aria-haspopup="true"
         aria-expanded="false"
-        class="form-control date"
+        class="form-control date system-form-control"
         data-do="time-field"
         name="{{@key}}"
         type="text"
@@ -231,7 +231,7 @@
     <input
         aria-haspopup="true"
         aria-expanded="false"
-        class="form-control date"
+        class="form-control date system-form-control"
         data-do="datetime-field"
         name="{{@key}}"
         type="text"
@@ -243,7 +243,7 @@
 {{/when}}
 {{#when config.type '===' 'week'}}
     <input
-        class="form-control"
+        class="form-control system-form-control"
         name="{{@key}}"
         type="week"
         value="{{this}}"
@@ -254,7 +254,7 @@
 {{/when}}
 {{#when config.type '===' 'month'}}
     <input
-        class="form-control"
+        class="form-control system-form-control"
         name="{{@key}}"
         type="month"
         value="{{this}}"
@@ -265,12 +265,14 @@
 {{/when}}
 {{#when config.type '===' 'checkbox'}}
     <input
+        class="system-form-control"
         name="{{@key}}"
         type="hidden"
         value="0"
     />
     <label class="checkbox checkbox-2">
         <input
+            class="system-form-control"
             name="{{@key}}"
             type="checkbox"
             value="1"
@@ -284,12 +286,14 @@
 {{/when}}
 {{#when config.type '===' 'switch'}}
     <input
+        class="system-form-control"
         name="{{@key}}"
         type="hidden"
         value="0"
     />
     <label class="switch switch-6">
         <input
+            class="system-form-control"
             name="{{@key}}"
             type="checkbox"
             value="1"
@@ -303,7 +307,7 @@
 {{/when}}
 {{#when config.type '===' 'knob'}}
     <input
-        class="form-control"
+        class="form-control system-form-control"
         data-do="knob-field"
         name="{{@key}}"
         type="text"
@@ -315,7 +319,7 @@
 {{/when}}
 {{#when config.type '===' 'select'}}
     <select
-        class="form-control"
+        class="form-control system-form-control"
         name="{{@key}}"
         {{#each config.attributes}}
             {{@key}}="{{this}}"
@@ -333,7 +337,7 @@
 {{/when}}
 {{#when config.type '===' 'multiselect'}}
     <select
-        class="form-control"
+        class="form-control system-form-control"
         data-do="select-field"
         multiple="multiple"
         name="{{@key}}[]"
@@ -352,10 +356,15 @@
     </select>
 {{/when}}
 {{#when config.type '===' 'checkboxes'}}
-    <div{{#each config.attributes}} {{@key}}="{{this}}"{{/each}}>
+    <div
+        {{#each config.attributes}}
+            {{@key}}="{{this}}"
+        {{/each}}
+    >
         {{#each config.options}}
             <label class="checkbox checkbox-2">
                 <input
+                    class="system-form-control"
                     name="{{../@key}}[]"
                     type="checkbox"
                     value="{{./key}}"
@@ -367,10 +376,15 @@
     </div>
 {{/when}}
 {{#when config.type '===' 'radios'}}
-    <div{{#each config.attributes}} {{@key}}="{{this}}"{{/each}}>
+    <div
+        {{#each config.attributes}}
+            {{@key}}="{{this}}"
+        {{/each}}
+    >
         {{#each config.options}}
             <label class="radio radio-2">
                 <input
+                    class="system-form-control"
                     name="{{../@key}}"
                     type="radio"
                     value="{{./key}}"
@@ -419,8 +433,13 @@
                         {{/fileinfo}}
                     </td>
                     <td class="file-field-name">
-                        {{this}}
-                        <input name="{{../@key}}" type="hidden" value="{{this}}" />
+                        {{chars this 75}}
+                        <input
+                            class="system-form-control"
+                            name="{{../@key}}"
+                            type="hidden"
+                            value="{{this}}"
+                        />
                     </td>
                 </tr>
             {{else}}
@@ -486,18 +505,23 @@
                             {{/fileinfo}}
                         </td>
                         <td class="file-field-name">
-                            {{this}}
-                            <input name="{{../@key}}[]" type="hidden" value="{{this}}" />
+                            {{chars this 75}}
+                            <input
+                                class="system-form-control system-file-input"
+                                name="{{../@key}}[]"
+                                type="hidden"
+                                value="{{this}}"
+                            />
                         </td>
                         <td class="file-field-actions">
                             <a class="text-info file-field-move-up" href="javascript:void(0)">
                                 <i class="fas fa-arrow-up"></i>
                             </a>
-                            &nbsp;&nbsp;&nbsp;'
+                            &nbsp;&nbsp;&nbsp;
                             <a class="text-info file-field-move-down" href="javascript:void(0)">
                                 <i class="fas fa-arrow-down"></i>
                             </a>
-                            &nbsp;&nbsp;&nbsp;'
+                            &nbsp;&nbsp;&nbsp;
                             <a class="btn btn-danger file-field-remove" href="javascript:void(0)">
                                 <i class="fas fa-times"></i>
                             </a>
@@ -565,8 +589,13 @@
                         {{/fileinfo}}
                     </td>
                     <td class="file-field-name">
-                        {{this}}
-                        <input name="{{@key}}" type="hidden" value="{{this}}" />
+                        {{chars this 75}}
+                        <input
+                            class="system-form-control"
+                            name="{{@key}}"
+                            type="hidden"
+                            value="{{this}}"
+                        />
                     </td>
                 </tr>
             {{else}}
@@ -591,7 +620,7 @@
         </tfoot>
     </table>
 {{/when}}
-{{#when config.type '===' 'images'}}
+{{#when config.type '===' 'imagelist'}}
     <table
         class="table table-striped file-field"
         data-accept="image/png,image/jpg,image/jpeg,image/gif"
@@ -633,8 +662,13 @@
                             {{/fileinfo}}
                         </td>
                         <td class="file-field-name">
-                            {{this}}
-                            <input name="{{../@key}}[]" type="hidden" value="{{this}}" />
+                            {{chars this 75}}
+                            <input
+                                class="system-form-control"
+                                name="{{../@key}}[]"
+                                type="hidden"
+                                value="{{this}}"
+                            />
                         </td>
                         <td class="file-field-actions">
                             <a class="text-info file-field-move-up" href="javascript:void(0)">
@@ -685,7 +719,7 @@
         {{#each this}}
             <div class="tag">
                 <input
-                    class="tag-input text-field"
+                    class="tag-input text-field system-form-control"
                     type="text"
                     name="{{../@key}}[]"
                     value="{{this}}"
@@ -728,7 +762,7 @@
                     </a>
                 </div>
                 <input
-                    class="text-field form-control"
+                    class="text-field form-control system-form-control"
                     name="{{../@key}}[]"
                     type="text"
                     value="{{this}}"
@@ -778,7 +812,7 @@
                     </a>
                 </div>
                 <textarea
-                    class="text-field form-control"
+                    class="text-field form-control system-form-control"
                     name="{{../@key}}[]"
                 >{{this}}</textarea>
                 <div class="input-group-append">
@@ -830,7 +864,7 @@
                 </div>
                 <textarea
                     data-do="wysiwyg"
-                    class="text-field form-control"
+                    class="text-field form-control system-form-control"
                     name="{{../@key}}[]"
                 >{{this}}</textarea>
             </div>
@@ -853,17 +887,18 @@
         {{#each this}}
             <div class="field-row input-group mb-3">
                 <input
-                    class="meta-input key form-control"
+                    class="meta-input key form-control system-form-control"
                     type="text"
                     placeholder="{{_ 'Key'}}"
                     value="{{@key}}"
                 />
                 <textarea
-                    class="meta-input value form-control"
+                    class="meta-input value form-control system-form-control"
                     placeholder="{{_ 'Value'}}"
                     rows="1"
                 >{{this}}</textarea>
                 <input
+                    class="system-form-control"
                     type="hidden"
                     name="{{../@key}}[{{@key}}]"
                     value="{{this}}"
@@ -908,9 +943,7 @@
                     <tr data-index="{{@index}}">
                         <td>
                             <a
-                                class="btn btn-danger remove"
-                                data-do="table-field-remove"
-                                data-on="click"
+                                class="btn btn-danger row-remove"
                                 href="javascript:void(0)"
                             >
                                 <i class="fas fa-times"></i>
@@ -919,7 +952,7 @@
                         {{#each this}}
                             <td>
                                 <input
-                                    class="input-column form-control"
+                                    class="input-column form-control system-form-control"
                                     type="text"
                                     name="{{../../@key}}[{{../@index}}][{{scope ../../config.columns @index}}]"
                                     placeholder="{{scope ../../config.columns @index}}"
@@ -932,10 +965,8 @@
             </tbody>
         </table>
         <a
-            class="field-add btn btn-success"
+            class="row-add btn btn-success"
             href="javascript:void(0)"
-            data-do="table-field-add"
-            data-on="click"
         >
             <i class="fas fa-plus"></i>
             <span>{{_ 'Add Row'}}</span>
@@ -944,7 +975,7 @@
 {{/when}}
 {{#when config.type '===' 'multirange'}}
     <input
-        class="irs-hidden-input"
+        class="irs-hidden-input system-form-control"
         data-do="multirange-field"
         data-type="double"
         name="{{@key}}"
@@ -958,7 +989,7 @@
 {{/when}}
 {{#when config.type '===' 'rawjson'}}
     <textarea
-        class="form-control hidden"
+        class="form-control hidden system-form-control"
         data-do="code-editor"
         data-mode="json"
         name="{{@key}}"

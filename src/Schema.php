@@ -670,10 +670,10 @@ class Schema extends Fieldset
             'type' => 'VARCHAR',
             'length' => 255
         ],
-        'files' => [
+        'filelist' => [
             'type' => 'JSON'
         ],
-        'images' => [
+        'imagelist' => [
             'type' => 'JSON'
         ],
         'tag' => [

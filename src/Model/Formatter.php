@@ -7,6 +7,7 @@
  */
 namespace Cradle\Package\System\Model;
 
+use Cradle\Package\System\Fieldset;
 use Cradle\Package\System\Schema;
 use Cradle\Helper\InstanceTrait;
 
@@ -41,13 +42,20 @@ class Formatter
      * Returns formatted data
      *
      * @param *array $data
+     * @param Fieldset $fieldset
      *
      * @return array
      */
-    public function formatData(array $data)
+    public function formatData(array $data, $fieldset = null)
     {
-        $fields = $this->schema->getFields();
-        $table = $this->schema->getName();
+        $schema = $this->schema;
+
+        if (!is_null($fieldset)) {
+            $schema = $fieldset;
+        }
+
+        $fields = $schema->getFields();
+        $table = $schema->getName();
 
         foreach ($fields as $field) {
             $name = $table . '_' . $field['name'];
@@ -63,11 +71,15 @@ class Formatter
                     //upload files
                     $data[$name] = $this->upload($data[$name]);
                     break;
-                case 'files':
-                case 'images':
+                case 'filelist':
+                case 'imagelist':
                     //upload files
                     $data[$name] = $this->upload($data[$name]);
-                    $data[$name] = json_encode($data[$name]);
+                    
+                    //we should not encode if fieldset
+                    if (is_null($fieldset)) {
+                        $data[$name] = json_encode($data[$name]);
+                    }
                     break;
                 case 'tag':
                 case 'textlist':
@@ -79,23 +91,44 @@ class Formatter
                 case 'multiselect':
                 case 'table':
                 case 'fieldset':
+                    //case for multiple
+                    if (isset($field['field']['attributes']['data-multiple'])
+                        && !$field['field']['attributes']['data-multiple']
+                    ) {
+                        //format single data
+                        $data[$name] = $this->formatData(
+                            $data[$name], 
+                            Fieldset::i($field['field']['parameters']),
+                            false
+                        );
+                    } else {
+                        //format each data
+                        foreach($data[$name] as $index => $row) {
+                            $data[$name][$index] = $this->formatData(
+                                $row,
+                                Fieldset::i($field['field']['parameters']),
+                                false
+                            );
+                        }
+                    }
+
                     //if it's an array already
-                    if(is_array($data[$name]) || is_object($data[$name])) {
+                    if((is_array($data[$name]) || is_object($data[$name])) && is_null($fieldset)) {
                         $data[$name] = json_encode($data[$name]);
-                        break;
+
+                        //if it's a json string
+                        if(strpos($data[$name], '{') === 0
+                            || strpos($data[$name], '[') === 0
+                        )
+                        {
+                            break;
+                        }
+
+                        //it can only be comma separated
+                        $data[$name] = explode(',', $data[$name]);
+                        $data[$name] = json_encode($data[$name]);
                     }
 
-                    //if it's a json string
-                    if(strpos($data[$name], '{') === 0
-                        || strpos($data[$name], '[') === 0
-                    )
-                    {
-                        break;
-                    }
-
-                    //it can only be comma separated
-                    $data[$name] = explode(',', $data[$name]);
-                    $data[$name] = json_encode($data[$name]);
                     break;
                 case 'created':
                 case 'updated':
@@ -177,8 +210,8 @@ class Formatter
                     [
                         'multiselect',
                         'checkboxes',
-                        'files',
-                        'images',
+                        'filelist',
+                        'imagelist',
                         'tag',
                         'textlist',
                         'textarealist',

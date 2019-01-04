@@ -9,6 +9,7 @@
 use Cradle\Data\Registry;
 use Cradle\Package\System\Fieldset;
 use Cradle\Package\System\Schema;
+use Cradle\Package\System\Helpers;
 
 return function($request, $response) {
     //add helpers
@@ -53,87 +54,28 @@ return function($request, $response) {
         return Schema::i($schema)->getSuggestionFormat($row);
     });
 
-    $handlebars->registerHelper('format', function (
-        $type,
-        $schema,
-        $row,
-        $name = null,
-        $options = null
-    ) {
-        static $schemas = [];
-        static $fieldsets = [];
-        static $templates = [];
+    $handlebars->registerHelper('format', function ($type, $schema, $row) {
+        //get the options for later
+        $arguments = func_get_args();
+        $options = array_pop($arguments);
 
-        //cache the templates
-        if (empty($templates)) {
-            $templates['detail'] = file_get_contents(
-                sprintf(
-                    '%s/Model/template/format/detail.html',
-                    dirname(__DIR__)
-                )
-            );
-
-            $templates['field'] = file_get_contents(
-                sprintf(
-                    '%s/Model/template/format/field.html',
-                    dirname(__DIR__)
-                )
-            );
-
-            $templates['list'] = file_get_contents(
-                sprintf(
-                    '%s/Model/template/format/list.html',
-                    dirname(__DIR__)
-                )
-            );
-        }
-
-        //if not cached
-        if (!is_array($schema) && !isset($schemas[$schema])) {
-            try { //cache the schema
-                $schemas[$schema] = Schema::i($schema);
-            } catch (Exception $e) {
-                return '';
-            }
-        }
-
-        //if its an array
-        if (is_array($schema)) {
-            try { //load the schema
-                $schema = Schema::i($schema);
-            } catch (Exception $e) {
-                return '';
-            }
-        } else {
-            //otherwise, get it from the cache
-            $schema = $schemas[$schema];
-        }
-
-        if (func_num_args() === 4) {
-            $options = $name;
-            $name = null;
+        //try to load the schema
+        try {
+            $schema = Helpers::getSchema($schema);
+        } catch (Exception $e) {
+            return '';
         }
 
         $fields = $schema->getFields();
-
-        //if the just want a specific value
-        if (!is_null($name) && isset($fields[$name])) {
-            $fields = [ $name => $fields[$name] ];
-        }
 
         //we need to define a function so it can be recursively called
         $getFormats = function(
             $row,
             $type,
             $fields,
-            $blank = false,
-            $root = null,
-            $index = null,
-            $parent = null
+            $parent = []
         ) use (
             &$schema,
-            &$templates,
-            &$fieldsets,
             &$getFormats
         ) {
             $formats = [];
@@ -151,17 +93,20 @@ return function($request, $response) {
                     continue;
                 }
 
+                if (!isset($parent['index'])) {
+                    $parent['index'] = [];
+                }
+
                 //determine the key name
                 $key = $name;
-
-                if (!is_null($root)) {
-                    $key = sprintf('%s[%s][%s]', $root, $index, $name);
+                if (isset($parent['name'])) {
+                    $key = sprintf('%s[%s]', $parent['name'], $name);
                 }
 
-                // if blank template
-                if (!is_null($root) && $blank) {
-                    $key = sprintf('{ROOT}[%s]', $name);
-                }
+                $indexCount1 = substr_count($key, '{INDEX_');
+                $indexPlaceholder1 = sprintf('{INDEX_%s}', $indexCount1);
+                $indexCount2 = $indexCount1 + 1;
+                $indexPlaceholder2 = sprintf('{INDEX_%s}', $indexCount2);
 
                 //determine the value
                 //for no field, but with a format
@@ -170,7 +115,7 @@ return function($request, $response) {
                     $value = $row[$name];
                 }
 
-                //if its a fieldset
+                //if its a fieldset and view is field/form
                 if ($type === 'field' && $field[$type]['type'] === 'fieldset') {
                     //make sure value is an array by default
                     if(is_null($value)) {
@@ -178,144 +123,216 @@ return function($request, $response) {
                     }
 
                     //if not cached
-                    $fieldset = $fields[$name]['field']['parameters'];
-                    if (!isset($fieldsets[$fieldset])) {
-                        try { //cache the schema
-                            $fieldsets[$fieldset] = Fieldset::i($fieldset);
-                        } catch (Exception $e) {
-                            return [];
+                    $fieldset = Helpers::getFieldset(
+                        $fields[$name]['field']['parameters']
+                    );
+
+                    $keyword = $fieldset->getName();
+                    $singular = $fieldset->getSingular();
+                    $plural = $fieldset->getPlural();
+                    $fieldset = $fieldset->getFields();
+                    $multiple = true;
+
+                    //determine the key and label
+                    $key = sprintf('%s[%s]', $name, $indexPlaceholder1);
+                    $label = sprintf('%s %s', $singular, $indexPlaceholder1);
+                    if (isset($parent['name'], $parent['label'])) {
+                        $key = sprintf('%s[%s][%s]', $parent['name'], $name, $indexPlaceholder1);
+                        $label = sprintf('%s - %s %s', $parent['label'], $singular, $indexPlaceholder1);
+                    }
+
+                    //if dont want multiple fieldsets (ie. with the add button)
+                    if (isset($field['field']['attributes']['data-multiple'])
+                        && !$field['field']['attributes']['data-multiple']
+                    ) {
+                        //determine the key and label
+                        $key = $name;
+                        $label = $singular;
+                        if (isset($parent['name'], $parent['label'])) {
+                            $key = sprintf('%s[%s]', $parent['name'], $name);
+                            $label = sprintf('%s - %s', $parent['label'], $singular);
+                        }
+
+                        $multiple = false;
+                        //set as required
+                        $field['field']['attributes']['data-required'] = true;
+                    }
+
+                    //if the fieldset is required
+                    if (isset($field['field']['attributes']['data-required'])
+                        && $field['field']['attributes']['data-required']
+                        && empty($value)
+                    ) {
+                        // fill in an empty data
+                        if ($multiple) {
+                            $value[] = array_fill_keys(array_keys($fieldset), null);
+                        } else {
+                            $value = array_fill_keys(array_keys($fieldset), null);
                         }
                     }
 
-                    //get the fields
-                    $fieldset = $fieldsets[$fieldset]->getFields();
+                    //get the templates. This is needed and used
+                    //to create mutiple fieldsets on the fly
+                    $parent['name'] = $key;
+                    $parent['label'] = $label;
+                    $config = $getFormats([], 'field', $fieldset, [
+                        'name' => $parent['name'],
+                        'label' => $parent['label']
+                    ]);
 
-                    //map each rows and get format
-                    $map = function($row, $index) use (
-                        $getFormats,
-                        $type,
-                        $fieldset,
-                        $key,
-                        $blank,
-                        $name
-                    ) {
-                        return [
-                            'formats' => $getFormats($row, $type, $fieldset, $blank, $key, $index, $name)
-                        ];
-                    };
+                    //get the values
+                    $values = [];
+
+                    if (!$multiple) {
+                        //resolve the label
+                        $values['label'] = $parent['label'];
+                        $values['rows'] = $getFormats($value, 'field', $fieldset, $parent);
+
+                        foreach($values['rows'] as $key2 => $row2) {
+                            //if there is a name template
+                            if (isset($row2['name'])) {
+                                $values['rows'][$key2]['name'] = $row2['name'];
+                                //set the dot notation. this is for error handling
+                                $values['rows'][$key2]['dot'] = Helpers::fieldNameToDotNotation(
+                                    $values['rows'][$key2]['name']
+                                );
+                            }
+                        }
+                    } else {
+                        foreach($value as $i => $row) {
+                            $parent['index'][] = $i;
+
+                            //resolve the label
+                            $values[$i]['label'] = $parent['label'];
+                            foreach ($parent['index'] as $j => $index) {
+                                $values[$i]['label'] = str_replace(
+                                    '{INDEX_' . $j . '}', 
+                                    $index + 1, 
+                                    $values[$i]['label']
+                                );
+                            }
+
+                            $values[$i]['rows'] = $getFormats($row, 'field', $fieldset, $parent);
+
+                            array_pop($parent['index']);
+
+                            foreach($values[$i]['rows'] as $key2 => $row2) {
+                                //if there is a name template
+                                if (isset($row2['name'])) {
+                                    $values[$i]['rows'][$key2]['name'] = str_replace(
+                                        $indexPlaceholder2, 
+                                        $i, 
+                                        $row2['name']
+                                    );
+                                    //set the dot notation. this is for error handling
+                                    $values[$i]['rows'][$key2]['dot'] = Helpers::fieldNameToDotNotation(
+                                        $values[$i]['rows'][$key2]['name']
+                                    );
+                                }
+                            }
+                        }
+                    }
 
                     $formats[$name] = [
                         '@key' => $name,
-                        'fieldset' => true,
+                        'type' => $type,
                         'label' => $fields[$name]['label'],
-                        'type' => $field['field']['type'],
-                        'raw' => $value,
-                        'config' => $fields[$name][$type],
-                        //recursive call
-                        'formats' => $blank ?
-                            $getFormats($row, $type, $fieldset, $blank, $key, $index + 1, 'ROOT') :
-                            array_map($map, $value, array_keys($value))
+                        'name' => $key,
+                        'dot' => $dot,
+                        'config' => [
+                            'field' => [
+                                'type' => $fields[$name]['field']['type'],
+                                'name' => $keyword,
+                                'singular' => $singular,
+                                'plural' => $plural,
+                                'label' => $label,
+                                'multiple' => $multiple,
+                                'fields' => $config
+                            ],
+                            'list' => $fields[$name]['list'],
+                            'detail' => $fields[$name]['detail']
+                        ],
+                        'value' => $values
                     ];
 
                     continue;
                 }
 
+                //if its a fieldset and view is detail/list
+                //this will format nested tables formats
+                //for fieldsets
                 if (($type === 'list' || $type === 'detail')
                     && $field['field']['type'] === 'fieldset'
-                    && $field[$type]['format'] !== 'jsonpretty'
+                    && $field['field']['type'] !== 'jsonpretty'
                 ) {
-                    //make sure value is an array by default
-                    if(is_null($value)) {
-                        $value = [];
-                    }
-
                     //if not cached
-                    $fieldset = $fields[$name]['field']['parameters'];
-                    if (!isset($fieldsets[$fieldset])) {
-                        try { //cache the schema
-                            $fieldsets[$fieldset] = Fieldset::i($fieldset);
-                        } catch (Exception $e) {
-                            return [];
-                        }
+                    $fieldset = Helpers::getFieldset(
+                        $fields[$name]['field']['parameters']
+                    )->getFields();
+                    
+                    //get the columns
+                    $columns = [];
+                    foreach($fieldset as $key => $field) {
+                        $columns[$key] = $field['label'];
                     }
 
-                    //get the fields
-                    $fieldset = $fieldsets[$fieldset]->getFields();
+                    //set the columns
+                    $fields[$name]['field']['columns'] = $columns;
 
-                    //get the columns
-                    $columns = $fields[$name]['field']['columns'] = array_map(function($field) {
-                        return $field['label'];
-                    }, $fieldset);
+                    if (isset($fields[$name]['field']['attributes']['data-multiple'])
+                        && !$fields[$name]['field']['attributes']['data-multiple']
+                    ) {
+                        $value = [ $value ];
+                    }
 
-                    //get the rows
-                    $rows = $value;
-
-                    //need to do this for table format
-                    foreach($columns as $key => $column) {
-                        //on each row
-                        foreach($rows as $index => $inner) {
-                            //if it's set
-                            if (isset($inner[$key])) {
+                    //we need to fill columns that is not
+                    //yet set to avoid broken table columns
+                    foreach($value as $index => $row) {
+                        foreach($columns as $key => $column) {
+                            if (isset($row[$key])) {
                                 continue;
                             }
 
-                            //if it's not set and it's a fieldset
-                            if ($fields[$name]['field']['type'] === 'fieldset') {
-                                $rows[$index][$key] = [];
-
-                            //set default value
+                            if ($fieldset[$key]['field']['type'] === 'fieldset') {
+                                $value[$index][$key] = [];
                             } else {
-                                $rows[$index][$key] = null;
+                                $value[$index][$key] = null;
                             }
                         }
                     }
 
-                    //on each row
-                    foreach($rows as $index => $inner) {
-                        //we should sort the rows based on column sorting
-                        $rows[$index] = array_merge(
-                            array_flip(array_keys($columns)),
-                            $rows[$index]
-                        );
-
-                        //get the formats
-                        $results = $getFormats($inner, $type, $fieldset, false);
-
-                        //on each value
-                        foreach($inner as $key => $value) {
-                            //get the formatted value
-                            $rows[$index][$key] = $results[$key]['value'];
-                        }
-                    }
-
-                    //update the value
-                    $value = $rows;
-                }
-
-                //FIX: for table columns need to sort out
-                //the values based on column order
-                if ($field['field']['type'] === 'table' && !empty($value)) {
-                    $columns = $field['field']['columns'];
-
-                    foreach($value as $index => $inner) {
+                    //now we need to format the
+                    //fieldset and fielset fields
+                    foreach($value as $index => $row) {
                         //we should sort the rows based on column sorting
                         $value[$index] = array_merge(
-                            array_flip(array_values($columns)),
+                            array_flip(array_keys($columns)), 
                             $value[$index]
                         );
+
+                        $results = $getFormats($row, $type, $fieldset);  
+
+                        //on each value
+                        foreach($row as $index2 => $value2) {
+                            //get the formatted value
+                            $value[$index][$index2] = $results[$index2]['value'];
+                        }
                     }
                 }
+
+                //resolve the key
+                $format = $key;
+                foreach ($parent['index'] as $i => $index) {
+                    $key = str_replace('{INDEX_' . $i . '}', $index, $key);
+                }
+
+                //set the dot notation. this is for error handling
+                $dot = Helpers::fieldNameToDotNotation($key);
 
                 //prepare the template
                 $template = cradle('global')
                     ->handlebars()
-                    ->compile($templates[$type]);
-
-                //create validation path, since fieldsets are
-                //recursively compiled template, we kind of loose
-                //the scope of the errors data. We can solve that by
-                //fetching the validation from response object.
-                $validation = trim(str_replace(['][', ']', '['], '.', $key), '.');
+                    ->compile(Helpers::getFormatTemplate($type));
 
                 //get the default value in case it's empty
                 if (is_null($value) || empty($value)) {
@@ -324,14 +341,20 @@ return function($request, $response) {
 
                 //and prepare the results
                 $formats[$name] = [
-                    '@path' => $key,
-                    //need this to access recursive errors from response
-                    '@validation' => $validation,
+                    '@key' => $name,
+                    'type' => $type,
                     'label' => $fields[$name]['label'],
-                    'type' => $field['field']['type'],
+                    'name' => $key,
+                    'dot' => $dot,
+                    'name_format' => $format,
+                    'config' => [
+                        'field' => $fields[$name]['field'],
+                        'list' => $fields[$name]['list'],
+                        'detail' => $fields[$name]['detail']
+                    ],
                     'raw' => $value,
-                    'config' => $fields[$name][$type],
                     'value' => trim($template([
+                        '@name' => $name,
                         '@key' => $key,
                         'this' => $value,
                         'row' => $row,
@@ -349,60 +372,9 @@ return function($request, $response) {
         //get the formats
         $formats = $getFormats($row, $type, $fields);
 
-        //get the templates
-        $fieldsetTemplates = [];
-
-        //if it's a field
-        if ($type === 'field') {
-            //instead of recursively fetching the templates which
-            //will cost more and will make it hard to debug, we
-            //separate it so we can output and re-use each template
-            //on the client side
-            $fieldsetTemplates = $getFormats($row, $type, $fields, true);
-
-            //filter fieldsets
-            $fieldsetTemplates = array_filter($fieldsetTemplates, function($template) {
-                return isset($template['fieldset']);
-            });
-
-            //recursively flatten out the templates
-            $flatten = function($data, &$output = []) use (&$flatten) {
-                //on each field
-                foreach($data as $name => $field) {
-                    if (!isset($field['fieldset'])) {
-                        continue;
-                    }
-
-                    //set the fieldset to root
-                    $output[$name] = $field;
-
-                    //on each formats
-                    foreach($output[$name]['formats'] as $index => $format) {
-                        if (!isset($format['fieldset'])) {
-                            continue;
-                        }
-
-                        //clear out the formats to avoid the formats showing upon initial rendering of the template
-                        unset($output[$name]['formats'][$index]['formats']);
-                    }
-
-                    //recursively put the formats on the root
-                    $flatten($field['formats'], $output);
-                }
-
-                return $output;
-            };
-
-            //get the flat templates
-            $fieldsetTemplates = [ 'formats' => $flatten($fieldsetTemplates) ];
-        }
-
-        //if only one format
-        if (isset($formats[$name])) {
-            return $options['fn']($formats[$name]);
-        }
-
-        return $options['fn']([ 'formats' => $formats, 'templates' => $fieldsetTemplates ]);
+        return $options['fn']([
+            'formats' => $formats
+        ]);
     });
 
     $handlebars->registerHelper('schema_row', function ($schema, $row, $key) {
@@ -477,7 +449,7 @@ return function($request, $response) {
         return nl2br(str_replace(' ', '&nbsp;', json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)));
     });
 
-    $handlebars->registerHelper('scopedot', function ($array, $dot, $options) {
+    $handlebars->registerHelper('scope_dot', function ($array, $dot, $options) {
         if (!is_array($array)) {
             return $options['inverse']();
         }

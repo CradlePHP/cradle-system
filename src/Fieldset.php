@@ -139,8 +139,8 @@ class Fieldset extends Registry
                 [
                         'file',
                         'image',
-                        'files',
-                        'images'
+                        'filelist',
+                        'imagelist'
                     ]
             )
             ) {
@@ -170,8 +170,8 @@ class Fieldset extends Registry
             if (in_array(
                 $field['field']['type'],
                 [
-                        'files',
-                        'images',
+                        'filelist',
+                        'imagelist',
                         'tag',
                         'textlist',
                         'textarealist',

@@ -170,7 +170,7 @@
 
             {{#format 'field' schema.name item}}
                 {{#each formats}}
-                    {{> form_set}}
+                    {{> form_fieldset}}
                 {{/each}}
 
                 {{{partial 'form_set-template' templates}}}
@@ -183,6 +183,4 @@
             </div>
         </div>
     </form>
-
-    {{> scripts}}
 </div>

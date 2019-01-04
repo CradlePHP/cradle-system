@@ -66,6 +66,26 @@ class Validator
             $name = $table . '_' . $field['name'];
 
             if ($field['field']['type'] === 'fieldset' && isset($data[$name])) {
+                if (!isset($errors[$name])) {
+                    $errors[$name] = [];
+                }
+
+                if (isset($field['field']['attributes']['data-multiple'])
+                    && !$field['field']['attributes']['data-multiple']
+                ) {
+                    $errors[$name] = $this->getCreateErrors(
+                        $data[$name],
+                        $errors[$name],
+                        Fieldset::i($field['field']['parameters'])
+                    );
+
+                    if (empty($errors[$name])) {
+                        unset($errors[$name]);
+                    }
+
+                    continue;
+                }
+
                 foreach($data[$name] as $index => $row) {
                     if (!isset($errors[$name][$index])) {
                         $errors[$name][$index] = [];
@@ -152,6 +172,26 @@ class Validator
         foreach ($fields as $name => $field) {
             if ($field['field']['type'] === 'fieldset') {
                 if (!isset($data[$name])) {
+                    continue;
+                }
+
+                if (!isset($errors[$name])) {
+                    $errors[$name] = [];
+                }
+
+                if (isset($field['field']['attributes']['data-multiple'])
+                    && !$field['field']['attributes']['data-multiple']
+                ) {
+                    $errors[$name] = $this->getUpdateErrors(
+                        $data[$name],
+                        $errors[$name],
+                        Fieldset::i($field['field']['parameters'])
+                    );
+
+                    if (empty($errors[$name])) {
+                        unset($errors[$name]);
+                    }
+
                     continue;
                 }
 

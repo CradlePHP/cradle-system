@@ -1,0 +1,110 @@
+{{#when config.field.type '===' 'fieldset'}}
+    <div class="form-group mt-2">
+        <label class="control-label">{{label}}</label>
+        <div class="form-{{config.field.type}}">
+            <fieldset
+                class="fieldset mb-3"
+                data-do="fieldset"
+                data-fieldset="{{config.field.parameters}}"
+                data-name="{{@key}}"
+                data-label="{{config.field.label}}"
+                {{#each config.attributes}}
+                    {{@key}}="{{this}}"
+                {{/each}}
+            >
+                {{#if config.field.multiple}}
+                    {{#each value}}
+                        <div class="box fieldset-row" data-multiple>
+                            <div class="box-head box-default">
+                                <h3 class="box-title fieldset-label">{{label}}</h3>
+                                <div class="box-right">
+                                    <a
+                                        class="btn btn-sm btn-danger float-right fieldset-remove"
+                                        href="javscript:void(0)"
+                                    >
+                                        <i class="fa fa-times"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="fieldset-body box-body box-padding">
+                                {{#each rows}}
+                                    {{{partial 'form_fieldset' this}}}
+                                {{/each}}
+                            </div>
+                        </div>
+                    {{/each}}
+                {{else}}
+                    <div class="box fieldset-row">
+                        <div class="box-head box-default">
+                            <h3 class="box-title fieldset-label">{{value.label}}</h3>
+                            <div class="box-right">
+                                <a
+                                    class="btn btn-sm btn-danger float-right fieldset-remove"
+                                    href="javscript:void(0)"
+                                >
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="fieldset-body box-body box-padding">
+                            {{#each value.rows}}
+                                {{{partial 'form_fieldset' this}}}
+                            {{/each}}
+                        </div>
+                    </div>
+                {{/if}}
+
+                <div class="hidden template-fieldset-row">
+                    <div class="box fieldset-row" {{#if config.field.multiple}}data-multiple{{/if}}>
+                        <div class="box-head box-default">
+                            <h3 class="box-title fieldset-label">{{config.field.label}}</h3>
+                            <div class="box-right">
+                                <a
+                                    class="btn btn-sm btn-danger float-right fieldset-remove"
+                                    href="javscript:void(0)"
+                                >
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="fieldset-body box-body box-padding">
+                            {{#each config.field.fields}}
+                                {{{partial 'form_fieldset' this}}}
+                            {{/each}}
+                        </div>
+                    </div>
+                </div>
+
+                {{#if config.field.multiple}}
+                    <a
+                        class="btn btn-success fieldset-add"
+                        href="javascript:void(0)"
+                    >
+                        <i class="fas fa-plus"></i>
+                        {{_ 'Add %s' label}}
+                    </a>
+                {{/if}}
+            </fieldset>
+        </div>
+
+    </div>
+{{else}}
+    <div class="form-group mt-2
+        {{#response 'json'}}
+            {{#scope_dot validation ../dot}}has-error{{/scope_dot}}
+        {{/response}}"
+    >
+        <label class="control-label">{{label}}</label>
+        <div
+            class="form-{{config.field.type}} system-form-field"
+            data-name="{{name_format}}"
+        >
+            {{{value}}}
+            {{#response 'json'}}
+                {{#scope_dot validation ../dot}}
+                    <span class="help-text">{{this}}</span>
+                {{/scope_dot}}
+            {{/response}}
+        </div>
+    </div>
+{{/when}}
