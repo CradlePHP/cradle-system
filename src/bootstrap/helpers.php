@@ -173,11 +173,9 @@ return function($request, $response) {
 
                     //get the templates. This is needed and used
                     //to create mutiple fieldsets on the fly
-                    $parent['name'] = $key;
-                    $parent['label'] = $label;
                     $config = $getFormats([], 'field', $fieldset, [
-                        'name' => $parent['name'],
-                        'label' => $parent['label']
+                        'name' => $key,
+                        'label' => $label
                     ]);
 
                     //get the values
@@ -185,8 +183,12 @@ return function($request, $response) {
 
                     if (!$multiple) {
                         //resolve the label
-                        $values['label'] = $parent['label'];
-                        $values['rows'] = $getFormats($value, 'field', $fieldset, $parent);
+                        $values['label'] = $label;
+                        $values['rows'] = $getFormats($value, 'field', $fieldset, [
+                            'name' => $key,
+                            'label' => $label,
+                            'index' => $parent['index']
+                        ]);
 
                         foreach($values['rows'] as $key2 => $row2) {
                             //if there is a name template
@@ -203,16 +205,20 @@ return function($request, $response) {
                             $parent['index'][] = $i;
 
                             //resolve the label
-                            $values[$i]['label'] = $parent['label'];
+                            $values[$i]['label'] = $label;
                             foreach ($parent['index'] as $j => $index) {
                                 $values[$i]['label'] = str_replace(
-                                    '{INDEX_' . $j . '}', 
-                                    $index + 1, 
+                                    '{INDEX_' . $j . '}',
+                                    $index + 1,
                                     $values[$i]['label']
                                 );
                             }
 
-                            $values[$i]['rows'] = $getFormats($row, 'field', $fieldset, $parent);
+                            $values[$i]['rows'] = $getFormats($row, 'field', $fieldset, [
+                                'name' => $key,
+                                'label' => $label,
+                                'index' => $parent['index']
+                            ]);
 
                             array_pop($parent['index']);
 
@@ -220,8 +226,8 @@ return function($request, $response) {
                                 //if there is a name template
                                 if (isset($row2['name'])) {
                                     $values[$i]['rows'][$key2]['name'] = str_replace(
-                                        $indexPlaceholder2, 
-                                        $i, 
+                                        $indexPlaceholder2,
+                                        $i,
                                         $row2['name']
                                     );
                                     //set the dot notation. this is for error handling
@@ -269,7 +275,7 @@ return function($request, $response) {
                     $fieldset = Helpers::getFieldset(
                         $fields[$name]['field']['parameters']
                     )->getFields();
-                    
+
                     //get the columns
                     $columns = [];
                     foreach($fieldset as $key => $field) {
@@ -306,11 +312,11 @@ return function($request, $response) {
                     foreach($value as $index => $row) {
                         //we should sort the rows based on column sorting
                         $value[$index] = array_merge(
-                            array_flip(array_keys($columns)), 
+                            array_flip(array_keys($columns)),
                             $value[$index]
                         );
 
-                        $results = $getFormats($row, $type, $fieldset);  
+                        $results = $getFormats($row, $type, $fieldset);
 
                         //on each value
                         foreach($row as $index2 => $value2) {
