@@ -262,9 +262,12 @@ return function($request, $response) {
                         }
 
                         //set as required
-                        $value = array_fill_keys(
-                            array_keys($fieldset),
-                            null
+                        $value = array_merge(
+                            array_fill_keys(
+                                array_keys($fieldset),
+                                null
+                            ),
+                            $value
                         );
 
                         //get the templates. This is needed and used
@@ -381,6 +384,8 @@ return function($request, $response) {
                             $value[$index][$index2] = $results[$index2]['value'];
                         }
                     }
+
+
                 }
 
                 //resolve the key
@@ -434,8 +439,6 @@ return function($request, $response) {
 
         //get the formats
         $formats = $getFormats($row, $type, $fields);
-
-        //print_r($formats);exit;
 
         return $options['fn'](['formats' => $formats]);
     });
