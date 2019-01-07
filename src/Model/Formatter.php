@@ -65,6 +65,30 @@ class Formatter
                 continue;
             }
 
+            if ($field['field']['type'] === 'fieldset') {
+                //case for multiple
+                if (isset($field['field']['attributes']['data-multiple'])
+                    && !$field['field']['attributes']['data-multiple']
+                ) {
+                    //format single data
+                    $data[$name] = $this->formatData(
+                        $data[$name],
+                        Fieldset::i($field['field']['parameters']),
+                        false
+                    );
+                } else {
+                    //format each data
+                    foreach($data[$name] as $index => $row) {
+
+                        $data[$name][$index] = $this->formatData(
+                            $row,
+                            Fieldset::i($field['field']['parameters']),
+                            false
+                        );
+                    }
+                }
+            }
+
             switch ($field['field']['type']) {
                 case 'file':
                 case 'image':
@@ -75,7 +99,7 @@ class Formatter
                 case 'imagelist':
                     //upload files
                     $data[$name] = $this->upload($data[$name]);
-                    
+
                     //we should not encode if fieldset
                     if (is_null($fieldset)) {
                         $data[$name] = json_encode($data[$name]);
@@ -91,27 +115,6 @@ class Formatter
                 case 'multiselect':
                 case 'table':
                 case 'fieldset':
-                    //case for multiple
-                    if (isset($field['field']['attributes']['data-multiple'])
-                        && !$field['field']['attributes']['data-multiple']
-                    ) {
-                        //format single data
-                        $data[$name] = $this->formatData(
-                            $data[$name], 
-                            Fieldset::i($field['field']['parameters']),
-                            false
-                        );
-                    } else {
-                        //format each data
-                        foreach($data[$name] as $index => $row) {
-                            $data[$name][$index] = $this->formatData(
-                                $row,
-                                Fieldset::i($field['field']['parameters']),
-                                false
-                            );
-                        }
-                    }
-
                     //if it's an array already
                     if((is_array($data[$name]) || is_object($data[$name])) && is_null($fieldset)) {
                         $data[$name] = json_encode($data[$name]);

@@ -130,14 +130,18 @@ class Validator
             }
         }
 
-        $relations = $this->schema->getRelations();
-        foreach ($relations as $relation) {
-            if ($relation['many'] != 1) {
-                continue;
-            }
+        // is this checker not fieldset specific?
+        // if yes let's check relations
+        if (!$fieldset) {
+            $relations = $this->schema->getRelations();
+            foreach ($relations as $relation) {
+                if ($relation['many'] != 1) {
+                    continue;
+                }
 
-            if (!isset($data[$relation['primary2']]) || !is_numeric($data[$relation['primary2']])) {
-                $errors[$relation['primary2']] = sprintf('%s should be valid', $relation['singular']);
+                if (!isset($data[$relation['primary2']]) || !is_numeric($data[$relation['primary2']])) {
+                    $errors[$relation['primary2']] = sprintf('%s should be valid', $relation['singular']);
+                }
             }
         }
 
