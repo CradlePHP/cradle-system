@@ -241,6 +241,7 @@ class Fieldset extends Registry
             foreach ($field['validation'] as $validation) {
                 if ($validation['method'] === 'required') {
                     $results[] = $name;
+                    break;
                 }
             }
         }
