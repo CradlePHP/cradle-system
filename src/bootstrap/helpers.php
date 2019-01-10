@@ -517,8 +517,8 @@ return function($request, $response) {
 
     $handlebars->registerHelper('stars', function($range, $max, $options = []) {
         $buffer = [];
-        $range = round($range);
         $half = strpos($range, '.5');
+        $range = round($range);
         $value = null;
 
         if (func_num_args() === 2) {
