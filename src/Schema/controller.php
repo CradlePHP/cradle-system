@@ -754,7 +754,10 @@ $this->get('/admin/system/schema/import', function($request, $response) {
         ->setPage('title', $data['title'])
         ->setPage('class', $class)
         ->setContent($body);
-}, 'admin-render-page');
+
+    //render page
+    $this->trigger('admin-render-page', $request, $response);
+});
 
 /**
  * Process the Schema Import
