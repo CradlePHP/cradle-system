@@ -393,7 +393,9 @@ class SqlService
 
         $sum = null;
         $filter = [];
+        $like = [];
         $in = [];
+        $json = [];
         $span  = [];
         $range = 50;
         $start = 0;
@@ -404,8 +406,16 @@ class SqlService
             $filter = $data['filter'];
         }
 
+        if (isset($data['like_filter']) && is_array($data['like_filter'])) {
+            $like = $data['like_filter'];
+        }
+
         if (isset($data['in_filter']) && is_array($data['in_filter'])) {
             $in = $data['in_filter'];
+        }
+
+        if (isset($data['json_filter']) && is_array($data['json_filter'])) {
+            $json = $data['json_filter'];
         }
 
         if (isset($data['span']) && is_array($data['span'])) {
@@ -561,11 +571,55 @@ class SqlService
             }
         }
 
+        //add like filters
+        foreach ($like as $column => $value) {
+            if (preg_match('/^[a-zA-Z0-9-_]+$/', $column)) {
+                $search->addFilter($column . ' LIKE %s', $value);
+                continue;
+            }
+
+            //by chance is it a json filter?
+            if (preg_match('/^[a-zA-Z0-9-_\.]+$/', $column)) {
+                $name = substr($column, 0, strpos($column, '.'));
+                $path = substr($column, strpos($column, '.'));
+                $path = preg_replace('/\.*([0-9]+)/', '[$1]', $path);
+
+                 //it should be a json column type
+                if (!in_array($name, $this->schema->getJsonFieldNames())) {
+                    continue;
+                }
+
+                $column = sprintf('JSON_EXTRACT(%s, "$%s")', $name, $path);
+                $search->addFilter($column . ' = %s', $value);
+                continue;
+            }
+        }
+
         // add in filters
         foreach ($in as $column => $values) {
             if (preg_match('/^[a-zA-Z0-9-_]+$/', $column)) {
                 $search->addFilter($column . ' IN ("' . implode('", "', $values) . '")');
             }
+        }
+
+        // add json filters
+        foreach ($json as $column => $values) {
+            //it should be a json column type
+            if (!in_array($column, $this->schema->getJsonFieldNames())) {
+                continue;
+            }
+            // values should be array
+            if (!is_array($values)) {
+                $values = [$values];
+            }
+            $or = [];
+            $where = [];
+            foreach ($values as $value) {
+                $where[] = "JSON_SEARCH(LOWER($column), 'one', %s) IS NOT NULL";
+                $or[] = '%' . strtolower($value) . '%';
+            }
+            array_unshift($or, '(' . implode(' OR ', $where) . ')');
+            call_user_func([$search, 'addFilter'], ...$or);
         }
 
         //add spans
