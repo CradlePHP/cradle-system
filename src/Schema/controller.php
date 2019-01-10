@@ -7,7 +7,7 @@
  */
 
 /**
- * Render the Model Search Page
+ * Render the Schema Search Page
  *
  * @param Request $request
  * @param Response $response
@@ -77,7 +77,7 @@ $this->get('/admin/system/schema/search', function ($request, $response) {
 });
 
 /**
- * Render the Model Create Page
+ * Render the Schema Create Page
  *
  * @param Request $request
  * @param Response $response
@@ -186,7 +186,7 @@ $this->get('/admin/system/schema/create', function ($request, $response) {
 }, 'admin-render-page');
 
 /**
- * Render the Model Update Page
+ * Render the Schema Update Page
  *
  * @param Request $request
  * @param Response $response
@@ -310,7 +310,7 @@ $this->get('/admin/system/schema/update/:name', function ($request, $response) {
 });
 
 /**
- * Process the Model Create Page
+ * Process the Schema Create Page
  *
  * @param Request $request
  * @param Response $response
@@ -388,7 +388,7 @@ $this->post('/admin/system/schema/create', function ($request, $response) {
 });
 
 /**
- * Process the Model Update Page
+ * Process the Schema Update Page
  *
  * @param Request $request
  * @param Response $response
@@ -480,7 +480,7 @@ $this->post('/admin/system/schema/update/:name', function ($request, $response) 
 });
 
 /**
- * Process the Model Remove
+ * Process the Schema Remove
  *
  * @param Request $request
  * @param Response $response
@@ -535,7 +535,7 @@ $this->get('/admin/system/schema/remove/:name', function ($request, $response) {
 });
 
 /**
- * Process the Model Restore
+ * Process the Schema Restore
  *
  * @param Request $request
  * @param Response $response
@@ -590,7 +590,7 @@ $this->get('/admin/system/schema/restore/:name', function ($request, $response) 
 });
 
 /**
- * Process the Model Export
+ * Process the Schema Export
  * 
  * @param Request $request
  * @param Response $response`
@@ -602,6 +602,11 @@ $this->get('/admin/system/schema/export', function($request, $response) {
     $path = $this->package('global')->path('config') . '/schema/';
     //default redirect
     $redirect = '/admin/system/schema/search';
+
+    //if there is a specified redirect_uri
+    if ($request->getStage('redirect_uri')) {
+        $redirect = $request->getStage('redirect_uri');
+    }
 
     //specific schema?
     if (!is_null($name)) {
@@ -685,7 +690,7 @@ $this->get('/admin/system/schema/export', function($request, $response) {
 });
 
 /**
- * Render the Model Import
+ * Render the Schema Import
  * 
  * @param Request $request
  * @param Response $response
@@ -752,7 +757,7 @@ $this->get('/admin/system/schema/import', function($request, $response) {
 }, 'admin-render-page');
 
 /**
- * Process the Model Import
+ * Process the Schema Import
  * 
  * @param Request $request
  * @param Response $response
@@ -768,6 +773,17 @@ $this->post('/admin/system/schema/import', function($request, $response) {
     $route = '/admin/system/schema/import';
     //get the redirect
     $redirect = '/admin/system/schema/search';
+
+    //this is for flexibility
+    if ($request->hasStage('route')) {
+        $route = $request->getStage('route');
+    }
+
+    //if there is a specified redirect
+    if ($request->getStage('redirect_uri')) {
+        //set the redirect
+        $redirect = $request->getStage('redirect_uri');
+    }
 
     //invalid file?
     if ($type !== 'application/json' && $type !== 'application/zip') {
