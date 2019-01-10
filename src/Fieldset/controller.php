@@ -183,7 +183,8 @@ $this->get('/admin/system/fieldset/create', function ($request, $response) {
         ->setContent($body);
 
     //render page
-}, 'admin-render-page');
+    $this->trigger('admin-render-page', $request, $response);
+});
 
 /**
  * Render the Fieldset Update Page
