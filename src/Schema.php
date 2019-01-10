@@ -621,6 +621,10 @@ class Schema extends Fieldset
             'type' => 'FLOAT',
             'length' => '10,2'
         ],
+        'stars' => [
+            'type' => 'FLOAT',
+            'length' => '10,1'
+        ],
         'date' => [
             'type' => 'date'
         ],

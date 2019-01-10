@@ -515,6 +515,35 @@ return function($request, $response) {
         return nl2br(str_replace(' ', '&nbsp;', json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)));
     });
 
+    $handlebars->registerHelper('stars', function($range, $max, $options = []) {
+        $buffer = [];
+        $range = round($range);
+        $half = strpos($range, '.5');
+        $value = null;
+
+        if (func_num_args() === 2) {
+            $options = $max;
+            $max = $range;
+        }
+
+        for($i = 0; $i < $max; $i++) {
+            if ($i == $range - 1 && $half) {
+                $value = 'half';
+            } else if ($i < $range) {
+                $value = 'whole';
+            } else {
+                $value = 'empty';
+            }
+
+            $buffer[] = $options['fn']([
+                'this' => $value, 
+                '@index' => $i
+            ]);
+        }
+
+        return implode('', $buffer);
+    });
+
     $handlebars->registerHelper('scope_dot', function ($array, $dot, $options) {
         if (!is_array($array)) {
             return $options['inverse']();

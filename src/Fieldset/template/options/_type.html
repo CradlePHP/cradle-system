@@ -143,6 +143,14 @@
     >
         Price Field
     </option>
+    <option
+        data-fieldset="attributes"
+        data-format="number|date|html"
+        value="stars"
+        {{#when field.type '===' 'stars'}}selected{{/when}}
+    >
+        Star Rating Field
+    </option>
 </optgroup>
 <optgroup label="Date Fields">
     <option

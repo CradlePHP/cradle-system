@@ -36,57 +36,20 @@
     {{#if this}}Yes{{else}}No{{/if}}
 {{/when}}
 {{#when config.format '===' 'stars'}}
-    <span class="rating text-yellow">
-        {{#when this '==' 0.5}}
-            <i class="fas fa-star-half"></i>
-        {{/when}}
-        {{#when this '==' 1}}
-            <i class="fas fa-star"></i>
-        {{/when}}
-        {{#when this '==' 1.5}}
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star-half"></i>
-        {{/when}}
-        {{#when this '==' 2}}
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-        {{/when}}
-        {{#when this '==' 2.5}}
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star-half"></i>
-        {{/when}}
-        {{#when this '==' 3}}
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-        {{/when}}
-        {{#when this '==' 3.5}}
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star-half"></i>
-        {{/when}}
-        {{#when this '==' 4}}
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-        {{/when}}
-        {{#when this '==' 4.5}}
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star-half"></i>
-        {{/when}}
-        {{#when this '>=' 5}}
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-        {{/when}}
+    <span class="stars-rating text-warning">
+        {{#stars this}}
+            {{#when this '===' 'half'}}
+                <i class="fas fa-star-half-alt"></i>
+            {{/when}}
+
+            {{#when this '===' 'whole'}}
+                <i class="fas fa-star"></i>
+            {{/when}}
+
+            {{#when this '===' 'empty'}}
+                <i class="far fa-star"></i>
+            {{/when}}
+        {{/stars}}
     </span>
 {{/when}}
 {{#when config.format '===' 'date'}}
