@@ -197,7 +197,7 @@ return function($request, $response) {
 
                         //get the values
                         $values = [];
-                        foreach($value as $i => $row) {
+                        foreach($value as $i => $row2) {
                             $indexes[] = $i;
 
                             //resolve the label
@@ -211,7 +211,7 @@ return function($request, $response) {
                             }
 
                             $values[$i]['rows'] = $getFormats(
-                                $row,
+                                $row2,
                                 'field',
                                 $fieldset,
                                 [
@@ -223,21 +223,21 @@ return function($request, $response) {
 
                             array_pop($indexes);
 
-                            foreach($values[$i]['rows'] as $key2 => $row2) {
+                            foreach($values[$i]['rows'] as $key2 => $row3) {
                                 //if there is a name template
-                                if (isset($row2['name'])) {
-                                    $row2['name'] = str_replace(
+                                if (isset($row3['name'])) {
+                                    $row3['name'] = str_replace(
                                         $indexPlaceholder2,
                                         $i,
-                                        $row2['name']
+                                        $row3['name']
                                     );
 
                                     //set the dot notation. this is for error handling
-                                    $row2['dot'] = Helpers::fieldNameToDotNotation(
-                                        $row2['name']
+                                    $row3['dot'] = Helpers::fieldNameToDotNotation(
+                                        $row3['name']
                                     );
 
-                                    $values[$i]['rows'][$key2] = $row2;
+                                    $values[$i]['rows'][$key2] = $row3;
                                 }
                             }
                         }
@@ -286,15 +286,15 @@ return function($request, $response) {
                             'index' => $indexes
                         ]);
 
-                        foreach($values['rows'] as $key2 => $row2) {
+                        foreach($values['rows'] as $key2 => $row3) {
                             //if there is a name template
-                            if (isset($row2['name'])) {
+                            if (isset($row3['name'])) {
                                 //set the dot notation. this is for error handling
-                                $row2['dot'] = Helpers::fieldNameToDotNotation(
-                                    $row2['name']
+                                $row3['dot'] = Helpers::fieldNameToDotNotation(
+                                    $row3['name']
                                 );
 
-                                $values['rows'][$key2] = $row2;
+                                $values['rows'][$key2] = $row3;
                             }
                         }
                     }
@@ -354,9 +354,9 @@ return function($request, $response) {
 
                     //we need to fill columns that is not
                     //yet set to avoid broken table columns
-                    foreach($value as $index => $row) {
+                    foreach($value as $index => $row2) {
                         foreach($columns as $key => $column) {
-                            if (isset($row[$key])) {
+                            if (isset($row2[$key])) {
                                 continue;
                             }
 
@@ -369,17 +369,17 @@ return function($request, $response) {
 
                     //now we need to format the
                     //fieldset and fielset fields
-                    foreach($value as $index => $row) {
+                    foreach($value as $index => $row2) {
                         //we should sort the rows based on column sorting
                         $value[$index] = array_merge(
                             array_flip(array_keys($columns)),
                             $value[$index]
                         );
 
-                        $results = $getFormats($row, $type, $fieldset);
+                        $results = $getFormats($row2, $type, $fieldset);
 
                         //on each value
-                        foreach($row as $index2 => $value2) {
+                        foreach($row2 as $index2 => $value2) {
                             //get the formatted value
                             $value[$index][$index2] = $results[$index2]['value'];
                         }
@@ -536,7 +536,7 @@ return function($request, $response) {
             }
 
             $buffer[] = $options['fn']([
-                'this' => $value, 
+                'this' => $value,
                 '@index' => $i
             ]);
         }
