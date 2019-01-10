@@ -33,6 +33,12 @@
         </div>
 
         <div class="float-right">
+            <a class="btn btn-pink" href="/admin/system/fieldset/import">
+                <i class="fas fa-upload"></i> Import
+            </a>
+            <a class="btn btn-purple" href="/admin/system/fieldset/export">
+                <i class="fas fa-download"></i> Export
+            </a>
             <a class="btn btn-success" href="/admin/system/fieldset/create?redirect_uri={{redirecturl}}">
                 <i class="fas fa-plus"></i> {{_ 'Create Fieldset'}}
             </a>
@@ -54,6 +60,13 @@
                     {{#each rows}}
                         <tr data-id="{{name}}">
                             <td>
+                                <a
+                                    class="text-primary"
+                                    title="Export"
+                                    href="/admin/system/fieldset/export?name={{name}}&redirect_uri={{redirecturl}}"
+                                >
+                                    <i class="fas fa-download"></i>
+                                </a>
                                 <a
                                     class="text-purple"
                                     href="/admin/system/fieldset/create?copy={{name}}&redirect_uri={{redirecturl}}"
