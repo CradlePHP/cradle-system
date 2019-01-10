@@ -138,13 +138,21 @@
                 </thead>
             {{/if}}
             <tbody>
-                {{#each this}}
-                    <tr>
-                        {{#each this}}
-                            <td>{{{this}}}</td>
-                        {{/each}}
-                    </tr>
-                {{/each}}
+                {{#if this.length}}
+                    {{#each this}}
+                        <tr>
+                            {{#if this.length}}
+                                {{#each this}}
+                                    {{#is_array this}}
+                                        <td>{{_ 'Array'}}</td>
+                                    {{else}}
+                                        <td>{{{this}}}</td>
+                                    {{/is_array}}
+                                {{/each}}
+                            {{/if}}
+                        </tr>
+                    {{/each}}
+                {{/if}}
             </tbody>
         </table>
     {{else}}

@@ -41,11 +41,15 @@ class Helpers
      *
      * @param *string $name
      *
-     * @return Fieldset
+     * @return Fieldset|false
      */
     public static function getFieldset($name) {
         if (!isset(self::$fieldsets[$name])) {
-            self::$fieldsets[$name] = Fieldset::i($name);
+            try {
+                self::$fieldsets[$name] = Fieldset::i($name);
+            } catch (Exception $e) {
+                return false;
+            }
         }
 
         return self::$fieldsets[$name];

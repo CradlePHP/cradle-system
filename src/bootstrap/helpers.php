@@ -54,7 +54,7 @@ return function($request, $response) {
         return Schema::i($schema)->getSuggestionFormat($row);
     });
 
-    $handlebars->registerHelper('format', function ($type, $schema, $row) {
+    $handlebars->registerHelper('format', function ($type, $schema, $row, $column = null) {
         //get the options for later
         $arguments = func_get_args();
         $options = array_pop($arguments);
@@ -327,65 +327,50 @@ return function($request, $response) {
                 //if its a fieldset and view is detail/list
                 //this will format nested tables formats
                 //for fieldsets
-                if (($type === 'list' || $type === 'detail')
+                if ($type !== 'field' //list or detail
+                    && $field[$type]['format'] === 'table'
                     && $field['field']['type'] === 'fieldset'
-                    && $field['field']['type'] !== 'jsonpretty'
                     && is_array($value)
                 ) {
-                    //if not cached
+                    //get columns
                     $fieldset = Helpers::getFieldset(
                         $field['field']['parameters']
                     );
 
-                    $fieldset = $fieldset->getFields();
+                    if ($fieldset) {
+                        $columns = [];
+                        $fieldsetFields = $fieldset->getFields();
+                        foreach ($fieldsetFields as $fieldsetField) {
+                            $columns[] = $fieldsetField['label'];
+                        }
 
-                    //get the columns
-                    $columns = [];
-                    foreach($fieldset as $key => $fieldsetField) {
-                        $columns[$key] = $fieldsetField['label'];
-                    }
+                        $fields[$name]['field']['columns'] = $columns;
 
-                    //set the columns
-                    $fields[$name]['field']['columns'] = $columns;
+                        if (!$multiple) {
+                            $value = [$value];
+                        }
 
-                    if (!$multiple) {
-                        $value = [ $value ];
-                    }
+                        $value2 = [];
+                        //get the format for each row
+                        foreach ($value as $i => $row2) {
+                            $value2[$i] = $getFormats($row2, $type, $fieldsetFields);
 
-                    //we need to fill columns that is not
-                    //yet set to avoid broken table columns
-                    foreach($value as $index => $row2) {
-                        foreach($columns as $key => $column) {
-                            if (isset($row2[$key])) {
+                            if (!is_array($value2[$i])) {
+                                unset($value2[$i]);
                                 continue;
                             }
 
-                            $value[$index][$key] = null;
-                            if ($fieldset[$key]['field']['type'] === 'fieldset') {
-                                $value[$index][$key] = [];
+                            foreach ($value2[$i] as $key2 => $row3) {
+                                if (!isset($row3['value'])) {
+                                    $row3['value'] = '';
+                                }
+
+                                $value2[$i][$key2] = $row3['value'];
                             }
                         }
+
+                        $value = $value2;
                     }
-
-                    //now we need to format the
-                    //fieldset and fielset fields
-                    foreach($value as $index => $row2) {
-                        //we should sort the rows based on column sorting
-                        $value[$index] = array_merge(
-                            array_flip(array_keys($columns)),
-                            $value[$index]
-                        );
-
-                        $results = $getFormats($row2, $type, $fieldset);
-
-                        //on each value
-                        foreach($row2 as $index2 => $value2) {
-                            //get the formatted value
-                            $value[$index][$index2] = $results[$index2]['value'];
-                        }
-                    }
-
-
                 }
 
                 //resolve the key
@@ -439,6 +424,10 @@ return function($request, $response) {
 
         //get the formats
         $formats = $getFormats($row, $type, $fields);
+
+        if (is_scalar($column) && isset($formats[$column])) {
+            return $options['fn']($formats[$column]);
+        }
 
         return $options['fn'](['formats' => $formats]);
     });
