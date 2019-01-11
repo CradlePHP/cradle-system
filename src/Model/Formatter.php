@@ -160,6 +160,8 @@ class Formatter
 
                     break;
                 case 'password':
+                    $data[$name] = password_hash($data[$name], PASSWORD_DEFAULT);
+                    break;
                 case 'md5':
                     $data[$name] = md5($data[$name]);
                     break;
