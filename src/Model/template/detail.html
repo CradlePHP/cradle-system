@@ -7,23 +7,23 @@
         </li>
         {{#if relation.suggestion}}
             <li class="breadcrumb-item">
-                <a href="/admin/system/model/{{relation.schema.name}}/search">
+                <a href="../../search">
                     <i class="{{relation.schema.icon}}"></i> {{relation.schema.plural}}
                 </a>
             </li>
             <li class="breadcrumb-item">
-                <a href="/admin/system/model/{{relation.schema.name}}/update/{{scope relation.data relation.schema.primary}}">
+                <a href="../../update/{{scope relation.data relation.schema.primary}}">
                     {{relation.suggestion}}
                 </a>
             </li>
             <li class="breadcrumb-item">
-                <a href="/admin/system/model/{{schema.name}}/search/{{relation.schema.name}}/{{scope relation.data relation.schema.primary}}">
+                <a href="../../{{scope relation.data relation.schema.primary}}/search/{{schema.name}}">
                     <i class="fas fa-{{schema.icon}}"></i> {{schema.plural}}
                 </a>
             </li>
         {{else}}
             <li class="breadcrumb-item">
-                <a href="/admin/system/model/{{schema.name}}/search">
+                <a href="../search">
                     <i class="fas fa-{{schema.icon}}"></i> {{schema.plural}}
                 </a>
             </li>
@@ -58,7 +58,11 @@
                 <div class="box-foot box-light">
                     <div class="box-left">
                         <a
-                            href="/admin/system/model/{{schema.name}}/update/{{scope detail schema.primary}}?redirect_uri={{redirecturl}}"
+                            {{#if relation.suggestion}}
+                                href="../../update/{{scope detail schema.primary}}?redirect_uri={{redirecturl}}"
+                            {{else}}
+                                href="../update/{{scope detail schema.primary}}?redirect_uri={{redirecturl}}"
+                            {{/if}}
                             class="btn btn-grey"
                         >
                             <i class="fa fa-edit"></i> {{_ 'Edit %s' schema.singular}}
@@ -79,22 +83,24 @@
                                 {{#relations schema.name 0}}
                                     {{#has ../detail name}}
                                         {{#scope ../detail name}}
+                                            {{#has this ../primary}}
                                             <tr>
                                                 <td>{{../singular}}</td>
                                                 <td>
-                                                    <a href="/admin/system/model/{{../name}}/detail/{{scope this ../primary}}">
+                                                    <a href="../../{{../name}}/detail/{{scope this ../primary}}">
                                                         {{suggest ../this this}}
                                                     </a>
                                                     &nbsp;&nbsp;
                                                     <a
                                                         class="text-pink remove"
-                                                        href="/admin/system/model/{{../../schema.name}}/{{scope ../../item ../../schema.primary}}/unlink/{{../name}}/{{scope this ../primary}}?redirect_uri={{../../redirect}}"
+                                                        href="../{{scope ../../detail ../../schema.primary}}/unlink/{{../name}}/{{scope this ../primary}}?redirect_uri={{../../redirect}}"
                                                         title="Remove {{../singular}}"
                                                     >
                                                         <i class="fa fa-unlink"></i>
                                                     </a>
                                                 </td>
                                             </tr>
+                                            {{/has}}
                                         {{/scope}}
                                     {{/has}}
                                 {{/relations}}
@@ -103,7 +109,7 @@
                                         <tr>
                                             <td>{{singular}}</td>
                                             <td>
-                                                <a href="/admin/system/model/{{name}}/detail/{{scope ../detail primary}}">
+                                                <a href="../../{{name}}/detail/{{scope ../detail primary}}">
                                                     {{suggest this ../detail}}
                                                 </a>
                                             </td>
@@ -114,7 +120,7 @@
                                     <tr>
                                         <td>{{singular}}</td>
                                         <td>
-                                            <a href="/admin/system/model/{{../schema.name}}/{{scope ../detail ../schema.primary}}/search/{{name}}">
+                                            <a href="../../{{../schema.name}}/{{scope ../detail ../schema.primary}}/search/{{name}}">
                                                 {{_ 'View All %s' plural}}
                                             </a>
                                         </td>
@@ -124,7 +130,7 @@
                                     <tr>
                                         <td>{{singular}}</td>
                                         <td>
-                                            <a href="/admin/system/model/{{../schema.name}}/{{scope ../detail ../schema.primary}}/search/{{name}}">
+                                            <a href="../../{{../schema.name}}/{{scope ../detail ../schema.primary}}/search/{{name}}">
                                                 {{_ 'View All %s' plural}}
                                             </a>
                                         </td>

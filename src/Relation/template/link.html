@@ -6,12 +6,12 @@
             </a>
         </li>
         <li class="breadcrumb-item">
-            <a href="/admin/system/model/{{schema.name}}/search">
+            <a href="../../search">
                 <i class="fas fa-{{schema.icon}}"></i> {{schema.plural}}
             </a>
         </li>
         <li class="breadcrumb-item">
-            <a href="/admin/system/model/{{schema.name}}/{{scope row schema.primary}}/search/{{relation.name}}">
+            <a href="../../{{scope row schema.primary}}/search/{{relation.name}}">
                 <i class="fas fa-{{relation.icon}}"></i> {{row.suggestion}} - {{relation.plural}}
             </a>
         </li>
@@ -57,7 +57,7 @@
                         data-target-label="input.suggestion-label-{{relation.name}}"
                         data-target-value="input.suggestion-value-{{relation.name}}"
                         {{#in valid_relations relation.name}}
-                            data-url="/admin/system/model/{{relation.name}}/search?q={QUERY}&render=false"
+                            data-url="../../../{{relation.name}}/search?q={QUERY}&render=false"
                         {{else}}
                             data-url="/admin/{{relation.name}}/search?q={QUERY}&render=false"
                         {{/in}}

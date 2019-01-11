@@ -1,12 +1,24 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="/admin/system/fieldset/search">
+            <a
+                {{#when action '===' 'create'}}
+                    href="search"
+                {{else}}
+                    href="../search"
+                {{/when}}
+            >
                 <i class="fas fa-home"></i> {{_ 'Admin'}}
             </a>
         </li>
         <li class="breadcrumb-item">
-            <a href="/admin/system/fieldset/search">
+            <a
+                {{#when action '===' 'create'}}
+                    href="search"
+                {{else}}
+                    href="../search"
+                {{/when}}
+            >
                 <i class="fas fa-sliders-h"></i> {{_ 'System Fieldsets'}}
             </a>
         </li>

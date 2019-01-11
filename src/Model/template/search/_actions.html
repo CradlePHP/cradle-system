@@ -40,31 +40,31 @@
             data-do="import"
             data-on="click"
             {{#if relation.schema.name}}
-            data-url="/admin/system/model/{{relation.schema.name}}/{{scope relation.data relation.schema.primary}}/import/{{schema.name}}"
+                data-url="../../{{scope relation.data relation.schema.primary}}/import/{{schema.name}}"
             {{else}}
-            data-url="/admin/system/model/{{schema.name}}/import"
+                data-url="import"
             {{/if}}
             href="javascript:void(0)"
         >
             <i class="fas fa-upload"></i> {{_ 'Import'}}
         </a>
         {{#if relation.suggestion}}
-            <a class="btn btn-purple" href="/admin/system/model/{{relation.schema.name}}/{{scope relation.data relation.schema.primary}}/export/{{schema.name}}/csv?{{query}}" target="_blank">
+            <a class="btn btn-purple" href="../../{{scope relation.data relation.schema.primary}}/export/{{schema.name}}/csv?{{query}}" target="_blank">
                 <i class="fas fa-download"></i> {{_ 'Export'}}
             </a>
 
-            <a class="btn btn-yellow" href="/admin/system/model/{{relation.schema.name}}/{{scope relation.data relation.schema.primary}}/link/{{schema.name}}?redirect_uri={{redirecturl}}">
+            <a class="btn btn-yellow" href="../../{{scope relation.data relation.schema.primary}}/link/{{schema.name}}?redirect_uri={{redirecturl}}">
                 <i class="fas fa-link"></i> {{_ 'Link %s' schema.singular}}
             </a>
 
-            <a class="btn btn-success" href="/admin/system/model/{{relation.schema.name}}/{{scope relation.data relation.schema.primary}}/create/{{schema.name}}?redirect_uri={{redirecturl}}">
+            <a class="btn btn-success" href="../../{{scope relation.data relation.schema.primary}}/create/{{schema.name}}?redirect_uri={{redirecturl}}">
                 <i class="fas fa-plus"></i> {{_ 'Create %s' schema.singular}}
             </a>
         {{else}}
             <a class="btn btn-purple" href="export/csv?{{query}}" target="_blank">
                 <i class="fas fa-download"></i> {{_ 'Export'}}
             </a>
-            <a class="btn btn-success" href="/admin/system/model/{{schema.name}}/create?redirect_uri={{redirecturl}}">
+            <a class="btn btn-success" href="create?redirect_uri={{redirecturl}}">
                 <i class="fas fa-plus"></i> {{_ 'Create %s' schema.singular}}
             </a>
         {{/if}}
