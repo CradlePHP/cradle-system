@@ -39,7 +39,13 @@ class Fieldset extends Registry
         }
 
         if (!$this->data || empty($this->data)) {
-            throw Exception::forFieldsetNotFound($name);
+            $this->data = cradle()
+                ->package('global')
+                ->schema($name);
+
+            if (!$this->data || empty($this->data)) {
+                throw Exception::forFieldsetNotFound($name);
+            }
         }
     }
 

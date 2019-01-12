@@ -43,7 +43,7 @@ $this->get('/admin/system/model/:schema1/:id/search/:schema2', function ($reques
         //add a flash
         $message = $this->package('global')->translate('Invalid relation');
         $this->package('global')->flash($message, 'error');
-        $this->package('global')->redirect($redirect);
+        return $this->package('global')->redirect($redirect);
     }
 
     $id = $request->getStage('id');

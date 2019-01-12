@@ -60,9 +60,9 @@ return function($request, $response) {
         $options = array_pop($arguments);
 
         //try to load the schema
-        try {
-            $schema = Helpers::getSchema($schema);
-        } catch (Exception $e) {
+        $schema = Helpers::getSchema($schema);
+
+        if (!$schema) {
             return '';
         }
 
@@ -145,6 +145,10 @@ return function($request, $response) {
                     $fieldset = Helpers::getFieldset(
                         $fields[$name]['field']['parameters']
                     );
+
+                    if (!$fieldset) {
+                        continue;
+                    }
 
                     $keyword = $fieldset->getName();
                     $singular = $fieldset->getSingular();
@@ -341,6 +345,10 @@ return function($request, $response) {
                         $columns = [];
                         $fieldsetFields = $fieldset->getFields();
                         foreach ($fieldsetFields as $fieldsetField) {
+                            if ($fieldsetField[$type]['format'] === 'hide') {
+                                continue;
+                            }
+
                             $columns[] = $fieldsetField['label'];
                         }
 
@@ -353,7 +361,14 @@ return function($request, $response) {
                         $value2 = [];
                         //get the format for each row
                         foreach ($value as $i => $row2) {
-                            $value2[$i] = $getFormats($row2, $type, $fieldsetFields);
+                            $indexes[] = $i;
+
+                            $value2[$i] = $getFormats($row2, $type, $fieldsetFields, [
+                                'name' => $key,
+                                'index' => $indexes
+                            ]);
+
+                            array_pop($indexes);
 
                             if (!is_array($value2[$i])) {
                                 unset($value2[$i]);
@@ -390,6 +405,9 @@ return function($request, $response) {
                 //get the default value in case it's empty
                 if (is_null($value) || empty($value)) {
                     $value = $fields[$name]['default'];
+                    if ($value === 'NOW()') {
+                        $value = date('Y-m-d H:i:s');
+                    }
                 }
 
                 //and prepare the results
@@ -412,6 +430,8 @@ return function($request, $response) {
                         'this' => $value,
                         'row' => $row,
                         'config' => $fields[$name][$type],
+                        'label' => $fields[$name]['label'],
+                        'dot' => $dot,
                         //need this for table columns
                         'field' => $fields[$name]['field'],
                         'schema' => $schema['name']

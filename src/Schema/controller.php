@@ -592,7 +592,7 @@ $this->get('/admin/system/schema/restore/:name', function ($request, $response) 
 
 /**
  * Process the Schema Export
- * 
+ *
  * @param Request $request
  * @param Response $response`
  */
@@ -632,7 +632,7 @@ $this->get('/admin/system/schema/export', function($request, $response) {
 
         //include the php file
         $content = json_encode(include($file), JSON_PRETTY_PRINT);
-        
+
         //return content
         return $response->setContent($content);
     }
@@ -692,7 +692,7 @@ $this->get('/admin/system/schema/export', function($request, $response) {
 
 /**
  * Render the Schema Import
- * 
+ *
  * @param Request $request
  * @param Response $response
  */
@@ -762,7 +762,7 @@ $this->get('/admin/system/schema/import', function($request, $response) {
 
 /**
  * Process the Schema Import
- * 
+ *
  * @param Request $request
  * @param Response $response
  */
@@ -894,7 +894,7 @@ $this->post('/admin/system/schema/import', function($request, $response) {
         $filename = $zip->getNameIndex($i);
 
         //root or not under schema?
-        if ($filename === 'schema/' 
+        if ($filename === 'schema/'
         || strpos($filename , 'schema/') === false) {
             continue;
         }

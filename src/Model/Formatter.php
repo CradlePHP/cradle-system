@@ -65,6 +65,10 @@ class Formatter
                 continue;
             }
 
+            if ($data[$name] === 'NOW()') {
+                $data[$name] = date('Y-m-d H:i:s');
+            }
+
             if ($field['field']['type'] === 'fieldset') {
                 //case for multiple
                 if (isset($field['field']['attributes']['data-multiple'])

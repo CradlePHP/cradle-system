@@ -150,6 +150,7 @@
                 {{#if item.disable}}
                     <input type="hidden" name="disable" value="1" />
                 {{/if}}
+                <input type="hidden" name="csrf" value="{{csrf}}" />
                 <button type="submit" class="btn btn-primary">{{_ 'Submit'}}</button>
             </div>
         </div>

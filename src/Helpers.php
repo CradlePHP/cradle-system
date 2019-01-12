@@ -64,7 +64,11 @@ class Helpers
      */
     public static function getSchema($name) {
         if (!isset(self::$schemas[$name])) {
-            self::$schemas[$name] = Schema::i($name);
+            try {
+                self::$schemas[$name] = Schema::i($name);
+            } catch (Exception $e) {
+                return false;
+            }
         }
 
         return self::$schemas[$name];

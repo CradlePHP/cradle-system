@@ -26,26 +26,66 @@
 
         //copy row
         $('a.fieldset-field-copy-trigger', target).click(function() {
-            var index = $('tr.fieldset-field-row', target).length;
+            var index = $(target).parent().children('tr.fieldset-field-row').length;
             var modal = $(this).siblings('div.modal').eq(0);
 
             copy = modal
                 .find('div.modal-body')
-                .clone()
-                .html()
-                .replace(
-                    /name="fields\[[0-9]\]/g,
-                    'name="fields['+index+']'
-                )
-                .replace(
-                    /name='fields\[[0-9]\]/g,
-                    "name='fields["+index+"]"
+                .clone();
+
+            $('[name]', copy).each(function() {
+                var name = $(this).attr('name');
+
+                name = name.replace(
+                    /fields\[[0-9]+\]/g,
+                    'fields[' + index + ']'
                 );
 
+                $(this).attr('name', name);
+                $(this).attr('value', $(this).val());
+
+                //this is for slugger
+                var source = $(this).attr('data-source');
+                if (source) {
+                    source = source.replace(
+                        /fields\[[0-9]+\]/g,
+                        'fields[' + index + ']'
+                    );
+
+                    $(this).attr('data-source', source);
+                }
+            });
+
+            $('[data-name]', copy).each(function() {
+                var name = $(this).attr('data-name');
+
+                name = name.replace(
+                    /fields\[[0-9]+\]/g,
+                    'fields[' + index + ']'
+                );
+
+                $(this).attr('data-name', name);
+            });
+
+            $('input', copy).each(function() {
+                var value = $(this).val();
+                $(this).attr('value', value);
+            });
+
+            $('input', copy).each(function() {
+                var value = $(this).val();
+                $(this).attr('value', value);
+            });
+
+            $('textarea', copy).each(function() {
+                var value = $(this).val();
+                $(this).html(value);
+            });
+
             $('#modal-template')
-                .compile()
+                .compile({INDEX: index})
                 .find('div.modal-body')
-                .html(copy)
+                .html(copy.html())
                 .parents('.modal')
                 .appendTo(document.body)
                 .modal({
@@ -1042,15 +1082,17 @@
             }
 
             if(name.val() === 'updated' && type !== 'updated') {
-                var value = name.val();
-
-                $('div.fieldset-fields table input.field-name').not(name).each(function() {
-                    if($(this).val() === value) {
-                        message = '<div class="error-message">Keyword already exists.</div>';
-                        name.addClass('is-error').after(message);
-                    }
-                });
+                name.addClass('is-error').after(message);
+                return;
             }
+
+            $('div.fieldset-fields table input.field-name').not(name).each(function() {
+                var value = name.val();
+                if($(this).val() === value) {
+                    message = '<div class="error-message">Keyword already exists.</div>';
+                    name.addClass('is-error').after(message);
+                }
+            });
         });
     });
 
