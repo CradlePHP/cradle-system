@@ -23,7 +23,13 @@
             </li>
         {{else}}
             <li class="breadcrumb-item">
-                <a href="../search">
+                <a 
+                    {{#when action '===' 'create'}}
+                        href="search"
+                    {{else}}
+                        href="../search"
+                    {{/when}}
+                >
                     <i class="fas fa-{{schema.icon}}"></i> {{schema.plural}}
                 </a>
             </li>
