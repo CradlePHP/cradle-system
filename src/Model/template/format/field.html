@@ -212,17 +212,17 @@
                 {{#when this '===' 'half'}}
                     <i class="fas fa-star-half-alt text-warning"></i>
                 {{/when}}
-    
+
                 {{#when this '===' 'whole'}}
                     <i class="fas fa-star text-warning"></i>
                 {{/when}}
-    
+
                 {{#when this '===' 'empty'}}
                     <i class="far fa-star"></i>
                 {{/when}}
             </div>
         {{/stars}}
-        
+
         <input
             autocomplete="{{name}}"
             class="form-control system-form-control hidden"
@@ -236,7 +236,6 @@
             {{/each}}
         />
     </div>
-    <br />
 {{/when}}
 {{#when config.type '===' 'date'}}
     <input
