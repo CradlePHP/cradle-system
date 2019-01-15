@@ -21,7 +21,10 @@
     },
     "require": {
         "cradlephp/storm": "~1.0.4",
-        "cradlephp/cradle-admin": "~2.2.0"
+        "cradlephp/cradle-admin": "~2.2.0",
+        "predis/predis": "1.1.1",
+        "elasticsearch/elasticsearch": "2.2.2",
+        "erusev/parsedown": "1.7.1"
     },
     "autoload": {
         "psr-4": {
