@@ -32,16 +32,13 @@ class Fieldset extends Registry
     public function __construct($name)
     {
         $this->data = $name;
+        $global = cradle('global');
         if (!is_array($this->data)) {
-            $this->data = cradle()
-                ->package('global')
-                ->fieldset($name);
+            $this->data = $global->fieldset($name);
         }
 
         if (!$this->data || empty($this->data)) {
-            $this->data = cradle()
-                ->package('global')
-                ->schema($name);
+            $this->data = $global->schema($name);
 
             if (!$this->data || empty($this->data)) {
                 throw Exception::forFieldsetNotFound($name);

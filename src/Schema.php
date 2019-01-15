@@ -36,9 +36,7 @@ class Schema extends Fieldset
     {
         $this->data = $name;
         if (!is_array($this->data)) {
-            $this->data = cradle()
-                ->package('global')
-                ->schema($name);
+            $this->data = cradle('global')->schema($name);
         }
 
         if (!$this->data || empty($this->data)) {
