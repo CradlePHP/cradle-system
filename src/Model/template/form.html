@@ -105,7 +105,11 @@
                             data-target-label="input.suggestion-label-{{name}}"
                             data-target-value="input.suggestion-value-{{name}}"
                             {{#in ../valid_relations name}}
-                                data-url="../{{name}}/search?q={QUERY}&render=false"
+                                {{#when ../action '===' 'create'}}
+                                    data-url="../{{name}}/search?q={QUERY}&render=false"
+                                {{else}}
+                                    data-url="../../{{name}}/search?q={QUERY}&render=false"
+                                {{/when}}
                             {{else}}
                                 data-url="/admin/{{name}}/search?q={QUERY}&render=false"
                             {{/in}}
@@ -161,7 +165,11 @@
                             data-target-label="input.suggestion-label-{{name}}"
                             data-target-value="input.suggestion-value-{{name}}"
                             {{#in ../valid_relations name}}
-                                data-url="../../{{name}}/search?q={QUERY}&render=false"
+                                {{#when ../action '===' 'create'}}
+                                    data-url="../{{name}}/search?q={QUERY}&render=false"
+                                {{else}}
+                                    data-url="../../{{name}}/search?q={QUERY}&render=false"
+                                {{/when}}
                             {{else}}
                                 data-url="/admin/{{name}}/search?q={QUERY}&render=false"
                             {{/in}}
