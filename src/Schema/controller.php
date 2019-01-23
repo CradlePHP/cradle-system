@@ -36,6 +36,19 @@ $this->get('/admin/system/schema/search', function ($request, $response) {
         $response->getResults()
     );
 
+    //organize by groups
+    $data['groups'] = ['Custom' => []];
+    if (isset($data['rows']) && is_array($data['rows'])) {
+        foreach ($data['rows'] as $row) {
+            $group = 'Custom';
+            if (isset($row['group']) && trim($row['group'])) {
+                $group = $row['group'];
+            }
+
+            $data['groups'][$group][] = $row;
+        }
+    }
+
     //----------------------------//
     // 2. Render Template
     $class = 'page-admin-system-schema-search page-admin';
@@ -334,6 +347,19 @@ $this->post('/admin/system/schema/create', function ($request, $response) {
         $request->setStage('validation', []);
     }
 
+    //redirect
+    $redirect = '/admin/system/schema/search';
+
+    //if there is a specified redirect
+    if ($request->getStage('redirect_uri')) {
+        //set the redirect
+        $redirect = $request->getStage('redirect_uri');
+    }
+
+    //make sure these are not added
+    $request->removeStage('redirect_uri');
+    $request->removeStage('csrf');
+
     //----------------------------//
     // 2. Process Request
     $this->trigger('system-schema-create', $request, $response);
@@ -351,15 +377,6 @@ $this->post('/admin/system/schema/create', function ($request, $response) {
         }
 
         return $this->routeTo('get', $route, $request, $response);
-    }
-
-    //redirect
-    $redirect = '/admin/system/schema/search';
-
-    //if there is a specified redirect
-    if ($request->getStage('redirect_uri')) {
-        //set the redirect
-        $redirect = $request->getStage('redirect_uri');
     }
 
     //if we dont want to redirect
@@ -422,6 +439,19 @@ $this->post('/admin/system/schema/update/:name', function ($request, $response) 
         $request->setStage('relations', []);
     }
 
+    //redirect
+    $redirect = '/admin/system/schema/search';
+
+    //if there is a specified redirect
+    if ($request->getStage('redirect_uri')) {
+        //set the redirect
+        $redirect = $request->getStage('redirect_uri');
+    }
+
+    //make sure these are not added
+    $request->removeStage('redirect_uri');
+    $request->removeStage('csrf');
+
     //----------------------------//
     // 2. Process Request
     $this->trigger('system-schema-update', $request, $response);
@@ -457,15 +487,6 @@ $this->post('/admin/system/schema/update/:name', function ($request, $response) 
         'schema',
         $request->getStage('name')
     );
-
-    //redirect
-    $redirect = '/admin/system/schema/search';
-
-    //if there is a specified redirect
-    if ($request->getStage('redirect_uri')) {
-        //set the redirect
-        $redirect = $request->getStage('redirect_uri');
-    }
 
     //if we dont want to redirect
     if ($redirect === 'false') {
