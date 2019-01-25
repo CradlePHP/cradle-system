@@ -75,7 +75,11 @@
     >
         <div class="box-head box-success">
             <div class="box-title">
-                <i class="fa fa-plus"></i> {{title}}
+                {{#when action '===' 'create'}}
+                    <i class="fas fa-plus"></i> {{title}}
+                {{else}}
+                    <i class="fas fa-edit"></i> {{title}}
+                {{/when}}
             </div>
         </div>
 
