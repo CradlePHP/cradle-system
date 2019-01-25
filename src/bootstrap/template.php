@@ -19,12 +19,12 @@ return function($request, $response) {
     ) {
         //if no template path was set
         if (!trim($template)) {
-            $template = dirname(__DIR__) . '/template';
+            $template = dirname(__DIR__) . '/Model/template';
         }
 
         //if no partial path was set
         if (!trim($partial)) {
-            $partial = dirname(__DIR__) . '/template';
+            $partial = dirname(__DIR__) . '/Model/template';
         }
 
         if (substr($template, -1) !== '/') {

@@ -37,7 +37,7 @@ $this->get('/admin/system/schema/search', function ($request, $response) {
     );
 
     //organize by groups
-    $data['groups'] = ['Custom' => []];
+    $data['groups'] = [];
     if (isset($data['rows']) && is_array($data['rows'])) {
         foreach ($data['rows'] as $row) {
             $group = 'Custom';
@@ -48,6 +48,8 @@ $this->get('/admin/system/schema/search', function ($request, $response) {
             $data['groups'][$group][] = $row;
         }
     }
+
+    ksort($data['groups']);
 
     //----------------------------//
     // 2. Render Template
