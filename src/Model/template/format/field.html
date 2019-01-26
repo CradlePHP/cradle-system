@@ -207,21 +207,39 @@
             {{@key}}="{{this}}"
         {{/each}}
     >
-        {{#stars this config.attributes.data-max}}
-            <div class="star d-inline-block">
-                {{#when this '===' 'half'}}
-                    <i class="fas fa-star-half-alt text-warning"></i>
-                {{/when}}
+        {{#if config.attributes.data-max}}
+            {{#stars this config.attributes.data-max}}
+                <div class="star d-inline-block">
+                    {{#when this '===' 'half'}}
+                        <i class="fas fa-star-half-alt text-warning"></i>
+                    {{/when}}
 
-                {{#when this '===' 'whole'}}
-                    <i class="fas fa-star text-warning"></i>
-                {{/when}}
+                    {{#when this '===' 'whole'}}
+                        <i class="fas fa-star text-warning"></i>
+                    {{/when}}
 
-                {{#when this '===' 'empty'}}
-                    <i class="far fa-star"></i>
-                {{/when}}
-            </div>
-        {{/stars}}
+                    {{#when this '===' 'empty'}}
+                        <i class="far fa-star"></i>
+                    {{/when}}
+                </div>
+            {{/stars}}
+        {{else}}
+            {{#stars this 5}}
+                <div class="star d-inline-block">
+                    {{#when this '===' 'half'}}
+                        <i class="fas fa-star-half-alt text-warning"></i>
+                    {{/when}}
+
+                    {{#when this '===' 'whole'}}
+                        <i class="fas fa-star text-warning"></i>
+                    {{/when}}
+
+                    {{#when this '===' 'empty'}}
+                        <i class="far fa-star"></i>
+                    {{/when}}
+                </div>
+            {{/stars}}
+        {{/if}}
 
         <input
             autocomplete="{{name}}"

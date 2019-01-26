@@ -110,6 +110,25 @@
             </div>
 
             <div class="form-group">
+                <label class="control-label">{{_ 'Group'}}</label>
+                <div>
+                    <input
+                        class="form-control schema-plural {{#if errors.group}}is-invalid{{/if}}"
+                        name="group"
+                        value="{{item.group}}"
+                        placeholder="{{_ 'eg. E-Commerce'}}"
+                        type="text"
+                    />
+
+                    {{#if errors.group}}
+                        <div class="invalid-feedback">
+                            {{errors.group}}
+                        </div>
+                    {{/if}}
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label class="control-label">{{_ 'Icon'}}</label>
                 <div>
 
