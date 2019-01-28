@@ -99,6 +99,21 @@ $this->on('system-schema-create', function ($request, $response) {
 
     $this->package('global')->schema($table, $data);
 
+    //gets the elastic settings
+    $elastic = $this->package('global')->config('services', 'elastic-main');
+
+    //checks if there are elastic search settings set
+    if ($elastic) {
+        //get elastic service
+        $systemElastic = $schema->service('elastic');
+        //set schema
+        $systemElastic->setSchema($schema);
+        // map elastic schema
+        $systemElastic->map();
+        // populate elastic schema
+        $systemElastic->populate();
+    }
+
     //return response format
     $response->setError(false)->setResults($data);
 });
@@ -395,6 +410,7 @@ $this->on('system-schema-update', function ($request, $response) {
 
     $schema = Schema::i($data);
     $table = $schema->getName();
+
     //this/these will be used a lot
     $systemSql = $schema->service('sql');
 
@@ -406,6 +422,23 @@ $this->on('system-schema-update', function ($request, $response) {
 
     //add the original
     $data['original'] = $original;
+
+    //gets the elastic settings
+    $elastic = $this->package('global')->config('services', 'elastic-main');
+
+    //checks if there are elastic search settings set
+    if ($elastic) {
+        //get elastic service
+        $systemElastic = $schema->service('elastic');
+        //set schema
+        $systemElastic->setSchema($schema);
+        // flush elastic schema
+        $systemElastic->flush();
+        // map elastic schema
+        $systemElastic->map();
+        // populate elastic schema
+        $systemElastic->populate();
+    }
 
     //return response format
     $response->setError(false)->setResults($data);
