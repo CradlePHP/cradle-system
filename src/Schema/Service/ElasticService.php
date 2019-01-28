@@ -61,16 +61,6 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         }
 
         $table = $this->schema->getName();
-        // $path = cradle()->package('global')->path('schema')
-        //       . sprintf('/elastic/%s/elastic.php', ucwords($table));
-
-        // // if mapped file doesn't exist,
-        // // do nothing
-        // if (!file_exists($path)) {
-        //     return false;
-        // }
-
-        // $data = include_once($path);
         $data[$table] = [];
         // try mapping
         try {
