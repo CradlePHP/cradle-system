@@ -224,19 +224,13 @@
     //----------------------------//
     // Modal Events
     $(window).on('modal-form-init', function(e, target) {
-        //field type change
-        $('select.field-type', target).change(function() {
-            var select = $(this);
-            var option = $('option[value="' + select.val() + '"]', this);
+        var setModalState = function () {
+            var select = $('select.field-type', target);
+            var option = $('option[value="' + select.val() + '"]', select);
 
             //fixing a jQuery bug on clone
             $('option', this).removeAttr('selected');
             option.attr('selected', 'selected');
-
-            //configuration
-            var fieldsets = (option.attr('data-fieldset') || '').split('|');
-            var formats = (option.attr('data-format') || '').split('|');
-            var indexes = (option.attr('data-index') || '').split('|');
 
             var value = option.attr('data-default');
             var label = option.attr('data-label');
@@ -244,9 +238,91 @@
             var searchable = option.attr('data-searchable');
             var filterable = option.attr('data-filterable');
             var sortable = option.attr('data-sortable');
-            var index = $(this).getModelIndex();
-
             var validation = option.attr('data-validation');
+
+            //determine label
+            if(label && label.length) {
+                $('input.field-label', target).val(label);
+                $('div.form-group-label', target).hide();
+            } else {
+                $('div.form-group-label', target).show();
+            }
+
+            //determine name
+            if(name && name.length) {
+                $('input.field-name', target).val(name);
+                $('div.form-group-name', target).hide();
+                select.parent().find('div.input-fieldset').remove();
+            } else {
+                $('div.form-group-name', target).show();
+            }
+
+            //determine validation
+            if(parseInt(validation) === 0) {
+                $('div.validation-row', target).remove();
+                $('div.form-group-validation', target).hide();
+            } else if(validation && validation.length) {
+                $('div.form-group-validation', target).show();
+            }
+
+            //determine default
+            if(value && value.length) {
+                $('input.field-default', target).val(value);
+                $('div.form-group-default', target).hide();
+            } else {
+                $('div.form-group-default', target).show();
+            }
+
+            //determine searchable
+            if(searchable && searchable.length) {
+                if(searchable == 1) {
+                    $('input.field-searchable', target).prop('checked', true);
+                } else {
+                    $('input.field-searchable', target).prop('checked', false);
+                }
+
+                $('input.field-searchable', target).parent().hide();
+            } else {
+                $('input.field-searchable', target).parent().show();
+            }
+
+            //determine filterable
+            if(filterable && filterable.length) {
+                if(filterable == 1) {
+                    $('input.field-filterable', target).prop('checked', true);
+                } else {
+                    $('input.field-filterable', target).prop('checked', false);
+                }
+
+                $('input.field-filterable', target).parent().hide();
+            } else {
+                $('input.field-filterable', target).parent().show();
+            }
+
+            //determine sortable
+            if(sortable && sortable.length) {
+                if(sortable == 1) {
+                    $('input.field-sortable', target).prop('checked', true);
+                } else {
+                    $('input.field-sortable', target).prop('checked', false);
+                }
+
+                $('input.field-sortable', target).parent().hide();
+            } else {
+                $('input.field-sortable', target).parent().show();
+            }
+        };
+
+        //field type change
+        $('select.field-type', target).change(function() {
+            var select = $(this);
+            var option = $('option[value="' + select.val() + '"]', this);
+
+            //configuration
+            var fieldsets = (option.attr('data-fieldset') || '').split('|');
+            var formats = (option.attr('data-format') || '').split('|');
+            var indexes = (option.attr('data-index') || '').split('|');
+            var index = $(this).getModelIndex();
 
             //reset
             $('select.field-list optgroup', target).show();
@@ -256,7 +332,9 @@
             $('input.field-sortable', target).attr('disabled', false);
 
             //remove all fieldsets
-            select.parent().find('div.input-fieldset').remove();
+            select.parent()
+                .find('div.input-fieldset')
+                .remove();
 
             fieldsets.forEach(function(field) {
                 var data = [];
@@ -342,76 +420,7 @@
                 }
             });
 
-            //determine label
-            if(label && label.length) {
-                $('input.field-label', target).val(label);
-                $('div.form-group-label', target).hide();
-            } else {
-                $('div.form-group-label', target).show();
-            }
-
-            //determine name
-            if(name && name.length) {
-                $('input.field-name', target).val(name);
-                $('div.form-group-name', target).hide();
-            } else {
-                $('div.form-group-name', target).show();
-            }
-
-            //determine validation
-            if(parseInt(validation) === 0) {
-                $('div.validation-row', target).remove();
-                $('div.form-group-validation', target).hide();
-            } else if(validation && validation.length) {
-                $('div.form-group-validation', target).show();
-            }
-
-            //determine default
-            if(value && value.length) {
-                $('input.field-default', target).val(value);
-                $('div.form-group-default', target).hide();
-            } else {
-                $('div.form-group-default', target).show();
-            }
-
-            //determine searchable
-            if(searchable && searchable.length) {
-                if(searchable == 1) {
-                    $('input.field-searchable', target).prop('checked', true);
-                } else {
-                    $('input.field-searchable', target).prop('checked', false);
-                }
-
-                $('input.field-searchable', target).parent().hide();
-            } else {
-                $('input.field-searchable', target).parent().show();
-            }
-
-            //determine filterable
-            if(filterable && filterable.length) {
-                if(filterable == 1) {
-                    $('input.field-filterable', target).prop('checked', true);
-                } else {
-                    $('input.field-filterable', target).prop('checked', false);
-                }
-
-                $('input.field-filterable', target).parent().hide();
-            } else {
-                $('input.field-filterable', target).parent().show();
-            }
-
-            //determine sortable
-            if(sortable && sortable.length) {
-                if(sortable == 1) {
-                    $('input.field-sortable', target).prop('checked', true);
-                } else {
-                    $('input.field-sortable', target).prop('checked', false);
-                }
-
-                $('input.field-sortable', target).parent().hide();
-            } else {
-                $('input.field-sortable', target).parent().show();
-            }
+            setModalState();
         });
 
         //list format change
@@ -566,6 +575,8 @@
 
             row.doon();
         });
+
+        setModalState();
     });
 
     $(window).on('modal-cancel-click', function(e, trigger) {
