@@ -54,7 +54,7 @@ class Validator
             }
 
             if ($exists) {
-                $errors['name'] = 'Name is already in used.';
+                $errors['name'] = 'Schema already exists';
             }
         }
 
