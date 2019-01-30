@@ -554,6 +554,123 @@ class Schema extends Fieldset
     }
 
     /**
+     * Transforms to SQL data
+     *
+     * @return array
+     */
+    public function toElastic()
+    {   
+        //set default data
+        $data = [
+            $this->getPrimaryFieldName() => 
+                ['type' => 'integer']
+        ];
+
+        foreach ($this->data['fields'] as $field) {
+            $map = [];
+            if (!isset(self::$fieldTypes[$field['field']['type']])) {
+                continue;
+            }
+
+            $name = $this->data['name'] . '_' . $field['name'];
+            $format = self::$fieldTypes[$field['field']['type']];
+
+            //set short datatype
+            if ($format['type'] === 'INT') {
+                $map['type'] = 'integer';
+            }
+
+            //set short datatype
+            if ($format['type'] === 'INT' 
+                && (isset($format['length']) 
+                    && $format['length'] === 1)) {
+                $map['type'] = 'short';
+            }
+
+            //set keyword datatype
+            if ($format['type'] === 'VARCHAR') {
+                $map = [
+                    'type' => 'keyword',
+                ];
+            }
+
+            //set date datatype
+            if ($format['type'] === 'datetime') {
+                $map = [
+                    'type' => 'date',
+                    'format' => 'yyyy-MM-dd HH:mm:ss'
+                ];
+            }  
+
+            //set time datatype
+            if ($format['type'] === 'time') {
+                $map = [
+                    'type' => 'date',
+                    'format' => 'hour_minute_second'
+                ];
+            }
+
+            //set text datatype
+            if ($format['type'] === 'TEXT') {
+                $map = [
+                    'type' => 'text'
+                ];
+            }
+
+            //set float datatype
+            if ($format['type'] === 'FLOAT') {
+                $map = [
+                    'type' => 'float'
+                ];
+            }
+
+            //set json to text (single array)
+            if ($format['type'] === 'JSON') {
+                $map = [
+                    'type' => 'text'
+                ];
+            }
+
+            //dynamic object
+            if ($field['field']['type'] === 'rawjson'
+                || $field['field']['type'] === 'meta'
+            ) {
+                $map = [
+                    'type' => 'object',
+                    'dynamic' => true
+                ];
+            }
+
+            //set ojbect datatype 
+            if ($field['field']['type'] === 'fieldset' 
+                && (isset($field['field']['attributes']['data-multiple'])
+                    && $field['field']['attributes']['data-multiple'] === 'false'
+                    )
+            ) {
+                $map = [
+                    'type' => 'text'
+                ];
+            } else if($field['field']['type'] === 'fieldset') {
+                $map = [
+                    'type' => 'object',
+                    'dynamic' => true
+                ];
+            }
+            
+            //set custom field (multirange) eg: 10;50 
+            if ($field['field']['type'] === 'multirange') {
+                $map = [
+                    'type' => 'keyword',
+                ];
+            }
+
+            $data[$name] = $map;
+        }
+
+        return $data;
+    }
+
+    /**
      * @var array $fieldTyles
      */
     protected static $fieldTypes = [
@@ -694,7 +811,8 @@ class Schema extends Fieldset
             'type' => 'JSON'
         ],
         'multirange' => [
-            'type' => 'JSON'
+            'type' => 'VARCHAR',
+            'length' => 255
         ],
         'rawjson' => [
             'type' => 'JSON'

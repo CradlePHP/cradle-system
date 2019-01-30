@@ -46,7 +46,6 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
     public function __construct(Resource $resource)
     {
         $this->resource = $resource;
-        $this->sql = Service::get('sql');
     }
 
     /**
@@ -61,7 +60,8 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         }
 
         $table = $this->schema->getName();
-        $data[$table] = [];
+        $mapping = $this->schema->toElastic();
+
         // try mapping
         try {
             $this->resource->indices()->create(['index' => $table]);
@@ -72,9 +72,10 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
                     '_source' => [
                         'enabled' => true
                     ],
-                    'properties' => []
+                    'properties' => $mapping
                 ]
             ]);
+
         } catch (NoNodesAvailableException $e) {
             //because there is no reason to continue;
             return false;
