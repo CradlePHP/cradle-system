@@ -16,6 +16,8 @@ use Cradle\Helper\InstanceTrait;
 use Cradle\Http\Request;
 use Cradle\Http\Response;
 
+use Cradle\Package\System\Helpers;
+
 /**
  * Model Schema Manager. This was made
  * take advantage of pass-by-ref
@@ -554,117 +556,153 @@ class Schema extends Fieldset
     }
 
     /**
-     * Transforms to SQL data
+     * Transforms to Elastic data
      *
      * @return array
      */
     public function toElastic()
     {   
-        //set default data
-        $data = [
-            $this->getPrimaryFieldName() => 
-                ['type' => 'integer']
-        ];
+        //call recursive map fields
+        $maps = $this->getMapFields($this->data['name']);
 
-        foreach ($this->data['fields'] as $field) {
-            $map = [];
-            if (!isset(self::$fieldTypes[$field['field']['type']])) {
-                continue;
+        return $maps;
+    }
+
+    /**
+     * Get Map Fields
+     *
+     * @return array
+     */
+    public function getMapFields($name) 
+    {
+        //get fields recursive
+        $getFields = function($name) use (
+            &$fieldset,
+            &$getFields
+        ) {
+            //get fieldset data            
+            $fieldset = Helpers::getFieldset($name);
+
+            //set default map
+            $maps = [
+                $name. '_id' => 
+                    ['type' => 'integer']
+            ];
+
+            if ($fieldset) {
+                foreach ($fieldset['fields'] as $field) {
+                    if (!isset(self::$fieldTypes[$field['field']['type']])) {
+                        continue;
+                    }
+
+                    $fieldName = $name . '_' . $field['name'];
+                    $format = self::$fieldTypes[$field['field']['type']];
+
+                    //set short datatype
+                    if ($format['type'] === 'INT') {
+                        $map['type'] = 'integer';
+                    }
+
+                    //set short datatype
+                    if ($format['type'] === 'INT' 
+                        && (isset($format['length']) 
+                            && $format['length'] === 1)) {
+                        $map['type'] = 'short';
+                    }
+
+                    //set keyword datatype
+                    if ($format['type'] === 'VARCHAR') {
+                        $map = [
+                            'type' => 'text',
+                        ];
+                    }
+
+                    //set date datatype
+                    if ($format['type'] === 'datetime') {
+                        $map = [
+                            'type' => 'date',
+                            'format' => 'yyyy-MM-dd HH:mm:ss'
+                        ];
+                    }  
+
+                    //set time datatype
+                    if ($format['type'] === 'time') {
+                        $map = [
+                            'type' => 'date',
+                            'format' => 'hour_minute_second'
+                        ];
+                    }
+
+                    //set text datatype
+                    if ($format['type'] === 'TEXT') {
+                        $map = [
+                            'type' => 'text'
+                        ];
+                    }
+
+                    //set float datatype
+                    if ($format['type'] === 'FLOAT') {
+                        $map = [
+                            'type' => 'float'
+                        ];
+                    }
+
+                    //set json to text (single array)
+                    if ($format['type'] === 'JSON') {
+                        $map = [
+                            'type' => 'text'
+                        ];
+                    }
+
+                    //dynamic object
+                    if ($field['field']['type'] === 'rawjson'
+                        || $field['field']['type'] === 'meta'
+                    ) {
+                        $map = [
+                            'type' => 'object',
+                            'dynamic' => true
+                        ];
+                    }
+
+                    //set ojbect datatype 
+                    if ($field['field']['type'] === 'fieldset' 
+                        && (isset($field['field']['attributes']['data-multiple'])
+                            && $field['field']['attributes']['data-multiple'] === 'false'
+                            )
+                    ) {
+                        $map = [
+                            'type' => 'text'
+                        ];
+                    } else if($field['field']['type'] === 'fieldset') {
+                        $map = $getFields($field['name']);
+                        $map = [
+                            'type' => 'nested',
+                            'properties' => $map
+                        ];
+                    }
+                    
+                    //set custom field (multirange) eg: 10;50 
+                    if ($field['field']['type'] === 'multirange') {
+                        $map = [
+                            'type' => 'keyword',
+                        ];
+                    }
+
+                    //map fields
+                    $maps[$fieldName] = $map;
+                }
             }
 
-            $name = $this->data['name'] . '_' . $field['name'];
-            $format = self::$fieldTypes[$field['field']['type']];
+            return $maps;
+        };
 
-            //set short datatype
-            if ($format['type'] === 'INT') {
-                $map['type'] = 'integer';
-            }
 
-            //set short datatype
-            if ($format['type'] === 'INT' 
-                && (isset($format['length']) 
-                    && $format['length'] === 1)) {
-                $map['type'] = 'short';
-            }
+        //call get fields recursive
+        $data = $getFields($name);
 
-            //set keyword datatype
-            if ($format['type'] === 'VARCHAR') {
-                $map = [
-                    'type' => 'keyword',
-                ];
-            }
-
-            //set date datatype
-            if ($format['type'] === 'datetime') {
-                $map = [
-                    'type' => 'date',
-                    'format' => 'yyyy-MM-dd HH:mm:ss'
-                ];
-            }  
-
-            //set time datatype
-            if ($format['type'] === 'time') {
-                $map = [
-                    'type' => 'date',
-                    'format' => 'hour_minute_second'
-                ];
-            }
-
-            //set text datatype
-            if ($format['type'] === 'TEXT') {
-                $map = [
-                    'type' => 'text'
-                ];
-            }
-
-            //set float datatype
-            if ($format['type'] === 'FLOAT') {
-                $map = [
-                    'type' => 'float'
-                ];
-            }
-
-            //set json to text (single array)
-            if ($format['type'] === 'JSON') {
-                $map = [
-                    'type' => 'text'
-                ];
-            }
-
-            //dynamic object
-            if ($field['field']['type'] === 'rawjson'
-                || $field['field']['type'] === 'meta'
-            ) {
-                $map = [
-                    'type' => 'object',
-                    'dynamic' => true
-                ];
-            }
-
-            //set ojbect datatype 
-            if ($field['field']['type'] === 'fieldset' 
-                && (isset($field['field']['attributes']['data-multiple'])
-                    && $field['field']['attributes']['data-multiple'] === 'false'
-                    )
-            ) {
-                $map = [
-                    'type' => 'text'
-                ];
-            } else if($field['field']['type'] === 'fieldset') {
-                $map = [
-                    'type' => 'object',
-                    'dynamic' => true
-                ];
-            }
-            
-            //set custom field (multirange) eg: 10;50 
-            if ($field['field']['type'] === 'multirange') {
-                $map = [
-                    'type' => 'keyword',
-                ];
-            }
-
-            $data[$name] = $map;
+        //map relations fields
+        foreach ($this->data['relations'] as $schema) {
+            $data = array_merge($data, $getFields($schema['name']));
         }
 
         return $data;

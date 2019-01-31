@@ -106,7 +106,7 @@ class Formatter
 
                     //we should not encode if fieldset
                     if (is_null($fieldset)) {
-                        $data[$name] = json_encode($data[$name]);
+                        $data[$name] = json_encode($data[$name], JSON_NUMERIC_CHECK);
                     }
                     break;
                 case 'tag':
@@ -121,7 +121,7 @@ class Formatter
                 case 'fieldset':
                     //if it's an array already
                     if((is_array($data[$name]) || is_object($data[$name])) && is_null($fieldset)) {
-                        $data[$name] = json_encode($data[$name]);
+                        $data[$name] = json_encode($data[$name], JSON_NUMERIC_CHECK);
 
                         //if it's a json string
                         if(strpos($data[$name], '{') === 0
@@ -133,7 +133,7 @@ class Formatter
 
                         //it can only be comma separated
                         $data[$name] = explode(',', $data[$name]);
-                        $data[$name] = json_encode($data[$name]);
+                        $data[$name] = json_encode($data[$name], JSON_NUMERIC_CHECK);
                     }
 
                     break;

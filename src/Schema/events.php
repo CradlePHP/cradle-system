@@ -495,24 +495,21 @@ $this->on('system-schema-update', function ($request, $response) {
     //update table
     $systemSql->update($data);
 
+    //add the original
+    $data['original'] = $original;
+
     //reset the cache
     $this->package('global')->schema($table, $data);
 
-    //if data was changed then update
-    if ($data !== $original) {
-        $payload = cradle()->makePayload();
-        $payload['request']->setStage($data);
+    $payload = cradle()->makePayload();
+    $payload['request']->setStage($data);
 
-        //elastic create
-        $this->trigger(
-            'system-schema-elastic-create', 
-            $payload['request'], 
-            $payload['response']
-        );
-    }
-
-    //add the original
-    $data['original'] = $original;
+    //elastic create
+    $this->trigger(
+        'system-schema-elastic-create', 
+        $payload['request'], 
+        $payload['response']
+    );
 
     //return response format
     $response->setError(false)->setResults($data);
