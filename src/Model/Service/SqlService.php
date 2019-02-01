@@ -406,14 +406,25 @@ class SqlService
             $filter = $data['filter'];
         }
 
+        //Legacy TODO: remove
         if (isset($data['like_filter']) && is_array($data['like_filter'])) {
             $like = $data['like_filter'];
         }
 
+        if (isset($data['like']) && is_array($data['like'])) {
+            $like = $data['like'];
+        }
+
+        //Legacy TODO: remove
         if (isset($data['in_filter']) && is_array($data['in_filter'])) {
             $in = $data['in_filter'];
         }
 
+        if (isset($data['in']) && is_array($data['in'])) {
+            $in = $data['in'];
+        }
+
+        //Legacy TODO: remove
         if (isset($data['json_filter']) && is_array($data['json_filter'])) {
             $json = $data['json_filter'];
         }
@@ -574,7 +585,7 @@ class SqlService
         //add like filters
         foreach ($like as $column => $value) {
             if (preg_match('/^[a-zA-Z0-9-_]+$/', $column)) {
-                $search->addFilter($column . ' LIKE %s', $value);
+                $search->addFilter($column . ' LIKE %s', '%' . $value . '%');
                 continue;
             }
 
@@ -597,27 +608,51 @@ class SqlService
 
         // add in filters
         foreach ($in as $column => $values) {
+            // values should be array
+            if (!is_array($values)) {
+                $values = [$values];
+            }
+
+            //if it's a json column type
+            if (in_array($column, $this->schema->getJsonFieldNames())) {
+                $or = [];
+                $where = [];
+                foreach ($values as $value) {
+                    $where[] = "JSON_SEARCH(LOWER($column), 'one', %s) IS NOT NULL";
+                    $or[] = '%' . strtolower($value) . '%';
+                }
+
+                array_unshift($or, '(' . implode(' OR ', $where) . ')');
+                call_user_func([$search, 'addFilter'], ...$or);
+
+                continue;
+            }
+
             if (preg_match('/^[a-zA-Z0-9-_]+$/', $column)) {
                 $search->addFilter($column . ' IN ("' . implode('", "', $values) . '")');
             }
         }
 
+        //Legacy TODO: remove
         // add json filters
         foreach ($json as $column => $values) {
             //it should be a json column type
             if (!in_array($column, $this->schema->getJsonFieldNames())) {
                 continue;
             }
+
             // values should be array
             if (!is_array($values)) {
                 $values = [$values];
             }
+
             $or = [];
             $where = [];
             foreach ($values as $value) {
                 $where[] = "JSON_SEARCH(LOWER($column), 'one', %s) IS NOT NULL";
                 $or[] = '%' . strtolower($value) . '%';
             }
+
             array_unshift($or, '(' . implode(' OR ', $where) . ')');
             call_user_func([$search, 'addFilter'], ...$or);
         }
@@ -796,6 +831,43 @@ class SqlService
         $model[$relation['primary2']] = $primary2;
 
         return $model->remove($table);
+    }
+
+    /**
+     * Unlinks all references in a table from another table
+     *
+     * @param *string $relation
+     * @param *int    $primary
+     *
+     * @return array
+     */
+    public function unlinkAll($relation, $primary)
+    {
+        if (is_null($this->schema)) {
+            throw SystemException::forNoSchema();
+        }
+
+        $name = $this->schema->getName();
+        $relations = $this->schema->getRelations();
+        $table = $name . '_' . $relation;
+
+        if (!isset($relations[$table])) {
+            throw SystemException::forNoRelation($name, $relation);
+        }
+
+        $relation = $relations[$table];
+
+        $filter = sprintf('%s = %%s', $relation['primary1']);
+
+        return $this
+            ->resource
+            ->search($table)
+            ->addFilter($filter, $primary)
+            ->getCollection()
+            ->each(function ($i, $model) use (&$table) {
+                $model->remove($table);
+            })
+            ->get();
     }
 
     /**

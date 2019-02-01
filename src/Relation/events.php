@@ -155,7 +155,7 @@ $this->on('system-relation-unlink', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-relation-unlinkall', function ($request, $response) {
+$this->on('system-relation-unlink-all', function ($request, $response) {
     //----------------------------//
     // 1. Get Data
     //get data from stage
