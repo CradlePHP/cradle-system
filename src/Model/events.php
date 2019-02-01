@@ -439,6 +439,7 @@ $this->on('system-model-update', function ($request, $response) {
     //get the primary value
     $primary = $schema->getPrimaryFieldName();
     $relations = $schema->getRelations();
+    $reverseRelations = $schema->getReverseRelations();
 
     //loop through relations
     foreach ($relations as $table => $relation) {
@@ -496,6 +497,59 @@ $this->on('system-model-update', function ($request, $response) {
                 $results[$primary],
                 $data[$relation['primary2']]
             );
+        }
+    }
+
+    //only for root reverse relation
+    if (!isset($data['relation_recursive'])) {
+        //loop through reverse relations
+        foreach ($reverseRelations as $table => $relation) {
+            //deal with same table name
+            if ($relation['source']['name'] === $relation['name']
+                //skip history
+                || $relation['source']['name'] === 'history'
+                ) {
+                continue;
+            }
+            //get primmary id
+            $primaryId = $results['schema']. '_id';
+            //get dynamic schema        
+            $schema = Schema::i($relation['source']['name']);
+            //set schema sql
+            $schemaSql = $schema->model()->service('sql');
+            //set schema elastic
+            $schemaElastic = $schema->model()->service('elastic');
+            //filter by primary id
+            $filter['filter'][$primaryId] =  $results[$results['schema']. '_id'];
+            //set range to 0
+            $filter['range'] = 0;
+            //get rows
+            $rows = $schemaSql->search($filter);
+
+            //loop elastic update
+            if ($rows) {
+                foreach ($rows['rows'] as $key => $row) {
+                    $payload = $this->makePayload();
+
+                    //set dynamic column id
+                    $columnId = $relation['source']['name']. '_id';
+                    $payload['request']
+                        ->setStage('schema', $relation['source']['name'])
+                        ->setStage('relation_recursive', true)
+                        ->setStage($columnId, $row[$columnId]);
+
+                    //set queue data
+                    $queueData = $payload['request']->getStage();
+                    $queuePackage = $this->package('cradlephp/cradle-queue');
+                    if (!$queuePackage->queue('system-model-update', $queueData)) {
+                        //update manually after the connection
+                        // $this->postprocess(function($payload) {
+                            $this->trigger('system-model-update', $payload['request'], $payload['response']);
+                        // });
+                    }
+
+                }
+            }
         }
     }
 
@@ -713,5 +767,89 @@ $this->on('system-model-import', function ($request, $response) {
         $results['new'] ++;
     }
 
+    $response->setError(false)->setResults($results);
+});
+
+/**
+ * System Model Update Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->on('system-model-elastic-reindex', function ($request, $response) {
+    //----------------------------//
+    // 1. Get Data
+    //get the object detail
+    $this->trigger('system-model-detail', $request, $response);
+
+    //if there's an error
+    if ($response->isError()) {
+        return;
+    }
+
+    //get the original for later
+    $original = $response->getResults();
+
+    //get data from stage
+    $data = [];
+    if ($request->hasStage()) {
+        $data = $request->getStage();
+    }
+
+    if (!isset($data['schema'])) {
+        throw Exception::forNoSchema();
+    }
+
+    $schema = Schema::i($data['schema']);
+
+    //----------------------------//
+    // 2. Validate Data
+    $errors = $schema
+        ->model()
+        ->validator()
+        ->getUpdateErrors($data);
+
+    //if there are errors
+    if (!empty($errors)) {
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->set('json', 'validation', $errors);
+    }
+
+    //----------------------------//
+    // 3. Prepare Data
+    $data = $schema
+        ->model()
+        ->formatter()
+        ->formatData($data);
+
+    //----------------------------//
+    // 4. Process Data
+    //this/these will be used a lot
+    $modelElastic = $schema->model()->service('elastic');
+
+    //index object
+    $modelElastic->update($results[$primary]);
+
+    //invalidate cache
+    $uniques = $schema->getUniqueFieldNames();
+    foreach ($uniques as $unique) {
+        if (isset($data[$unique])) {
+            $modelRedis->removeDetail($unique . '-' . $data[$unique]);
+        }
+    }
+
+    $modelRedis->removeSearch();
+
+    //fix the results and put back the arrays
+    $results = $schema
+        ->model()
+        ->formatter()
+        ->expandData($results);
+
+    //add the original
+    $results['original'] = $original;
+
+    //return response format
     $response->setError(false)->setResults($results);
 });

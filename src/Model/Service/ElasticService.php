@@ -290,5 +290,30 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         }
     }
 
-    
+    /**
+     * Reindex 
+     *
+     * @param *string $table | *int $id
+     *
+     * @return array
+     */
+    public function reIndex($data)
+    {
+
+     // cradle()->inspect($data);exit;
+        // set schema to sql
+        $schema = Schema::i($data['table']);
+        $schemaSql = $schema->model()->service('sql');
+        $schemaElastic = $schema->model()->service('elastic');
+
+        $filter['filter'][$data['column']] = $data[$data['column']];
+        $filter['range'] = 0;
+        $results = $schemaSql->search($filter);
+
+        if ($results) {
+            foreach ($results['rows'] as $key => $row) {
+                $schemaElastic->update($row[$data['column']]);
+            }
+        }
+    }
 }
