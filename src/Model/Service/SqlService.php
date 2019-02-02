@@ -463,7 +463,10 @@ class SqlService
             $search->setRange($range);
         }
 
-        // get json fields
+        // collect searchable
+        $searchable = $this->schema->getSearchableFieldNames();
+
+        // collect json fields
         $fields = $this->schema->getJsonFieldNames();
 
         //consider forward relations
@@ -485,6 +488,9 @@ class SqlService
                         $relation['name'],
                         $relation['primary2']
                     );
+
+                //add to searchable
+                $searchable = array_merge($searchable, $relation['searchable']);
             //needs to have a filter to add the other kinds of joins
             } else if (!isset($filter[$relation['primary2']])
                 && !isset($in[$relation['primary2']])
@@ -679,8 +685,6 @@ class SqlService
         }
 
         //keyword?
-        $searchable = $this->schema->getSearchableFieldNames();
-
         if (!empty($searchable)) {
             $keywords = [];
 
