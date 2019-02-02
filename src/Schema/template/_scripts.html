@@ -224,6 +224,7 @@
             var filterable = option.attr('data-filterable');
             var sortable = option.attr('data-sortable');
             var validation = option.attr('data-validation');
+            var indexes = (option.attr('data-index') || '').split('|');
 
             //determine label
             if(label && label.length) {
@@ -296,6 +297,15 @@
             } else {
                 $('input.field-sortable', target).parent().show();
             }
+
+            //determine index
+            ['searchable', 'filterable', 'sortable'].forEach(function(index) {
+                if(indexes.indexOf(index) === -1) {
+                    $('input.field-' + index, target)
+                        .attr('checked', false)
+                        .attr('disabled', true);
+                }
+            });
         };
 
         //field type change
@@ -306,7 +316,6 @@
             //configuration
             var fieldsets = (option.attr('data-fieldset') || '').split('|');
             var formats = (option.attr('data-format') || '').split('|');
-            var indexes = (option.attr('data-index') || '').split('|');
             var index = $(this).getModelIndex();
 
             //reset
@@ -393,15 +402,6 @@
                     if($('option:selected', detail).length) {
                         detail.parent().val('none').trigger('change');
                     }
-                }
-            });
-
-            //determine index
-            ['searchable', 'filterable', 'sortable'].forEach(function(index) {
-                if(indexes.indexOf(index) === -1) {
-                    $('input.field-' + index, target)
-                        .attr('checked', false)
-                        .attr('disabled', true);
                 }
             });
 
