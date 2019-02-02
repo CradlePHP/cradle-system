@@ -491,8 +491,6 @@
 
             row.doon();
         });
-
-        $(target).formlog()
     });
 
     $(window).on('modal-cancel-click', function(e, trigger) {
@@ -516,8 +514,6 @@
 
     $(window).on('modal-save-click', function(e, trigger) {
         var modal = $(trigger).parents('div.modal').eq(0);
-
-        $(modal).formlog()
 
         $('.is-error', modal).removeClass('is-error');
         $('div.error-message', modal).remove();
