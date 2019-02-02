@@ -183,7 +183,7 @@ $this->on('system-fieldset-remove', function ($request, $response) {
         rename($path, $new);
     }
 
-    $response->setError(false)->setResults($results);
+    $response->setError(false)->setResults($path);
 });
 
 /**
