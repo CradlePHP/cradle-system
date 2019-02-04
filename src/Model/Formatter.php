@@ -184,7 +184,8 @@ class Formatter
                 case 'token':
                     $data[$name] = md5(uniqid());
                     break;
-                case 'number' || 'small':
+                case 'number':
+                case 'small':
                     if (!$data[$name]) {
                         $data[$name] = null;
                     }
