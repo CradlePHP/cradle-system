@@ -722,6 +722,9 @@ class Schema extends Fieldset
         'multirange' => [
             'type' => 'JSON'
         ],
+        'latlng' => [
+            'type' => 'JSON'
+        ],
         'rawjson' => [
             'type' => 'JSON'
         ],

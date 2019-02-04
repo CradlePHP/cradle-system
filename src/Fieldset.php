@@ -173,20 +173,21 @@ class Fieldset extends Registry
             if (in_array(
                 $field['field']['type'],
                 [
-                        'filelist',
-                        'imagelist',
-                        'tag',
-                        'textlist',
-                        'textarealist',
-                        'wysiwyglist',
-                        'meta',
-                        'checkboxes',
-                        'multirange',
-                        'rawjson',
-                        'multiselect',
-                        'fieldset',
-                        'table'
-                    ]
+                    'filelist',
+                    'imagelist',
+                    'tag',
+                    'textlist',
+                    'textarealist',
+                    'wysiwyglist',
+                    'meta',
+                    'checkboxes',
+                    'multirange',
+                    'rawjson',
+                    'multiselect',
+                    'fieldset',
+                    'table',
+                    'latlng'
+                ]
             )
             ) {
                 $results[] = $name;

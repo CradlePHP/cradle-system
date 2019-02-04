@@ -374,6 +374,14 @@
         Multi Range Field
     </option>
     <option
+        data-fieldset="attributes"
+        data-format="json"
+        value="latlng"
+        {{#when field.type '===' 'latlng'}}selected{{/when}}
+    >
+        Lat/Lng
+    </option>
+    <option
         data-fieldset="attributes|fieldset"
         data-format="json"
         value="fieldset"

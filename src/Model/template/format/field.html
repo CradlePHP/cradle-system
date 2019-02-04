@@ -1078,6 +1078,36 @@
         {{/each}}
     />
 {{/when}}
+{{#when config.type '===' 'latlng'}}
+    <input
+        autocomplete="{{name}}"
+        class="form-control system-form-control"
+        name="{{@key}}[0]"
+        type="number"
+        value="{{this.0}}"
+        min="-90"
+        max="90"
+        step="0.00000001"
+        placeholder="Latitude"
+        {{#each config.attributes}}
+            {{@key}}="{{this}}"
+        {{/each}}
+    />
+    <input
+        autocomplete="{{name}}"
+        class="form-control system-form-control"
+        name="{{@key}}[1]"
+        type="number"
+        value="{{this.1}}"
+        min="-180"
+        max="180"
+        step="0.00000001"
+        placeholder="Longitude"
+        {{#each config.attributes}}
+            {{@key}}="{{this}}"
+        {{/each}}
+    />
+{{/when}}
 {{#when config.type '===' 'rawjson'}}
     <textarea
         class="form-control hidden system-form-control"
