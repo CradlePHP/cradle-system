@@ -73,15 +73,17 @@
     <a href="{{compile config.parameters.0 row}}">{{compile config.parameters.1 row}}</a>
 {{/when}}
 {{#when config.format '===' 'image'}}
-    <img 
-        src="{{this}}"
-        {{#if config.parameters.0}}
-            width="{{config.parameters.0}}"
-        {{/if}}
-        {{#if config.parameters.1}}
-            height="{{config.parameters.1}}"
-        {{/if}}
-    />
+    {{#if this}}
+        <img
+            src="{{this}}"
+            {{#if config.parameters.0}}
+                width="{{config.parameters.0}}"
+            {{/if}}
+            {{#if config.parameters.1}}
+                height="{{config.parameters.1}}"
+            {{/if}}
+        />
+    {{/if}}
 {{/when}}
 {{#when config.format '===' 'email'}}
     <a href="mailto:{{this}}">{{compile config.parameters row}}</a>
