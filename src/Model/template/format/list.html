@@ -169,6 +169,36 @@
         <div class="alert alert-info m-0">{{_ 'Empty'}}</div>
     {{/if}}
 {{/when}}
+{{#when config.format '===' 'carousel'}}
+    {{#if this.length}}
+        <div
+            class="carousel slide"
+            data-do="carousel"
+            data-width="{{config.parameters.0}}"
+            data-height="{{config.parameters.1}}"
+        >
+            <div class="carousel-inner">
+                {{#each this}}
+                    <div class="carousel-item text-center {{#if @first}} active{{/if}}">
+                        <img 
+                            class="m-auto"
+                            src="{{this}}"
+                            {{#if ../config.parameters.1}}
+                                height="{{../config.parameters.1}}"
+                            {{/if}}
+                        />
+                    </div>
+                {{/each}}
+            </div>
+            <a class="carousel-control-prev" role="button">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            <a class="carousel-control-next" role="button">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+    {{/if}}
+{{/when}}
 {{#when config.format '===' 'jsonpretty'}}
     {{{json_pretty this}}}
 {{/when}}
