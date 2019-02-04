@@ -553,6 +553,10 @@ return function($request, $response) {
         return implode('', $buffer);
     });
 
+    $handlebars->registerHelper('textarea', function($string) {
+        return str_replace('</textarea>', '<\/textarea>', $string);
+    });
+
     $handlebars->registerHelper('scope_dot', function ($array, $dot, $options) {
         if (!is_array($array)) {
             return $options['inverse']();

@@ -188,6 +188,13 @@ class Formatter
                     if (!$data[$name]) {
                         $data[$name] = null;
                     }
+                    break;
+                case 'textarea':
+                case 'wysiwyg':
+                case 'code':
+                    //fix for textarea in textarea
+                    $data[$name] = str_replace('<\/textarea>', '</textarea>', $data[$name]);
+                    break;
             }
         }
 

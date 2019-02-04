@@ -102,7 +102,7 @@
         {{#each config.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
-    >{{{this}}}</textarea>
+    >{{{textarea this}}}</textarea>
 {{/when}}
 {{#when config.type '===' 'wysiwyg'}}
     <textarea
@@ -112,7 +112,7 @@
         {{#each config.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
-    >{{{this}}}</textarea>
+    >{{{textarea this}}}</textarea>
 {{/when}}
 {{#when config.type '===' 'markdown'}}
     <textarea
@@ -132,7 +132,7 @@
         {{#each config.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
-    >{{{this}}}</textarea>
+    >{{{textarea this}}}</textarea>
 {{/when}}
 {{#when config.type '===' 'number'}}
     <input
