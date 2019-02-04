@@ -102,7 +102,7 @@
         {{#each config.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
-    >{{{this}}}</textarea>
+    >{{{textarea this}}}</textarea>
 {{/when}}
 {{#when config.type '===' 'wysiwyg'}}
     <textarea
@@ -112,7 +112,7 @@
         {{#each config.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
-    >{{{this}}}</textarea>
+    >{{{textarea this}}}</textarea>
 {{/when}}
 {{#when config.type '===' 'markdown'}}
     <textarea
@@ -132,7 +132,7 @@
         {{#each config.attributes}}
             {{@key}}="{{this}}"
         {{/each}}
-    >{{{this}}}</textarea>
+    >{{{textarea this}}}</textarea>
 {{/when}}
 {{#when config.type '===' 'number'}}
     <input
@@ -451,6 +451,17 @@
         {{/each}}
     </div>
 {{/when}}
+{{#when config.type '===' 'countrylist'}}
+    <select
+        class="form-control system-form-control"
+        data-do="country-dropdown"
+        name="{{@key}}"
+        {{#each config.attributes}}
+            {{@key}}="{{this}}"
+        {{/each}}
+    >
+    </select>
+{{/when}}
 {{#when config.type '===' 'file'}}
     <table
         class="table table-striped file-field"
@@ -514,6 +525,12 @@
                         type="button"
                     >
                         {{_ 'Choose File'}}
+                    </button>
+                    <button
+                        class="file-field-link btn btn-success"
+                        type="button"
+                    >
+                        {{_ 'Choose URL'}}
                     </button>
                 </td>
             </tr>
@@ -601,6 +618,12 @@
                     >
                         {{_ 'Choose Files'}}
                     </button>
+                    <button
+                        class="file-field-link btn btn-success"
+                        type="button"
+                    >
+                        {{_ 'Add URL'}}
+                    </button>
                 </td>
             </tr>
         </tfoot>
@@ -670,6 +693,12 @@
                         type="button"
                     >
                         {{_ 'Choose Image'}}
+                    </button>
+                    <button
+                        class="file-field-link btn btn-success"
+                        type="button"
+                    >
+                        {{_ 'Choose URL'}}
                     </button>
                 </td>
             </tr>
@@ -757,6 +786,12 @@
                         type="button"
                     >
                         {{_ 'Choose Images'}}
+                    </button>
+                    <button
+                        class="file-field-link btn btn-success"
+                        type="button"
+                    >
+                        {{_ 'Add URL'}}
                     </button>
                 </td>
             </tr>
@@ -1038,6 +1073,36 @@
         tabindex="-1"
         type="hidden"
         value="{{this}}"
+        {{#each config.attributes}}
+            {{@key}}="{{this}}"
+        {{/each}}
+    />
+{{/when}}
+{{#when config.type '===' 'latlng'}}
+    <input
+        autocomplete="{{name}}"
+        class="form-control system-form-control"
+        name="{{@key}}[0]"
+        type="number"
+        value="{{this.0}}"
+        min="-90"
+        max="90"
+        step="0.00000001"
+        placeholder="Latitude"
+        {{#each config.attributes}}
+            {{@key}}="{{this}}"
+        {{/each}}
+    />
+    <input
+        autocomplete="{{name}}"
+        class="form-control system-form-control"
+        name="{{@key}}[1]"
+        type="number"
+        value="{{this.1}}"
+        min="-180"
+        max="180"
+        step="0.00000001"
+        placeholder="Longitude"
         {{#each config.attributes}}
             {{@key}}="{{this}}"
         {{/each}}

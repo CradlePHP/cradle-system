@@ -69,6 +69,19 @@ class Formatter
                 $data[$name] = date('Y-m-d H:i:s');
             }
 
+            if ($field['field']['type'] === 'latlng' && is_array($data[$name])) {
+                if (!is_numeric($data[$name][0])) {
+                    $data[$name][0] = 0;
+                }
+
+                if (!is_numeric($data[$name][1])) {
+                    $data[$name][1] = 0;
+                }
+
+                $data[$name][0] = sprintf('%.8F', $data[$name][0]);
+                $data[$name][1] = sprintf('%.8F', $data[$name][1]);
+            }
+
             if ($field['field']['type'] === 'fieldset') {
                 //case for multiple
                 if (isset($field['field']['attributes']['data-multiple'])
@@ -118,6 +131,7 @@ class Formatter
                 case 'multirange':
                 case 'multiselect':
                 case 'table':
+                case 'latlng':
                 case 'fieldset':
                     //if it's an array already
                     if((is_array($data[$name]) || is_object($data[$name])) && is_null($fieldset)) {
@@ -184,10 +198,18 @@ class Formatter
                 case 'token':
                     $data[$name] = md5(uniqid());
                     break;
-                case 'number' || 'small':
+                case 'number':
+                case 'small':
                     if (!$data[$name]) {
                         $data[$name] = null;
                     }
+                    break;
+                case 'textarea':
+                case 'wysiwyg':
+                case 'code':
+                    //fix for textarea in textarea
+                    $data[$name] = str_replace('<\/textarea>', '</textarea>', $data[$name]);
+                    break;
             }
         }
 
@@ -229,7 +251,8 @@ class Formatter
                         'multirange',
                         'rawjson',
                         'fieldset',
-                        'table'
+                        'table',
+                        'latlng'
                     ]
                 )
             ) {

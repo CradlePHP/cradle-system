@@ -270,6 +270,15 @@
     >
         Radios Fieldset
     </option>
+    <option
+        data-index="searchable|filterable|sortable"
+        data-fieldset="attributes"
+        data-format="string"
+        value="countrylist"
+        {{#when field.type '===' 'countrylist'}}selected{{/when}}
+    >
+        Country List Field
+    </option>
 </optgroup>
 <optgroup label="File Fields">
     <option
@@ -365,6 +374,14 @@
         Multi Range Field
     </option>
     <option
+        data-fieldset="attributes"
+        data-format="json"
+        value="latlng"
+        {{#when field.type '===' 'latlng'}}selected{{/when}}
+    >
+        Lat/Lng
+    </option>
+    <option
         data-fieldset="attributes|fieldset"
         data-format="json"
         value="fieldset"
@@ -384,9 +401,9 @@
 <optgroup label="_________">
     <option
         data-default="1"
-        data-filterable="1"
+        data-filterable="0"
         data-format="string"
-        data-index="filterable|searchable"
+        data-index="searchable"
         data-searchable="1"
         data-sortable="0"
         data-validation="0"
@@ -394,6 +411,19 @@
         {{#when field.type '===' 'uuid'}}selected{{/when}}
     >
         Unique ID
+    </option>
+    <option
+        data-default="0.0.0.0"
+        data-filterable="1"
+        data-format="string"
+        data-index="filterable|searchable"
+        data-searchable="1"
+        data-sortable="0"
+        data-validation="0"
+        value="ipaddress"
+        {{#when field.type '===' 'ipaddress'}}selected{{/when}}
+    >
+        IP Address
     </option>
     <option
         data-default="1"

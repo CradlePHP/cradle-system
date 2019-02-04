@@ -67,21 +67,6 @@
                 $(this).attr('data-name', name);
             });
 
-            $('input', copy).each(function() {
-                var value = $(this).val();
-                $(this).attr('value', value);
-            });
-
-            $('input', copy).each(function() {
-                var value = $(this).val();
-                $(this).attr('value', value);
-            });
-
-            $('textarea', copy).each(function() {
-                var value = $(this).val();
-                $(this).html(value);
-            });
-
             $('#modal-template')
                 .compile({INDEX: index})
                 .find('div.modal-body')
@@ -506,8 +491,6 @@
 
             row.doon();
         });
-
-        $(target).formlog()
     });
 
     $(window).on('modal-cancel-click', function(e, trigger) {
@@ -531,8 +514,6 @@
 
     $(window).on('modal-save-click', function(e, trigger) {
         var modal = $(trigger).parents('div.modal').eq(0);
-
-        $(modal).formlog()
 
         $('.is-error', modal).removeClass('is-error');
         $('div.error-message', modal).remove();
@@ -587,6 +568,8 @@
                     .removeClass('modal-create')
                     .addClass('modal-update')
                 );
+
+            $('h5.modal-title', modal).html('Edit Field');
         }
 
         var row = $(trigger).parents('tr.fieldset-field-row').eq(0);
@@ -1098,7 +1081,49 @@
 
     //----------------------------//
     // Functions
+    var $clone = $.fn.clone;
     $.fn.extend({
+        clone: function() {
+            //before cloning we need to set the html states for fields
+            //considerations
+            // input
+            // - checkbox
+            // - radio
+            // textarea
+            // select
+            $('input', this).each(function() {
+                $(this).attr('value', $(this).val());
+
+                var type = ($(this).attr('type') || 'text').toLowerCase();
+
+                if (type === 'radio' || type === 'checkbox') {
+                    var checked = $(this).prop('checked');
+                    if (checked) {
+                        $(this).attr('checked', 'checked');
+                    } else {
+                        $(this).removeAttr('checked');
+                    }
+                }
+            });
+
+            $('textarea', this).each(function() {
+                $(this).html($(this).val());
+            });
+
+            $('select', this).each(function() {
+                var selected = this.options[this.selectedIndex];
+                $('option', this).removeAttr('selected');
+
+                if (selected) {
+                    $(selected).attr('selected', 'selected');
+                }
+            });
+
+            var withDataAndEvents = arguments[0] || false;
+            var deepWithDataAndEvents = arguments[1] || false;
+            var clone = $clone.call(this, withDataAndEvents, deepWithDataAndEvents);
+            return clone;
+        },
         compile: function(variables) {
             var template = this.text();
 
