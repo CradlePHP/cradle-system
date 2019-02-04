@@ -86,6 +86,7 @@ return function($request, $response) {
                     || ($type === 'field' && $field[$type]['type'] === 'active')
                     || ($type === 'field' && $field[$type]['type'] === 'created')
                     || ($type === 'field' && $field[$type]['type'] === 'updated')
+                    || ($type === 'field' && $field[$type]['type'] === 'ipaddress')
                     || ($type === 'field' && $field[$type]['type'] === 'uuid')
                     || ($type === 'list' && $field[$type]['format'] === 'hide')
                     || ($type === 'detail' && $field[$type]['format'] === 'hide')

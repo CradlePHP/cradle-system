@@ -64,6 +64,7 @@ class SqlService
         $table = $this->schema->getName();
         $created = $this->schema->getCreatedFieldName();
         $updated = $this->schema->getUpdatedFieldName();
+        $ipaddress = $this->schema->getIPAddressFieldName();
 
         if ($created) {
             $data[$created] = date('Y-m-d H:i:s');
@@ -71,6 +72,10 @@ class SqlService
 
         if ($updated) {
             $data[$updated] = date('Y-m-d H:i:s');
+        }
+
+        if ($ipaddress && isset($_SERVER['REMOTE_ADDR'])) {
+            $data[$ipaddress] = $_SERVER['REMOTE_ADDR'];
         }
 
         $uuids = $this->schema->getUuidFieldNames();

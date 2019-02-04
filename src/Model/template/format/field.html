@@ -451,6 +451,17 @@
         {{/each}}
     </div>
 {{/when}}
+{{#when config.type '===' 'countrylist'}}
+    <select
+        class="form-control system-form-control"
+        data-do="country-dropdown"
+        name="{{@key}}"
+        {{#each config.attributes}}
+            {{@key}}="{{this}}"
+        {{/each}}
+    >
+    </select>
+{{/when}}
 {{#when config.type '===' 'file'}}
     <table
         class="table table-striped file-field"
