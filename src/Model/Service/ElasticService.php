@@ -289,6 +289,4 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
             return false;
         }
     }
-
-    
 }
