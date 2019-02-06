@@ -73,7 +73,17 @@
     <a href="{{compile config.parameters.0 row}}">{{compile config.parameters.1 row}}</a>
 {{/when}}
 {{#when config.format '===' 'image'}}
-    <img src="{{this}}" width="{{config.parameters.0}}" height="{{config.parameters.1}}" />
+    {{#if this}}
+        <img
+            src="{{this}}"
+            {{#if config.parameters.0}}
+                width="{{config.parameters.0}}"
+            {{/if}}
+            {{#if config.parameters.1}}
+                height="{{config.parameters.1}}"
+            {{/if}}
+        />
+    {{/if}}
 {{/when}}
 {{#when config.format '===' 'email'}}
     <a href="mailto:{{this}}">{{compile config.parameters row}}</a>
@@ -85,7 +95,7 @@
     {{{compile config.parameters row}}}
 {{/when}}
 {{#when config.format '===' 'comma'}}
-    {{join this ','}}
+    {{join this ', '}}
 {{/when}}
 {{#when config.format '===' 'space'}}
     {{join this ' '}}
@@ -192,6 +202,36 @@
         </div>
     {{else}}
         <div class="alert alert-info">{{_ 'Empty'}}</div>
+    {{/if}}
+{{/when}}
+{{#when config.format '===' 'carousel'}}
+    {{#if this.length}}
+        <div
+            class="carousel slide"
+            data-do="carousel"
+            data-width="{{config.parameters.0}}"
+            data-height="{{config.parameters.1}}"
+        >
+            <div class="carousel-inner">
+                {{#each this}}
+                    <div class="carousel-item text-center {{#if @first}} active{{/if}}">
+                        <img
+                            class="m-auto"
+                            src="{{this}}"
+                            {{#if ../config.parameters.1}}
+                                height="{{../config.parameters.1}}"
+                            {{/if}}
+                        />
+                    </div>
+                {{/each}}
+            </div>
+            <a class="carousel-control-prev" role="button">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            <a class="carousel-control-next" role="button">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
     {{/if}}
 {{/when}}
 {{#when config.format '===' 'jsonpretty'}}

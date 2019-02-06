@@ -23,7 +23,7 @@
             </li>
         {{else}}
             <li class="breadcrumb-item">
-                <a 
+                <a
                     {{#when action '===' 'create'}}
                         href="search"
                     {{else}}
@@ -110,7 +110,11 @@
                             data-target-value="input.suggestion-value-{{name}}"
                             {{#in ../valid_relations name}}
                                 {{#when ../action '===' 'create'}}
-                                    data-url="../{{name}}/search?q={QUERY}&render=false"
+                                    {{#if ../relation.suggestion}}
+                                        data-url="../../../{{name}}/search?q={QUERY}&render=false"
+                                    {{else}}
+                                        data-url="../{{name}}/search?q={QUERY}&render=false"
+                                    {{/if}}
                                 {{else}}
                                     data-url="../../{{name}}/search?q={QUERY}&render=false"
                                 {{/when}}

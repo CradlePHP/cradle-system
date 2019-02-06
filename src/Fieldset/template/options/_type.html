@@ -243,6 +243,14 @@
     >
         Radios Fieldset
     </option>
+    <option
+        data-fieldset="attributes"
+        data-format="string"
+        value="countrylist"
+        {{#when field.type '===' 'countrylist'}}selected{{/when}}
+    >
+        Country List Field
+    </option>
 </optgroup>
 <optgroup label="File Fields">
     <option
@@ -290,24 +298,24 @@
     <option
         data-fieldset="attributes"
         data-format="json"
-        value="texts"
-        {{#when field.type '===' 'texts'}}selected{{/when}}
+        value="textlist"
+        {{#when field.type '===' 'textlist'}}selected{{/when}}
     >
         Text List Fieldset
     </option>
     <option
         data-fieldset="attributes"
         data-format="json"
-        value="textareas"
-        {{#when field.type '===' 'textareas'}}selected{{/when}}
+        value="textarealist"
+        {{#when field.type '===' 'textarealist'}}selected{{/when}}
     >
         Textarea List Fieldset
     </option>
     <option
         data-fieldset="attributes"
         data-format="json"
-        value="wysiwygs"
-        {{#when field.type '===' 'wysiwygs'}}selected{{/when}}
+        value="wysiwyglist"
+        {{#when field.type '===' 'wysiwyglist'}}selected{{/when}}
     >
         WYSIWYG List Fieldset
     </option>
@@ -334,6 +342,14 @@
         {{#when field.type '===' 'multirange'}}selected{{/when}}
     >
         Multi Range Field
+    </option>
+    <option
+        data-fieldset="attributes"
+        data-format="json"
+        value="latlng"
+        {{#when field.type '===' 'latlng'}}selected{{/when}}
+    >
+        Lat/Lng
     </option>
     <option
         data-fieldset="attributes|fieldset"
