@@ -183,7 +183,7 @@ $this->on('system-fieldset-remove', function ($request, $response) {
         rename($path, $new);
     }
 
-    $response->setError(false)->setResults($results);
+    $response->setError(false)->setResults($data);
 });
 
 /**
@@ -222,7 +222,7 @@ $this->on('system-fieldset-restore', function ($request, $response) {
         rename($path, $new);
     }
 
-    $response->setError(false)->setResults($results);
+    $response->setError(false)->setResults($data);
 });
 
 /**

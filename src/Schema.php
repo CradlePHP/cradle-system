@@ -87,6 +87,7 @@ class Schema extends Fieldset
             'fields' => $this->getFields(),
             'files' => $this->getFileFieldNames(),
             'json' => $this->getJsonFieldNames(),
+            'ipaddress' => $this->getIPAddressFieldName(),
             'listable' => $this->getListableFieldNames(),
             'detailable' => $this->getDetailableFieldNames(),
             'primary' => $this->getPrimaryFieldName(),
@@ -120,6 +121,27 @@ class Schema extends Fieldset
         $table = $this->data['name'];
         foreach ($this->data['fields'] as $field) {
             if ($field['name'] === 'created') {
+                return $table . '_' . $field['name'];
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns IP address field
+     *
+     * @return string|false
+     */
+    public function getIPAddressFieldName()
+    {
+        if (!isset($this->data['fields']) || empty($this->data['fields'])) {
+            return false;
+        }
+
+        $table = $this->data['name'];
+        foreach ($this->data['fields'] as $field) {
+            if ($field['field']['type'] === 'ipaddress') {
                 return $table . '_' . $field['name'];
             }
         }
@@ -809,6 +831,10 @@ class Schema extends Fieldset
             'type' => 'VARCHAR',
             'length' => 255
         ],
+        'countrylist' => [
+            'type' => 'VARCHAR',
+            'length' => 255
+        ],
         'multiselect' => [
             'type' => 'JSON'
         ],
@@ -852,6 +878,9 @@ class Schema extends Fieldset
             'type' => 'VARCHAR',
             'length' => 255
         ],
+        'latlng' => [
+            'type' => 'JSON'
+        ],
         'rawjson' => [
             'type' => 'JSON'
         ],
@@ -862,6 +891,10 @@ class Schema extends Fieldset
             'type' => 'JSON'
         ],
         'uuid' => [
+            'type' => 'VARCHAR',
+            'length' => 255
+        ],
+        'ipaddress' => [
             'type' => 'VARCHAR',
             'length' => 255
         ],

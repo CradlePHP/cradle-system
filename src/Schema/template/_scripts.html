@@ -67,21 +67,6 @@
                 $(this).attr('data-name', name);
             });
 
-            $('input', copy).each(function() {
-                var value = $(this).val();
-                $(this).attr('value', value);
-            });
-
-            $('input', copy).each(function() {
-                var value = $(this).val();
-                $(this).attr('value', value);
-            });
-
-            $('textarea', copy).each(function() {
-                var value = $(this).val();
-                $(this).html(value);
-            });
-
             $('#modal-template')
                 .compile({INDEX: index})
                 .find('div.modal-body')
@@ -239,6 +224,7 @@
             var filterable = option.attr('data-filterable');
             var sortable = option.attr('data-sortable');
             var validation = option.attr('data-validation');
+            var indexes = (option.attr('data-index') || '').split('|');
 
             //determine label
             if(label && label.length) {
@@ -311,6 +297,15 @@
             } else {
                 $('input.field-sortable', target).parent().show();
             }
+
+            //determine index
+            ['searchable', 'filterable', 'sortable'].forEach(function(index) {
+                if(indexes.indexOf(index) === -1) {
+                    $('input.field-' + index, target)
+                        .attr('checked', false)
+                        .attr('disabled', true);
+                }
+            });
         };
 
         //field type change
@@ -321,7 +316,6 @@
             //configuration
             var fieldsets = (option.attr('data-fieldset') || '').split('|');
             var formats = (option.attr('data-format') || '').split('|');
-            var indexes = (option.attr('data-index') || '').split('|');
             var index = $(this).getModelIndex();
 
             //reset
@@ -408,15 +402,6 @@
                     if($('option:selected', detail).length) {
                         detail.parent().val('none').trigger('change');
                     }
-                }
-            });
-
-            //determine index
-            ['searchable', 'filterable', 'sortable'].forEach(function(index) {
-                if(indexes.indexOf(index) === -1) {
-                    $('input.field-' + index, target)
-                        .attr('checked', false)
-                        .attr('disabled', true);
                 }
             });
 
@@ -654,6 +639,8 @@
                     .removeClass('modal-create')
                     .addClass('modal-update')
                 );
+
+            $('h5.modal-title', modal).html('Edit Field');
         }
 
         var row = $(trigger).parents('tr.schema-field-row').eq(0);
@@ -701,7 +688,7 @@
         var index = target.getModelIndex();
         var index2 = target.data('index');
 
-        $('a.remove', target).click(function() {
+        $('a.remove:first', target).click(function() {
             target.remove();
         });
 
@@ -1240,7 +1227,49 @@
 
     //----------------------------//
     // Functions
+    var $clone = $.fn.clone;
     $.fn.extend({
+        clone: function() {
+            //before cloning we need to set the html states for fields
+            //considerations
+            // input
+            // - checkbox
+            // - radio
+            // textarea
+            // select
+            $('input', this).each(function() {
+                $(this).attr('value', $(this).val());
+
+                var type = ($(this).attr('type') || 'text').toLowerCase();
+
+                if (type === 'radio' || type === 'checkbox') {
+                    var checked = $(this).prop('checked');
+                    if (checked) {
+                        $(this).attr('checked', 'checked');
+                    } else {
+                        $(this).removeAttr('checked');
+                    }
+                }
+            });
+
+            $('textarea', this).each(function() {
+                $(this).html($(this).val());
+            });
+
+            $('select', this).each(function() {
+                var selected = this.options[this.selectedIndex];
+                $('option', this).removeAttr('selected');
+
+                if (selected) {
+                    $(selected).attr('selected', 'selected');
+                }
+            });
+
+            var withDataAndEvents = arguments[0] || false;
+            var deepWithDataAndEvents = arguments[1] || false;
+            var clone = $clone.call(this, withDataAndEvents, deepWithDataAndEvents);
+            return clone;
+        },
         compile: function(variables) {
             var template = this.text();
 
@@ -1283,7 +1312,5 @@
             });
         }
     });
-
-    var copy = null;
 })(jQuery);
 </script>

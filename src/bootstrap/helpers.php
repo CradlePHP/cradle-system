@@ -86,6 +86,7 @@ return function($request, $response) {
                     || ($type === 'field' && $field[$type]['type'] === 'active')
                     || ($type === 'field' && $field[$type]['type'] === 'created')
                     || ($type === 'field' && $field[$type]['type'] === 'updated')
+                    || ($type === 'field' && $field[$type]['type'] === 'ipaddress')
                     || ($type === 'field' && $field[$type]['type'] === 'uuid')
                     || ($type === 'list' && $field[$type]['format'] === 'hide')
                     || ($type === 'detail' && $field[$type]['format'] === 'hide')
@@ -551,6 +552,10 @@ return function($request, $response) {
         }
 
         return implode('', $buffer);
+    });
+
+    $handlebars->registerHelper('textarea', function($string) {
+        return str_replace('</textarea>', '<\/textarea>', $string);
     });
 
     $handlebars->registerHelper('scope_dot', function ($array, $dot, $options) {
