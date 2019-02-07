@@ -517,8 +517,6 @@ $this->on('system-model-update', function ($request, $response) {
             $schema = Schema::i($relation['source']['name']);
             //set schema sql
             $schemaSql = $schema->model()->service('sql');
-            //set schema elastic
-            $schemaElastic = $schema->model()->service('elastic');
             //filter by primary id
             $filter['filter'][$primaryId] =  $results[$results['schema']. '_id'];
             //set range to 0
@@ -543,9 +541,7 @@ $this->on('system-model-update', function ($request, $response) {
                     $queuePackage = $this->package('cradlephp/cradle-queue');
                     if (!$queuePackage->queue('system-model-update', $queueData)) {
                         //update manually after the connection
-                        // $this->postprocess(function($payload) {
-                            $this->trigger('system-model-update', $payload['request'], $payload['response']);
-                        // });
+                        $this->trigger('system-model-update', $payload['request'], $payload['response']);
                     }
 
                 }

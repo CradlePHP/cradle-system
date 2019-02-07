@@ -686,7 +686,7 @@ class Schema extends Fieldset
                         ];
                     }
 
-                    //set ojbect datatype 
+                    //set object datatype 
                     if ($field['field']['type'] === 'fieldset' 
                         && (isset($field['field']['attributes']['data-multiple'])
                             && $field['field']['attributes']['data-multiple'] === 'false'
@@ -707,6 +707,20 @@ class Schema extends Fieldset
                     if ($field['field']['type'] === 'multirange') {
                         $map = [
                             'type' => 'keyword',
+                        ];
+                    }
+
+                    //set ip address
+                    if ($field['field']['type'] === 'ipaddress') {
+                        $map = [
+                            'type' => 'ip',
+                        ];
+                    }
+
+                    //set geoip (latlng)
+                    if ($field['field']['type'] === 'latlng') {
+                        $map = [
+                            'type' => 'geo_point',
                         ];
                     }
 
