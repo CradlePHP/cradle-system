@@ -41,9 +41,10 @@ $this->get('/admin/system/model/:schema1/:id/search/:schema2', function ($reques
         }
 
         //add a flash
-        $message = $this->package('global')->translate('Invalid relation');
-        $this->package('global')->flash($message, 'error');
-        return $this->package('global')->redirect($redirect);
+        $global = $this->package('global');
+        $message = $global->translate('Invalid relation');
+        $global->flash($message, 'error');
+        return $global->redirect($redirect);
     }
 
     $id = $request->getStage('id');
@@ -168,6 +169,7 @@ $this->get('/admin/system/model/:schema1/:id/create/:schema2', function ($reques
 $this->get('/admin/system/model/:schema1/:id/link/:schema2', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
+    $global = $this->package('global');
     //get schema data
     $schema = Schema::i($request->getStage('schema1'));
 
@@ -213,15 +215,15 @@ $this->get('/admin/system/model/:schema1/:id/link/:schema2', function ($request,
         //wala talaga
         if (!isset($relations[$table])) {
             //set a message
-            $message = $this->package('global')->translate('Relation does not exist');
+            $message = $global->translate('Relation does not exist');
 
             //if we dont want to redirect
             if ($redirect === 'false') {
                 return $response->setError(true, $message);
             }
 
-            $this->package('global')->flash($message, 'error');
-            return $this->package('global')->redirect($redirect);
+            $global->flash($message, 'error');
+            return $global->redirect($redirect);
         }
 
         //fake it
@@ -247,8 +249,8 @@ $this->get('/admin/system/model/:schema1/:id/link/:schema2', function ($request,
     //can we update ?
     if ($response->isError()) {
         //add a flash
-        $this->package('global')->flash($response->getMessage(), 'error');
-        return $this->package('global')->redirect($redirect);
+        $global->flash($response->getMessage(), 'error');
+        return $global->redirect($redirect);
     }
 
     //pass the item to the template
@@ -282,7 +284,7 @@ $this->get('/admin/system/model/:schema1/:id/link/:schema2', function ($request,
     $class = 'page-admin-system-relation-link page-admin';
 
     //determine the title
-    $data['title'] = $this->package('global')->translate(
+    $data['title'] = $global->translate(
         'Linking %s',
         $data['relation']['singular']
     );
@@ -464,12 +466,13 @@ $this->post('/admin/system/model/:schema1/:id/create/:schema2', function ($reque
     }
 
     //add a flash
-    $this->package('global')->flash(sprintf(
+    $global = $this->package('global');
+    $global->flash(sprintf(
         '%s was Created',
         $schema2->getSingular()
     ), 'success');
 
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**
@@ -555,13 +558,14 @@ $this->post('/admin/system/model/:schema1/:id/link/:schema2', function ($request
     }
 
     //add a flash
-    $message = $this->package('global')->translate(
+    $global = $this->package('global');
+    $message = $global->translate(
         '%s was linked to %s',
         $schema->getSingular(),
         $relation['singular']
     );
 
-    $this->package('global')->flash($message, 'success');
+    $global->flash($message, 'success');
 
     //record logs
     $this->log(
@@ -576,7 +580,7 @@ $this->post('/admin/system/model/:schema1/:id/link/:schema2', function ($request
         $response
     );
 
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**
@@ -627,18 +631,19 @@ $this->get('/admin/system/model/:schema1/:id1/link/:schema2/:id2', function ($re
         return;
     }
 
+    $global = $this->package('global');
     if ($response->isError()) {
         //add a flash
-        $this->package('global')->flash($response->getMessage(), 'error');
+        $global->flash($response->getMessage(), 'error');
     } else {
         //add a flash
-        $message = $this->package('global')->translate(
+        $message = $global->translate(
             '%s was linked to %s',
             $schema->getSingular(),
             $relation['singular']
         );
 
-        $this->package('global')->flash($message, 'success');
+        $global->flash($message, 'success');
 
         //record logs
         $this->log(
@@ -654,7 +659,7 @@ $this->get('/admin/system/model/:schema1/:id1/link/:schema2/:id2', function ($re
         );
     }
 
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**
@@ -705,18 +710,19 @@ $this->get('/admin/system/model/:schema1/:id1/unlink/:schema2/:id2', function ($
         return;
     }
 
+    $global = $this->package('global');
     if ($response->isError()) {
         //add a flash
-        $this->package('global')->flash($response->getMessage(), 'error');
+        $global->flash($response->getMessage(), 'error');
     } else {
         //add a flash
-        $message = $this->package('global')->translate(
+        $message = $global->translate(
             '%s was unlinked from %s',
             $schema->getSingular(),
             $relation['singular']
         );
 
-        $this->package('global')->flash($message, 'success');
+        $global->flash($message, 'success');
 
         //record logs
         $this->log(
@@ -732,7 +738,7 @@ $this->get('/admin/system/model/:schema1/:id1/unlink/:schema2/:id2', function ($
         );
     }
 
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**

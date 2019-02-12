@@ -174,6 +174,7 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
 $this->get('/admin/system/model/:schema/create', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
+    $global = $this->package('global');
     //get schema data
     $schema = Schema::i($request->getStage('schema'));
 
@@ -205,8 +206,8 @@ $this->get('/admin/system/model/:schema/create', function ($request, $response) 
         //can we update ?
         if ($response->isError()) {
             //add a flash
-            $this->package('global')->flash($response->getMessage(), 'error');
-            return $this->package('global')->redirect(sprintf(
+            $global->flash($response->getMessage(), 'error');
+            return $global->redirect(sprintf(
                 '/admin/system/schema/%s/search',
                 $request->getStage('schema')
             ));
@@ -251,7 +252,7 @@ $this->get('/admin/system/model/:schema/create', function ($request, $response) 
     //if there are file fields
     if (!empty($data['schema']['files'])) {
         //add CDN
-        $config = $this->package('global')->service('s3-main');
+        $config = $global->service('s3-main');
         $data['cdn_config'] = File::getS3Client($config);
     }
 
@@ -282,7 +283,7 @@ $this->get('/admin/system/model/:schema/create', function ($request, $response) 
     $data['action'] = 'create';
 
     //determine the title
-    $data['title'] = $this->package('global')->translate(
+    $data['title'] = $global->translate(
         'Create %s',
         $data['schema']['singular']
     );
@@ -334,6 +335,7 @@ $this->get('/admin/system/model/:schema/create', function ($request, $response) 
 $this->get('/admin/system/model/:schema/update/:id', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
+    $global = $this->package('global');
     //get schema data
     $schema = Schema::i($request->getStage('schema'));
 
@@ -374,8 +376,8 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
         }
 
         //add a flash
-        $this->package('global')->flash($response->getMessage(), 'error');
-        return $this->package('global')->redirect($redirect);
+        $global->flash($response->getMessage(), 'error');
+        return $global->redirect($redirect);
     }
 
     $data['detail'] = $response->getResults();
@@ -429,7 +431,7 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
     //if there are file fields
     if (!empty($data['schema']['files'])) {
         //add CDN
-        $config = $this->package('global')->service('s3-main');
+        $config = $global->service('s3-main');
         $data['cdn_config'] = File::getS3Client($config);
     }
 
@@ -451,7 +453,7 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
     $data['action'] = 'update';
 
     //determine the title
-    $data['title'] = $this->package('global')->translate(
+    $data['title'] = $global->translate(
         'Updating %s',
         $data['schema']['singular']
     );
@@ -503,6 +505,7 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
 $this->get('/admin/system/model/:schema/detail/:id', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
+    $global = $this->package('global');
     //get schema data
     $schema = Schema::i($request->getStage('schema'));
 
@@ -540,8 +543,8 @@ $this->get('/admin/system/model/:schema/detail/:id', function ($request, $respon
         }
 
         //add a flash
-        $this->package('global')->flash($response->getMessage(), 'error');
-        return $this->package('global')->redirect($redirect);
+        $global->flash($response->getMessage(), 'error');
+        return $global->redirect($redirect);
     }
 
     $data['detail'] = $response->getResults();
@@ -600,7 +603,7 @@ $this->get('/admin/system/model/:schema/detail/:id', function ($request, $respon
     $compiled = $handlebars->compile($data['schema']['suggestion'])($data['detail']);
 
     //determine the title
-    $data['title'] = $this->package('global')->translate($compiled);
+    $data['title'] = $global->translate($compiled);
 
     $template = __DIR__ . '/template';
     if (is_dir($response->getPage('template_root'))) {
@@ -728,14 +731,15 @@ $this->post('/admin/system/model/:schema/search', function ($request, $response)
     }
 
     //add a flash
+    $global = $this->package('global');
     if (!empty($errors)) {
-        $this->package('global')->flash(
+        $global->flash(
             'Some items could not be processed',
             'error',
             $errors
         );
     } else {
-        $this->package('global')->flash(
+        $global->flash(
             sprintf(
                 'Bulk action %s successful',
                 $action
@@ -744,7 +748,7 @@ $this->post('/admin/system/model/:schema/search', function ($request, $response)
         );
     }
 
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**
@@ -853,12 +857,13 @@ $this->post('/admin/system/model/:schema/create', function ($request, $response)
     }
 
     //add a flash
-    $this->package('global')->flash(sprintf(
+    $global = $this->package('global');
+    $global->flash(sprintf(
         '%s was Created',
         $schema->getSingular()
     ), 'success');
 
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**
@@ -984,12 +989,13 @@ $this->post('/admin/system/model/:schema/update/:id', function ($request, $respo
     }
 
     //add a flash
-    $this->package('global')->flash(sprintf(
+    $global = $this->package('global');
+    $global->flash(sprintf(
         '%s was Updated',
         $schema->getSingular()
     ), 'success');
 
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**
@@ -1049,16 +1055,17 @@ $this->get('/admin/system/model/:schema/remove/:id', function ($request, $respon
         return;
     }
 
+    $global = $this->package('global');
     if ($response->isError()) {
         //add a flash
-        $this->package('global')->flash($response->getMessage(), 'error');
+        $global->flash($response->getMessage(), 'error');
     } else {
         //add a flash
         $message = sprintf('%s was Removed', $schema->getSingular());
-        $this->package('global')->flash($message, 'success');
+        $global->flash($message, 'success');
     }
 
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**
@@ -1118,16 +1125,17 @@ $this->get('/admin/system/model/:schema/restore/:id', function ($request, $respo
         return;
     }
 
+    $global = $this->package('global');
     if ($response->isError()) {
         //add a flash
-        $this->package('global')->flash($response->getMessage(), 'error');
+        $global->flash($response->getMessage(), 'error');
     } else {
         //add a flash
         $message = sprintf('%s was Restored', $schema->getSingular());
-        $this->package('global')->flash($message, 'success');
+        $global->flash($message, 'success');
     }
 
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**

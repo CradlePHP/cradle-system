@@ -88,13 +88,15 @@ $this->on('system-fieldset-create', function ($request, $response) {
     $fieldset = Fieldset::i($data);
     $table = $fieldset->getName();
 
-    $path = $this->package('global')->path('fieldset');
+    $global = $this->package('global');
+
+    $path = $global->path('fieldset');
 
     if (!is_dir($path)) {
         mkdir($path, 0777);
     }
 
-    $this->package('global')->fieldset($table, $data);
+    $global->fieldset($table, $data);
 
     //return response format
     $response->setError(false)->setResults($data);
@@ -174,12 +176,13 @@ $this->on('system-fieldset-remove', function ($request, $response) {
         $restorable = false;
     }
 
-    $path = $this->package('global')->path('fieldset') . '/' . $table . '.php';
+    $global = $this->package('global');
+    $path = $global->path('fieldset') . '/' . $table . '.php';
 
     if(!$restorable) {
         unlink($path);
     } else if (file_exists($path)) {
-        $new = $this->package('global')->path('fieldset') . '/_' . $table . '.php';
+        $new = $global->path('fieldset') . '/_' . $table . '.php';
         rename($path, $new);
     }
 
@@ -214,10 +217,12 @@ $this->on('system-fieldset-restore', function ($request, $response) {
     $fieldset = Fieldset::i($data);
     $table = $fieldset->getName();
 
-    $path = $this->package('global')->path('fieldset') . '/_' . $table . '.php';
+    $global = $this->package('global');
+
+    $path = $global->path('fieldset') . '/_' . $table . '.php';
 
     if (file_exists($path)) {
-        $new = $this->package('global')->path('fieldset') . '/' . $table . '.php';
+        $new = $global->path('fieldset') . '/' . $table . '.php';
 
         rename($path, $new);
     }
@@ -244,10 +249,11 @@ $this->on('system-fieldset-search', function ($request, $response) {
     //no validation needed
     //----------------------------//
     // 3. Prepare Data
+    $global = $this->package('global');
     //no preparation needed
     //----------------------------//
     // 4. Process Data
-    $path = $this->package('global')->path('fieldset');
+    $path = $global->path('fieldset');
 
     if (!is_dir($path)) {
         mkdir($path, 0777);
@@ -272,7 +278,7 @@ $this->on('system-fieldset-search', function ($request, $response) {
             continue;
         }
 
-        $results[] = $this->package('global')->fieldset(substr($file, 0, -4));
+        $results[] = $global->fieldset(substr($file, 0, -4));
     }
 
     //set response format
