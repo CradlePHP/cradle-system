@@ -95,8 +95,7 @@ class Formatter
                     );
                 } else {
                     //format each data
-                    foreach($data[$name] as $index => $row) {
-
+                    foreach ($data[$name] as $index => $row) {
                         $data[$name][$index] = $this->formatData(
                             $row,
                             Fieldset::i($field['field']['parameters']),
@@ -134,14 +133,13 @@ class Formatter
                 case 'latlng':
                 case 'fieldset':
                     //if it's an array already
-                    if((is_array($data[$name]) || is_object($data[$name])) && is_null($fieldset)) {
+                    if ((is_array($data[$name]) || is_object($data[$name])) && is_null($fieldset)) {
                         $data[$name] = json_encode($data[$name], JSON_NUMERIC_CHECK);
 
                         //if it's a json string
-                        if(strpos($data[$name], '{') === 0
+                        if (strpos($data[$name], '{') === 0
                             || strpos($data[$name], '[') === 0
-                        )
-                        {
+                        ) {
                             break;
                         }
 
@@ -285,7 +283,7 @@ class Formatter
             $payload['response']
         );
 
-        if(!$payload['response']->hasResults('data')) {
+        if (!$payload['response']->hasResults('data')) {
             return $data;
         }
 

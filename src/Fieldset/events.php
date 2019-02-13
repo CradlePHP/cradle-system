@@ -170,13 +170,13 @@ $this->on('system-fieldset-remove', function ($request, $response) {
     $table = $fieldset->getName();
 
     $restorable = true;
-    if($request->getStage('mode') === 'permanent') {
+    if ($request->getStage('mode') === 'permanent') {
         $restorable = false;
     }
 
     $path = $this->package('global')->path('fieldset') . '/' . $table . '.php';
 
-    if(!$restorable) {
+    if (!$restorable) {
         unlink($path);
     } else if (file_exists($path)) {
         $new = $this->package('global')->path('fieldset') . '/_' . $table . '.php';

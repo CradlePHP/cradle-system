@@ -583,7 +583,7 @@ class Schema extends Fieldset
      * @return array
      */
     public function toElastic()
-    {   
+    {
         //call recursive map fields
         $maps = $this->getMapFields($this->data['name']);
 
@@ -595,19 +595,19 @@ class Schema extends Fieldset
      *
      * @return array
      */
-    public function getMapFields($name) 
+    public function getMapFields($name)
     {
         //get fields recursive
-        $getFields = function($name) use (
+        $getFields = function ($name) use (
             &$fieldset,
             &$getFields
         ) {
-            //get fieldset data            
+            //get fieldset data
             $fieldset = Helpers::getFieldset($name);
 
             //set default map
             $maps = [
-                $name. '_id' => 
+                $name. '_id' =>
                     ['type' => 'integer']
             ];
 
@@ -626,8 +626,8 @@ class Schema extends Fieldset
                     }
 
                     //set short datatype
-                    if ($format['type'] === 'INT' 
-                        && (isset($format['length']) 
+                    if ($format['type'] === 'INT'
+                        && (isset($format['length'])
                             && $format['length'] === 1)) {
                         $map['type'] = 'short';
                     }
@@ -645,7 +645,7 @@ class Schema extends Fieldset
                             'type' => 'date',
                             'format' => 'yyyy-MM-dd HH:mm:ss'
                         ];
-                    }  
+                    }
 
                     //set time datatype
                     if ($format['type'] === 'time') {
@@ -686,8 +686,8 @@ class Schema extends Fieldset
                         ];
                     }
 
-                    //set object datatype 
-                    if ($field['field']['type'] === 'fieldset' 
+                    //set object datatype
+                    if ($field['field']['type'] === 'fieldset'
                         && (isset($field['field']['attributes']['data-multiple'])
                             && $field['field']['attributes']['data-multiple'] === 'false'
                             )
@@ -695,7 +695,7 @@ class Schema extends Fieldset
                         $map = [
                             'type' => 'text'
                         ];
-                    } else if($field['field']['type'] === 'fieldset') {
+                    } else if ($field['field']['type'] === 'fieldset') {
                         $map = $getFields($field['name']);
                         $map = [
                             'type' => 'nested',
@@ -703,7 +703,7 @@ class Schema extends Fieldset
                         ];
                     }
                     
-                    //set custom field (multirange) eg: 10;50 
+                    //set custom field (multirange) eg: 10;50
                     if ($field['field']['type'] === 'multirange') {
                         $map = [
                             'type' => 'keyword',

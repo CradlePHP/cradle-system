@@ -11,7 +11,7 @@ use Cradle\Package\System\Fieldset;
 use Cradle\Package\System\Schema;
 use Cradle\Package\System\Helpers;
 
-return function($request, $response) {
+return function ($request, $response) {
     //add helpers
     $handlebars = $this->package('global')->handlebars();
 
@@ -69,7 +69,7 @@ return function($request, $response) {
         $fields = $schema->getFields();
 
         //we need to define a function so it can be recursively called
-        $getFormats = function(
+        $getFormats = function (
             $row,
             $type,
             $fields,
@@ -138,7 +138,7 @@ return function($request, $response) {
                 //if its a fieldset and view is field/form
                 if ($type === 'field' && $field[$type]['type'] === 'fieldset') {
                     //make sure value is an array by default
-                    if(is_null($value)) {
+                    if (is_null($value)) {
                         $value = [];
                     }
 
@@ -175,7 +175,8 @@ return function($request, $response) {
                             $key = sprintf(
                                 '%s[%s][%s]',
                                 $parent['name'],
-                                $name, $indexPlaceholder1
+                                $name,
+                                $indexPlaceholder1
                             );
 
                             $label = sprintf(
@@ -202,7 +203,7 @@ return function($request, $response) {
 
                         //get the values
                         $values = [];
-                        foreach($value as $i => $row2) {
+                        foreach ($value as $i => $row2) {
                             $indexes[] = $i;
 
                             //resolve the label
@@ -228,7 +229,7 @@ return function($request, $response) {
 
                             array_pop($indexes);
 
-                            foreach($values[$i]['rows'] as $key2 => $row3) {
+                            foreach ($values[$i]['rows'] as $key2 => $row3) {
                                 //if there is a name template
                                 if (isset($row3['name'])) {
                                     $row3['name'] = str_replace(
@@ -291,7 +292,7 @@ return function($request, $response) {
                             'index' => $indexes
                         ]);
 
-                        foreach($values['rows'] as $key2 => $row3) {
+                        foreach ($values['rows'] as $key2 => $row3) {
                             //if there is a name template
                             if (isset($row3['name'])) {
                                 //set the dot notation. this is for error handling
@@ -525,7 +526,7 @@ return function($request, $response) {
         return nl2br(str_replace(' ', '&nbsp;', json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)));
     });
 
-    $handlebars->registerHelper('stars', function($range, $max, $options = []) {
+    $handlebars->registerHelper('stars', function ($range, $max, $options = []) {
         $buffer = [];
         $half = strpos($range, '.5');
         $range = round($range);
@@ -536,7 +537,7 @@ return function($request, $response) {
             $max = $range;
         }
 
-        for($i = 0; $i < $max; $i++) {
+        for ($i = 0; $i < $max; $i++) {
             if ($i == $range - 1 && $half) {
                 $value = 'half';
             } else if ($i < $range) {
@@ -554,7 +555,7 @@ return function($request, $response) {
         return implode('', $buffer);
     });
 
-    $handlebars->registerHelper('textarea', function($string) {
+    $handlebars->registerHelper('textarea', function ($string) {
         return str_replace('</textarea>', '<\/textarea>', $string);
     });
 

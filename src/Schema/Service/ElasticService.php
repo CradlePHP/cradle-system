@@ -53,9 +53,10 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
      *
      * @return bool
      */
-    public function map() {
+    public function map()
+    {
         // no schema validation
-        if(is_null($this->schema)) {
+        if (is_null($this->schema)) {
             throw SystemException::forNoSchema();
         }
 
@@ -75,7 +76,6 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
                     'properties' => $mapping
                 ]
             ]);
-
         } catch (NoNodesAvailableException $e) {
             //because there is no reason to continue;
             return false;
@@ -96,9 +96,10 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
      * @param array $data
      * @return bool
      */
-    public function populate(array $data = []) {
+    public function populate(array $data = [])
+    {
         // no schema validation
-        if(is_null($this->schema)) {
+        if (is_null($this->schema)) {
             throw SystemException::forNoSchema();
         }
         $exists = false;
@@ -110,7 +111,6 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
                     ['index' => $this->schema
                         ->getName()]
                 );
-
         } catch (\Throwable $e) {
             // return false if something went wrong
             return false;
@@ -135,13 +135,13 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         $data = $modelSql->search(['range' => 1]);
         // get total entry
         $total = 0;
-        if (isset ($data['total']) && is_numeric ($data['total'])) {
+        if (isset($data['total']) && is_numeric($data['total'])) {
             $total = $data['total'];
         }
 
         // set current to 0 if current is not set
         $current = 0;
-        if (isset ($data['current']) && is_numeric ($data['current'])) {
+        if (isset($data['current']) && is_numeric($data['current'])) {
             $current = $data['current'];
         }
 
@@ -154,11 +154,10 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
 
             // if end is set
             if (isset($data['end']) && is_numeric($data['end'])) {
-                if($current + $i > $data['end']) {
+                if ($current + $i > $data['end']) {
                     // end this
                     break;
                 }
-
             }
 
             // set request params
@@ -174,7 +173,6 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
                     // nothing to do
                     return false;
                 }
-
             }
 
             // increment current
@@ -192,9 +190,10 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
      *
      * @return bool
      */
-    public function flush() {
+    public function flush()
+    {
         // no schema validation
-        if(is_null($this->schema)) {
+        if (is_null($this->schema)) {
             throw SystemException::forNoSchema();
         }
 
@@ -209,7 +208,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
                 );
 
             return true;
-        } catch(\Throwable $e) {
+        } catch (\Throwable $e) {
             return false;
         }
     }

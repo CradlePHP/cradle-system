@@ -18,6 +18,7 @@ use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 use Cradle\Module\Utility\Service\ElasticServiceInterface;
 use Cradle\Module\Utility\Service\AbstractElasticService;
 use Cradle\Package\System\Schema as SystemSchema;
+
 /**
  * Model ElasticSearch Service
  *
@@ -119,7 +120,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         // 4. Process Data
         $schema = SystemSchema::i($model);
         
-        if(is_null($schema)) {
+        if (is_null($schema)) {
             throw SystemException::forNoSchema();
         }
 

@@ -86,7 +86,7 @@ class Validator
                     continue;
                 }
 
-                foreach($data[$name] as $index => $row) {
+                foreach ($data[$name] as $index => $row) {
                     if (!isset($errors[$name][$index])) {
                         $errors[$name][$index] = [];
                     }
@@ -199,7 +199,7 @@ class Validator
                     continue;
                 }
 
-                foreach($data[$name] as $index => $row) {
+                foreach ($data[$name] as $index => $row) {
                     if (!isset($errors[$name][$index])) {
                         $errors[$name][$index] = [];
                     }

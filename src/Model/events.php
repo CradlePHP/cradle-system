@@ -459,7 +459,7 @@ $this->on('system-model-update', function ($request, $response) {
             $lastId = $current[$relation['name']][$relation['primary2']];
 
         // relation already merged with the primary?
-        } else if(isset($current[$relation['primary2']])) {
+        } else if (isset($current[$relation['primary2']])) {
             $lastId = $current[$relation['primary2']];
         }
 
@@ -513,7 +513,7 @@ $this->on('system-model-update', function ($request, $response) {
             }
             //get primmary id
             $primaryId = $results['schema']. '_id';
-            //get dynamic schema        
+            //get dynamic schema
             $schema = Schema::i($relation['source']['name']);
             //set schema sql
             $schemaSql = $schema->model()->service('sql');
@@ -543,7 +543,6 @@ $this->on('system-model-update', function ($request, $response) {
                         //update manually after the connection
                         $this->trigger('system-model-update', $payload['request'], $payload['response']);
                     }
-
                 }
             }
         }

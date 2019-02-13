@@ -57,8 +57,8 @@ $this->on('system-schema-create', function ($request, $response) {
 
     //sql create
     $this->trigger(
-        'system-schema-sql-create', 
-        $payload['request'], 
+        'system-schema-sql-create',
+        $payload['request'],
         $payload['response']
     );
 
@@ -68,8 +68,8 @@ $this->on('system-schema-create', function ($request, $response) {
 
     //file create
     $this->trigger(
-        'system-schema-file-create', 
-        $payload['request'], 
+        'system-schema-file-create',
+        $payload['request'],
         $payload['response']
     );
 
@@ -79,8 +79,8 @@ $this->on('system-schema-create', function ($request, $response) {
 
     // create elastic
     $this->trigger(
-        'system-schema-elastic-create', 
-        $payload['request'], 
+        'system-schema-elastic-create',
+        $payload['request'],
         $payload['response']
     );
 
@@ -299,7 +299,7 @@ $this->on('system-schema-remove', function ($request, $response) {
     $systemSql = $schema->service('sql');
 
     $restorable = true;
-    if($request->getStage('mode') === 'permanent') {
+    if ($request->getStage('mode') === 'permanent') {
         $restorable = false;
     }
 
@@ -312,7 +312,7 @@ $this->on('system-schema-remove', function ($request, $response) {
 
     $path = $this->package('global')->path('schema') . '/' . $table . '.php';
 
-    if(!$restorable) {
+    if (!$restorable) {
         unlink($path);
     } else if (file_exists($path)) {
         $new = $this->package('global')->path('schema') . '/_' . $table . '.php';
@@ -506,8 +506,8 @@ $this->on('system-schema-update', function ($request, $response) {
 
     //elastic create
     $this->trigger(
-        'system-schema-elastic-create', 
-        $payload['request'], 
+        'system-schema-elastic-create',
+        $payload['request'],
         $payload['response']
     );
 
