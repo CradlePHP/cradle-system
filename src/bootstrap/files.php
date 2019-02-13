@@ -26,8 +26,9 @@ return function ($request, $response) {
             $data = $request->getStage('data');
 
             //try cdn if enabled
-            $s3 = $this->package('global')->service('s3-main');
-            $upload = $this->package('global')->path('upload');
+            $global = $this->package('global');
+            $s3 = $global->service('s3-main');
+            $upload = $global->path('upload');
 
             //try cdn if enabled
             $data = File::base64ToS3($data, $s3);

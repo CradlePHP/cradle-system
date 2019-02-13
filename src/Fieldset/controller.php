@@ -85,6 +85,7 @@ $this->get('/admin/system/fieldset/search', function ($request, $response) {
 $this->get('/admin/system/fieldset/create', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
+    $global = $this->package('global');
     $data = ['item' => $request->getPost()];
 
     //if this is a return back from processing
@@ -103,8 +104,8 @@ $this->get('/admin/system/fieldset/create', function ($request, $response) {
         //can we update ?
         if ($response->isError()) {
             //add a flash
-            $this->package('global')->flash($response->getMessage(), 'error');
-            return $this->package('global')->redirect('/admin/system/fieldset/search');
+            $global->flash($response->getMessage(), 'error');
+            return $global->redirect('/admin/system/fieldset/search');
         }
 
         $data['item'] = $response->getResults();
@@ -123,10 +124,10 @@ $this->get('/admin/system/fieldset/create', function ($request, $response) {
     $data['action'] = 'create';
 
     //determine the title
-    $data['title'] = $this->package('global')->translate('Create System Fieldset');
+    $data['title'] = $global->translate('Create System Fieldset');
 
     //add custom page helpers
-    $this->package('global')
+    $global
         ->handlebars()
         ->registerHelper('is_array', function ($value, $option) {
             if (is_array($value)) {
@@ -195,6 +196,7 @@ $this->get('/admin/system/fieldset/create', function ($request, $response) {
 $this->get('/admin/system/fieldset/update/:name', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
+    $global = $this->package('global');
     //pass the item with only the post data
     $data = ['item' => $request->getPost()];
 
@@ -222,8 +224,8 @@ $this->get('/admin/system/fieldset/update/:name', function ($request, $response)
             }
 
             //add a flash
-            $this->package('global')->flash($response->getMessage(), 'error');
-            return $this->package('global')->redirect($redirect);
+            $global->flash($response->getMessage(), 'error');
+            return $global->redirect($redirect);
         }
 
         $data['item'] = $response->getResults();
@@ -247,10 +249,10 @@ $this->get('/admin/system/fieldset/update/:name', function ($request, $response)
     $data['action'] = 'update';
 
     //determine the title
-    $data['title'] = $this->package('global')->translate('Updating System Fieldset');
+    $data['title'] = $global->translate('Updating System Fieldset');
 
     //add custom page helpers
-    $this->package('global')
+    $global
         ->handlebars()
         ->registerHelper('is_array', function ($value, $option) {
             if (is_array($value)) {
@@ -319,6 +321,7 @@ $this->get('/admin/system/fieldset/update/:name', function ($request, $response)
 $this->post('/admin/system/fieldset/create', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
+    $global = $this->package('global');
     //if detail has no value make it null
     if ($request->hasStage('detail') && !$request->getStage('detail')) {
         $request->setStage('detail', null);
@@ -382,10 +385,10 @@ $this->post('/admin/system/fieldset/create', function ($request, $response) {
 
     //it was good
     //add a flash
-    $this->package('global')->flash('System Fieldset was Created', 'success');
+    $global->flash('System Fieldset was Created', 'success');
 
     //redirect
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**
@@ -397,7 +400,6 @@ $this->post('/admin/system/fieldset/create', function ($request, $response) {
 $this->post('/admin/system/fieldset/update/:name', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
-
     //if detail has no value make it null
     if ($request->hasStage('detail') && !$request->getStage('detail')) {
         $request->setStage('detail', null);
@@ -473,11 +475,12 @@ $this->post('/admin/system/fieldset/update/:name', function ($request, $response
     }
 
     //it was good
+    $global = $this->package('global');
     //add a flash
-    $this->package('global')->flash('System Fieldset was Updated', 'success');
+    $global->flash('System Fieldset was Updated', 'success');
 
     //redirect
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**
@@ -510,13 +513,14 @@ $this->get('/admin/system/fieldset/remove/:name', function ($request, $response)
         return;
     }
 
+    $global = $this->package('global');
     if ($response->isError()) {
         //add a flash
-        $this->package('global')->flash($response->getMessage(), 'error');
+        $global->flash($response->getMessage(), 'error');
     } else {
         //add a flash
-        $message = $this->package('global')->translate('System Fieldset was Removed');
-        $this->package('global')->flash($message, 'success');
+        $message = $global->translate('System Fieldset was Removed');
+        $global->flash($message, 'success');
 
         //record logs
         $this->log(
@@ -532,7 +536,7 @@ $this->get('/admin/system/fieldset/remove/:name', function ($request, $response)
         );
     }
 
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**
@@ -565,13 +569,14 @@ $this->get('/admin/system/fieldset/restore/:name', function ($request, $response
         return;
     }
 
+    $global = $this->package('global');
     if ($response->isError()) {
         //add a flash
-        $this->package('global')->flash($response->getMessage(), 'error');
+        $global->flash($response->getMessage(), 'error');
     } else {
         //add a flash
-        $message = $this->package('global')->translate('System Fieldset was Restored');
-        $this->package('global')->flash($message, 'success');
+        $message = $global->translate('System Fieldset was Restored');
+        $global->flash($message, 'success');
 
         //record logs
         $this->log(
@@ -587,7 +592,7 @@ $this->get('/admin/system/fieldset/restore/:name', function ($request, $response
         );
     }
 
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**
@@ -596,11 +601,13 @@ $this->get('/admin/system/fieldset/restore/:name', function ($request, $response
  * @param Request $request
  * @param Response $response`
  */
+
 $this->get('/admin/system/fieldset/export', function ($request, $response) {
+    $global = $this->package('global');
     //get the name
     $name = $request->getStage('name');
     //get the config path
-    $path = $this->package('global')->path('config') . '/fieldset/';
+    $path = $global->path('config') . '/fieldset/';
     //default redirect
     $redirect = '/admin/system/fieldset/search';
 
@@ -617,8 +624,8 @@ $this->get('/admin/system/fieldset/export', function ($request, $response) {
         //file does not exists?
         if (!file_exists($file)) {
             //add a flash
-            $this->package('global')->flash('Not Found', 'error');
-            return $this->package('global')->redirect($redirect);
+            $global->flash('Not Found', 'error');
+            return $global->redirect($redirect);
         }
 
         //get the filename
@@ -632,7 +639,7 @@ $this->get('/admin/system/fieldset/export', function ($request, $response) {
 
         //include the php file
         $content = json_encode(include($file), JSON_PRETTY_PRINT);
-        
+
         //return content
         return $response->setContent($content);
     }
@@ -640,8 +647,8 @@ $this->get('/admin/system/fieldset/export', function ($request, $response) {
     //check if ZipArchive is installed
     if (!class_exists('ZipArchive')) {
         //add a flash
-        $this->package('global')->flash('ZipArchive module not found', 'error');
-        return $this->package('global')->redirect($redirect);
+        $global->flash('ZipArchive module not found', 'error');
+        return $global->redirect($redirect);
     }
 
     //create zip archive
@@ -652,8 +659,8 @@ $this->get('/admin/system/fieldset/export', function ($request, $response) {
     //try to open
     if (!$zip->open($tmp, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
         //add a flash
-        $this->package('global')->flash('Failed to create archive', 'error');
-        return $this->package('global')->redirect($redirect);
+        $global->flash('Failed to create archive', 'error');
+        return $global->redirect($redirect);
     }
 
     //create an empty directory
@@ -676,8 +683,8 @@ $this->get('/admin/system/fieldset/export', function ($request, $response) {
     //check if file exists
     if (!file_exists($tmp)) {
         //add a flash
-        $this->package('global')->flash('Failed to create archive', 'error');
-        return $this->package('global')->redirect($redirect);
+        $global->flash('Failed to create archive', 'error');
+        return $global->redirect($redirect);
     }
 
     //prepare response
@@ -767,10 +774,11 @@ $this->get('/admin/system/fieldset/import', function ($request, $response) {
  * @param Response $response
  */
 $this->post('/admin/system/fieldset/import', function ($request, $response) {
+    $global = $this->package('global');
     //get the content
     $fieldset = $request->getStage('fieldset');
     //get the config path
-    $config = $this->package('global')->path('config') . '/fieldset/';
+    $config = $global->path('config') . '/fieldset/';
     //get the type
     $type = substr($fieldset, 5, strpos($fieldset, ';base64') - 5);
     //get the route
@@ -857,9 +865,9 @@ $this->post('/admin/system/fieldset/import', function ($request, $response) {
 
         //it was good
         //add a flash
-        $this->package('global')->flash('System Fieldset was Imported', 'success');
+        $global->flash('System Fieldset was Imported', 'success');
         //redirect
-        return $this->package('global')->redirect($redirect);
+        return $global->redirect($redirect);
     }
 
     //get temporary folder
@@ -959,7 +967,7 @@ $this->post('/admin/system/fieldset/import', function ($request, $response) {
 
     //it was good
     //add a flash
-    $this->package('global')->flash('System Fieldset was Imported', 'success');
+    $global->flash('System Fieldset was Imported', 'success');
     //redirect
-    return $this->package('global')->redirect($redirect);
+    return $global->redirect($redirect);
 });
