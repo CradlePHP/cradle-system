@@ -636,6 +636,7 @@ class Schema extends Fieldset
                     if ($format['type'] === 'VARCHAR') {
                         $map = [
                             'type' => 'text',
+                            'ignore_above' => 250
                         ];
                     }
 
@@ -658,7 +659,8 @@ class Schema extends Fieldset
                     //set text datatype
                     if ($format['type'] === 'TEXT') {
                         $map = [
-                            'type' => 'text'
+                            'type' => 'text',
+                            'ignore_above' => 250
                         ];
                     }
 
@@ -672,7 +674,8 @@ class Schema extends Fieldset
                     //set json to text (single array)
                     if ($format['type'] === 'JSON') {
                         $map = [
-                            'type' => 'text'
+                            'type' => 'text',
+                            'ignore_above' => 250
                         ];
                     }
 
@@ -693,7 +696,8 @@ class Schema extends Fieldset
                             )
                     ) {
                         $map = [
-                            'type' => 'text'
+                            'type' => 'text',
+                            'ignore_above' => 250
                         ];
                     } else if ($field['field']['type'] === 'fieldset') {
                         $map = $getFields($field['name']);
