@@ -259,7 +259,7 @@ class Schema extends Fieldset
         $results = [];
         $name = $this->getName();
 
-        $payload = cradle()->makePayload();
+        $payload = $this->makePayload();
 
         cradle()->trigger(
             'system-schema-search',
