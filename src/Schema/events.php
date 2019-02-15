@@ -52,7 +52,7 @@ $this->on('system-schema-create', function ($request, $response) {
         }
     }
 
-    $payload = cradle()->makePayload();
+    $payload = $this->makePayload();
     $payload['request']->setStage($data);
 
     //sql create
@@ -501,7 +501,7 @@ $this->on('system-schema-update', function ($request, $response) {
     //reset the cache
     $this->package('global')->schema($table, $data);
 
-    $payload = cradle()->makePayload();
+    $payload = $this->makePayload();
     $payload['request']->setStage($data);
 
     //elastic create
