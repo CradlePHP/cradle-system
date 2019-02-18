@@ -439,6 +439,7 @@ $this->on('system-model-update', function ($request, $response) {
     //get the primary value
     $primary = $schema->getPrimaryFieldName();
     $relations = $schema->getRelations();
+    $reverseRelations = $schema->getReverseRelations();
 
     //loop through relations
     foreach ($relations as $table => $relation) {
@@ -458,7 +459,7 @@ $this->on('system-model-update', function ($request, $response) {
             $lastId = $current[$relation['name']][$relation['primary2']];
 
         // relation already merged with the primary?
-        } else if(isset($current[$relation['primary2']])) {
+        } else if (isset($current[$relation['primary2']])) {
             $lastId = $current[$relation['primary2']];
         }
 
@@ -496,6 +497,54 @@ $this->on('system-model-update', function ($request, $response) {
                 $results[$primary],
                 $data[$relation['primary2']]
             );
+        }
+    }
+
+    //only for root reverse relation
+    if (!isset($data['relation_recursive'])) {
+        //loop through reverse relations
+        foreach ($reverseRelations as $table => $relation) {
+            //deal with same table name
+            if ($relation['source']['name'] === $relation['name']
+                //skip history
+                || $relation['source']['name'] === 'history'
+                ) {
+                continue;
+            }
+            //get primmary id
+            $primaryId = $results['schema']. '_id';
+            //get dynamic schema
+            $schema = Schema::i($relation['source']['name']);
+            //set schema sql
+            $schemaSql = $schema->model()->service('sql');
+            //filter by primary id
+            $filter['filter'][$primaryId] =  $results[$results['schema']. '_id'];
+            //set range to 0
+            $filter['range'] = 0;
+            //get rows
+            $rows = $schemaSql->search($filter);
+
+            //loop elastic update
+            if ($rows) {
+                foreach ($rows['rows'] as $key => $row) {
+                    $payload = $this->makePayload();
+
+                    //set dynamic column id
+                    $columnId = $relation['source']['name']. '_id';
+                    $payload['request']
+                        ->setStage('schema', $relation['source']['name'])
+                        ->setStage('relation_recursive', true)
+                        ->setStage($columnId, $row[$columnId]);
+
+                    //set queue data
+                    $queueData = $payload['request']->getStage();
+                    $queuePackage = $this->package('cradlephp/cradle-queue');
+                    if (!$queuePackage->queue('system-model-update', $queueData)) {
+                        //update manually after the connection
+                        $this->trigger('system-model-update', $payload['request'], $payload['response']);
+                    }
+                }
+            }
         }
     }
 

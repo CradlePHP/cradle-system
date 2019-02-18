@@ -46,42 +46,6 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
     public function __construct(Resource $resource)
     {
         $this->resource = $resource;
-        $this->sql = Service::get('sql');
-    }
-
-    /**
-     * Create an elastic map
-     *
-     * @return void
-     */
-    public function createMap() {
-        if(is_null($this->schema)) {
-            throw SystemException::forNoSchema();
-        }
-
-        // translate data first to sql
-        $data = $this->schema->toSql();
-
-        // then translate it to elastic mapping
-        $mapping = $this->schema->toElastic($data);
-        // get schema path
-        $path = cradle()->package('global')->path('schema') . '/elastic';
-        // if elastic dir doesn't exists
-        // create elastic folder
-        if(!is_dir($path)) {
-            mkdir($path, 0777);
-        }
-
-        // if elastic schema dir doesn't exist
-        // create elastic schema dir
-        mkdir ($path . '/' . ucwords($data['name']));
-
-        // save mapping
-        file_put_contents(
-            $path . '/' . ucwords($data['name']) . '/elastic.php',
-            '<?php //-->' . "\n return " .
-            var_export($mapping, true) . ';'
-        );
     }
 
     /**
@@ -89,23 +53,15 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
      *
      * @return bool
      */
-    public function map() {
+    public function map()
+    {
         // no schema validation
-        if(is_null($this->schema)) {
+        if (is_null($this->schema)) {
             throw SystemException::forNoSchema();
         }
 
         $table = $this->schema->getName();
-        $path = cradle()->package('global')->path('schema')
-              . sprintf('/elastic/%s/elastic.php', ucwords($table));
-
-        // if mapped file doesn't exist,
-        // do nothing
-        if (!file_exists($path)) {
-            return false;
-        }
-
-        $data = include_once($path);
+        $mapping = $this->schema->toElastic();
 
         // try mapping
         try {
@@ -117,7 +73,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
                     '_source' => [
                         'enabled' => true
                     ],
-                    'properties' => $data[$table]
+                    'properties' => $mapping
                 ]
             ]);
         } catch (NoNodesAvailableException $e) {
@@ -140,12 +96,12 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
      * @param array $data
      * @return bool
      */
-    public function populate(array $data = []) {
+    public function populate(array $data = [])
+    {
         // no schema validation
-        if(is_null($this->schema)) {
+        if (is_null($this->schema)) {
             throw SystemException::forNoSchema();
         }
-
         $exists = false;
         try {
             // check if index exist
@@ -155,7 +111,6 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
                     ['index' => $this->schema
                         ->getName()]
                 );
-
         } catch (\Throwable $e) {
             // return false if something went wrong
             return false;
@@ -180,13 +135,13 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         $data = $modelSql->search(['range' => 1]);
         // get total entry
         $total = 0;
-        if (isset ($data['total']) && is_numeric ($data['total'])) {
+        if (isset($data['total']) && is_numeric($data['total'])) {
             $total = $data['total'];
         }
 
         // set current to 0 if current is not set
         $current = 0;
-        if (isset ($data['current']) && is_numeric ($data['current'])) {
+        if (isset($data['current']) && is_numeric($data['current'])) {
             $current = $data['current'];
         }
 
@@ -199,11 +154,10 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
 
             // if end is set
             if (isset($data['end']) && is_numeric($data['end'])) {
-                if($current + $i > $data['end']) {
+                if ($current + $i > $data['end']) {
                     // end this
                     break;
                 }
-
             }
 
             // set request params
@@ -219,7 +173,6 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
                     // nothing to do
                     return false;
                 }
-
             }
 
             // increment current
@@ -237,9 +190,10 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
      *
      * @return bool
      */
-    public function flush() {
+    public function flush()
+    {
         // no schema validation
-        if(is_null($this->schema)) {
+        if (is_null($this->schema)) {
             throw SystemException::forNoSchema();
         }
 
@@ -254,7 +208,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
                 );
 
             return true;
-        } catch(\Throwable $e) {
+        } catch (\Throwable $e) {
             return false;
         }
     }

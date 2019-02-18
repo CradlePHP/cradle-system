@@ -6,7 +6,7 @@
  * distributed with this package.
  */
 
-return function($request, $response) {
+return function ($request, $response) {
     /**
      * Add Template Builder
      */
@@ -14,7 +14,7 @@ return function($request, $response) {
         $file,
         array $data = [],
         $partials = [],
-        $template  = null,
+        $template = null,
         $partial = null
     ) {
         //if no template path was set
@@ -48,7 +48,7 @@ return function($request, $response) {
             $path = str_replace('_', '/', $name);
             $last = strrpos($path, '/');
 
-            if($last !== false) {
+            if ($last !== false) {
                 $path = substr_replace($path, '/_', $last, 1);
             }
 

@@ -104,7 +104,7 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
     if (isset($data['filter'])) {
         $data['filter']['active'] = null;
 
-        foreach($data['filter'] as $filter => $value) {
+        foreach ($data['filter'] as $filter => $value) {
             if ($filter === $data['schema']['active']) {
                 $data['filter']['active'] = $value;
             }
@@ -1156,7 +1156,7 @@ $this->post('/admin/system/model/:schema/import', function ($request, $response)
     try {
         // decode the data
         $data = @json_decode($request->getBody(), true);
-    } catch(\Exception $e) {
+    } catch (\Exception $e) {
         return $response
             ->setContent(json_encode([
                 'error' => true,
@@ -1176,7 +1176,7 @@ $this->post('/admin/system/model/:schema/import', function ($request, $response)
     // catch errors for better debugging
     try {
         $this->trigger('system-model-import', $request, $response);
-    } catch(\Exception $e) {
+    } catch (\Exception $e) {
         return $response
             ->setContent(json_encode([
                 'error' => true,

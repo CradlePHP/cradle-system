@@ -80,7 +80,7 @@ class SqlService
 
         $uuids = $this->schema->getUuidFieldNames();
 
-        foreach($uuids as $uuid) {
+        foreach ($uuids as $uuid) {
             $data[$uuid] = sha1(uniqid());
         }
 
@@ -244,7 +244,7 @@ class SqlService
 
             $fields = Schema::i($relation['name'])->getJsonFieldNames();
 
-            foreach($rows as $i => $row) {
+            foreach ($rows as $i => $row) {
                 foreach ($fields as $field) {
                     if (isset($row[$field]) && trim($row[$field])) {
                         $row[$field] = json_decode($row[$field], true);
@@ -254,8 +254,8 @@ class SqlService
                 }
 
                 //custom formats & formulas
-                foreach(Schema::i($relation['name'])->getFields() as $field) {
-                    if($field['detail']['format'] === 'formula') {
+                foreach (Schema::i($relation['name'])->getFields() as $field) {
+                    if ($field['detail']['format'] === 'formula') {
                         $helper = cradle('global')
                             ->handlebars()
                             ->getHelper('formula');
@@ -269,7 +269,7 @@ class SqlService
                         continue;
                     }
 
-                    if($field['detail']['format'] === 'custom') {
+                    if ($field['detail']['format'] === 'custom') {
                         $helper = cradle('global')
                             ->handlebars()
                             ->getHelper('compile');
@@ -290,8 +290,8 @@ class SqlService
         }
 
         //custom formats & formulas
-        foreach($this->schema->getFields() as $field) {
-            if($field['detail']['format'] === 'formula') {
+        foreach ($this->schema->getFields() as $field) {
+            if ($field['detail']['format'] === 'formula') {
                 $helper = cradle('global')
                     ->handlebars()
                     ->getHelper('formula');
@@ -303,7 +303,7 @@ class SqlService
                 );
             }
 
-            if($field['detail']['format'] === 'custom') {
+            if ($field['detail']['format'] === 'custom') {
                 $helper = cradle('global')
                     ->handlebars()
                     ->getHelper('compile');
@@ -750,8 +750,8 @@ class SqlService
             }
 
             //custom formats & formulas
-            foreach($this->schema->getFields() as $field) {
-                if($field['detail']['format'] === 'formula') {
+            foreach ($this->schema->getFields() as $field) {
+                if ($field['detail']['format'] === 'formula') {
                     $helper = cradle('global')
                         ->handlebars()
                         ->getHelper('formula');
@@ -765,7 +765,7 @@ class SqlService
                     continue;
                 }
 
-                if($field['detail']['format'] === 'custom') {
+                if ($field['detail']['format'] === 'custom') {
                     $helper = cradle('global')
                         ->handlebars()
                         ->getHelper('compile');

@@ -601,7 +601,8 @@ $this->get('/admin/system/fieldset/restore/:name', function ($request, $response
  * @param Request $request
  * @param Response $response`
  */
-$this->get('/admin/system/fieldset/export', function($request, $response) {
+
+$this->get('/admin/system/fieldset/export', function ($request, $response) {
     $global = $this->package('global');
     //get the name
     $name = $request->getStage('name');
@@ -666,7 +667,7 @@ $this->get('/admin/system/fieldset/export', function($request, $response) {
     $zip->addEmptyDir('fieldset');
 
     //collect all .php files and add it
-    foreach(glob($path . '*.php') as $file) {
+    foreach (glob($path . '*.php') as $file) {
         //determin json filename
         $name = str_replace('.php', '.json', basename($file));
         //read the content
@@ -702,7 +703,7 @@ $this->get('/admin/system/fieldset/export', function($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/fieldset/import', function($request, $response) {
+$this->get('/admin/system/fieldset/import', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     $data = ['item' => $request->getPost()];
@@ -772,7 +773,7 @@ $this->get('/admin/system/fieldset/import', function($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->post('/admin/system/fieldset/import', function($request, $response) {
+$this->post('/admin/system/fieldset/import', function ($request, $response) {
     $global = $this->package('global');
     //get the content
     $fieldset = $request->getStage('fieldset');
@@ -896,13 +897,13 @@ $this->post('/admin/system/fieldset/import', function($request, $response) {
     $errors = [];
 
     //loop through files
-    for($i = 0; $i < $zip->numFiles; $i++){
+    for ($i = 0; $i < $zip->numFiles; $i++) {
         //get the filename
         $filename = $zip->getNameIndex($i);
 
         //root or not under fieldset?
         if ($filename === 'fieldset/'
-        || strpos($filename , 'fieldset/') === false) {
+        || strpos($filename, 'fieldset/') === false) {
             continue;
         }
 

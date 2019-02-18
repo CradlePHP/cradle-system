@@ -52,34 +52,82 @@ $this->on('system-schema-create', function ($request, $response) {
         }
     }
 
-    $this->trigger('system-schema-search', $request, $response);
-    $schemas = $response->getResults('rows');
+    $payload = $this->makePayload();
+    $payload['request']->setStage($data);
 
-    foreach ($schemas as $key => $schema) {
-        foreach ($schema['fields'] as $fkey => $field) {
-            $schema['fields'][$field['name']] = $field;
-            unset($schema['fields'][$fkey]);
-        }
+    //sql create
+    $this->trigger(
+        'system-schema-sql-create',
+        $payload['request'],
+        $payload['response']
+    );
 
-        $schemas[$schema['name']] = $schema;
-        unset($schemas[$key]);
+    if ($payload['response']->isError()) {
+        return;
     }
 
-    foreach ($data['fields'] as $key => $field) {
-        if ($field['field']['type'] == 'multifield'
-            && isset($field['field']['schema'])
-            && isset($schemas[$field['field']['schema']['name']])
-        ) {
-            $detail = [];
-            $fields = $field['field']['schema']['fields'];
-            $multifield = $schemas[$field['field']['schema']['name']];
-            foreach ($fields as $fkey => $fname) {
-                if (isset($multifield['fields'][$fname])) {
-                    $detail[$fname] = $multifield['fields'][$fname];
-                }
-            }
+    //file create
+    $this->trigger(
+        'system-schema-file-create',
+        $payload['request'],
+        $payload['response']
+    );
 
-            $data['fields'][$key]['field']['schema']['detail'] = $detail;
+    if ($payload['response']->isError()) {
+        return;
+    }
+
+    // create elastic
+    $this->trigger(
+        'system-schema-elastic-create',
+        $payload['request'],
+        $payload['response']
+    );
+
+    //return response format
+    $response->setError(false)->setResults($data);
+});
+
+/**
+ * System Schema Sql Create Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->on('system-schema-sql-create', function ($request, $response) {
+    //----------------------------//
+    // 1. Get Data
+    $data = [];
+    if ($request->hasStage()) {
+        $data = $request->getStage();
+    }
+
+    //----------------------------//
+    // 2. Validate Data
+    $errors = Validator::getCreateErrors($data);
+
+    //if there are errors
+    if (!empty($errors)) {
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->set('json', 'validation', $errors);
+    }
+
+    //----------------------------//
+    // 3. Prepare Data
+    // filter relations
+    if (isset($data['relations'])) {
+        // filter out empty relations
+        $data['relations'] = array_filter(
+            $data['relations'],
+            function ($relation) {
+                // make sure we have relation name
+                return $relation['name'] !== '' ? true : false;
+            }
+        );
+
+        foreach ($data['relations'] as $key => $relation) {
+            $data['relations'][$key]['name'] = strtolower($relation['name']);
         }
     }
 
@@ -91,14 +139,90 @@ $this->on('system-schema-create', function ($request, $response) {
     //create table
     $schema->service('sql')->create($data);
 
+    $this->package('global')->schema($table, $data);
+
+    //return response format
+    $response->setError(false)->setResults($data);
+});
+
+/**
+ * System Schema File Create Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->on('system-schema-file-create', function ($request, $response) {
+    //----------------------------//
+    // 1. Get Data
+    $data = [];
+    if ($request->hasStage()) {
+        $data = $request->getStage();
+    }
+
+    //----------------------------//
+    // 2. Validate Data
+    //----------------------------//
+    // 3. Prepare Data
+    // filter relations
+
+    
+    //----------------------------//
+    // 4. Process Data
     $path = $this->package('global')->path('schema');
 
     if (!is_dir($path)) {
         mkdir($path, 0777);
     }
 
-    $this->package('global')->schema($table, $data);
+    //return response format
+    $response->setError(false)->setResults($data);
+});
 
+/**
+ * System Schema Elastic Create Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this->on('system-schema-elastic-create', function ($request, $response) {
+    //----------------------------//
+    // 1. Get Data
+    $data = [];
+    if ($request->hasStage()) {
+        $data = $request->getStage();
+    }
+
+    //----------------------------//
+    // 2. Validate Data
+    //----------------------------//
+    // 3. Prepare Data
+    // filter relations
+    if (isset($data['relations'])) {
+        // filter out empty relations
+        $data['relations'] = array_filter(
+            $data['relations'],
+            function ($relation) {
+                // make sure we have relation name
+                return $relation['name'] !== '' ? true : false;
+            }
+        );
+
+        foreach ($data['relations'] as $key => $relation) {
+            $data['relations'][$key]['name'] = strtolower($relation['name']);
+        }
+    }
+
+    //----------------------------//
+    // 4. Process Data
+    $schema = Schema::i($data);
+
+    //flush elastic
+    $schema->service('elastic')->flush();
+    //map elastic
+    $schema->service('elastic')->map();
+    //populate elastic
+    $schema->service('elastic')->populate();
+    
     //return response format
     $response->setError(false)->setResults($data);
 });
@@ -175,7 +299,7 @@ $this->on('system-schema-remove', function ($request, $response) {
     $systemSql = $schema->service('sql');
 
     $restorable = true;
-    if($request->getStage('mode') === 'permanent') {
+    if ($request->getStage('mode') === 'permanent') {
         $restorable = false;
     }
 
@@ -188,7 +312,7 @@ $this->on('system-schema-remove', function ($request, $response) {
 
     $path = $this->package('global')->path('schema') . '/' . $table . '.php';
 
-    if(!$restorable) {
+    if (!$restorable) {
         unlink($path);
     } else if (file_exists($path)) {
         $new = $this->package('global')->path('schema') . '/_' . $table . '.php';
@@ -359,53 +483,33 @@ $this->on('system-schema-update', function ($request, $response) {
         }
     }
 
-    $this->trigger('system-schema-search', $request, $response);
-    $schemas = $response->getResults('rows');
-
-    foreach ($schemas as $key => $schema) {
-        foreach ($schema['fields'] as $fkey => $field) {
-            $schema['fields'][$field['name']] = $field;
-            unset($schema['fields'][$fkey]);
-        }
-
-        $schemas[$schema['name']] = $schema;
-        unset($schemas[$key]);
-    }
-
-    foreach ($data['fields'] as $key => $field) {
-        if ($field['field']['type'] == 'multifield'
-            && isset($field['field']['schema'])
-            && isset($schemas[$field['field']['schema']['name']])
-        ) {
-            $detail = [];
-            $fields = $field['field']['schema']['fields'];
-            $multifield = $schemas[$field['field']['schema']['name']];
-            foreach ($fields as $fkey => $fname) {
-                if (isset($multifield['fields'][$fname])) {
-                    $detail[$fname] = $multifield['fields'][$fname];
-                }
-            }
-
-            $data['fields'][$key]['field']['schema']['detail'] = $detail;
-        }
-    }
-
     //----------------------------//
     // 4. Process Data
 
     $schema = Schema::i($data);
     $table = $schema->getName();
+
     //this/these will be used a lot
     $systemSql = $schema->service('sql');
 
     //update table
     $systemSql->update($data);
 
+    //add the original
+    $data['original'] = $original;
+
     //reset the cache
     $this->package('global')->schema($table, $data);
 
-    //add the original
-    $data['original'] = $original;
+    $payload = $this->makePayload();
+    $payload['request']->setStage($data);
+
+    //elastic create
+    $this->trigger(
+        'system-schema-elastic-create',
+        $payload['request'],
+        $payload['response']
+    );
 
     //return response format
     $response->setError(false)->setResults($data);

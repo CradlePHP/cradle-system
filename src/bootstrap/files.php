@@ -8,7 +8,7 @@
 
 use Cradle\Module\Utility\File;
 
-return function($request, $response) {
+return function ($request, $response) {
     //for backwards compatibility
     $events = $this
         ->getEventHandler()
