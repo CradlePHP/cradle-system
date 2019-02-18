@@ -259,7 +259,7 @@ class Schema extends Fieldset
         $results = [];
         $name = $this->getName();
 
-        $payload = $this->makePayload();
+        $payload = cradle()->makePayload();
 
         cradle()->trigger(
             'system-schema-search',
@@ -274,7 +274,12 @@ class Schema extends Fieldset
         }
 
         foreach ($rows as $row) {
-            $schema = Schema::i($row['name']);
+            try {
+                $schema = Schema::i($row['name']);
+            } catch (Exception $e) {
+                continue;
+            }
+
             $table = $row['name'] . '_' . $name;
 
             $relations = $schema->getRelations();
@@ -706,7 +711,7 @@ class Schema extends Fieldset
                             'properties' => $map
                         ];
                     }
-                    
+
                     //set custom field (multirange) eg: 10;50
                     if ($field['field']['type'] === 'multirange') {
                         $map = [
