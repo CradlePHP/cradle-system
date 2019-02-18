@@ -274,7 +274,7 @@ class Formatter
      */
     public function upload($data)
     {
-        $payload = $this->makePayload();
+        $payload = cradle()->makePayload();
         $payload['request']->setStage('data', $data);
 
         cradle()->trigger(
