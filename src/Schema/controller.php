@@ -124,6 +124,26 @@ $this->get('/admin/system/schema/create', function ($request, $response) {
         }
 
         $data['item'] = $response->getResults();
+
+        //remove locks
+        unset($data['item']['disable']);
+
+        if (isset($data['item']['fields'])
+            && is_array($data['item']['fields'])
+        ) {
+            foreach ($data['item']['fields'] as $i => $field) {
+                unset($data['item']['fields'][$i]['disable']);
+            }
+        }
+
+        if (isset($data['item']['relations'])
+            && is_array($data['item']['relations'])
+        ) {
+            foreach ($data['item']['relations'] as $i => $relation) {
+                unset($data['item']['relations'][$i]['disable']);
+            }
+        }
+
     }
 
     //add CSRF
