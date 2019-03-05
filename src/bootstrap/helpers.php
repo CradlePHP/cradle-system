@@ -405,7 +405,8 @@ return function ($request, $response) {
                     ->compile(Helpers::getFormatTemplate($type));
 
                 //get the default value in case it's empty
-                if (is_null($value) || empty($value)) {
+                if ((is_null($value) || empty($value))
+                    && $value !== '0') {
                     $value = $fields[$name]['default'];
                     if ($value === 'NOW()') {
                         $value = date('Y-m-d H:i:s');
