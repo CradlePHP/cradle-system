@@ -397,6 +397,9 @@ class SqlService
         }
 
         $sum = null;
+        $count = null;
+        $columns = [];
+        $groups = [];
         $filter = [];
         $like = [];
         $in = [];
@@ -405,7 +408,6 @@ class SqlService
         $range = 50;
         $start = 0;
         $order = [];
-        $count = 0;
 
         if (isset($data['filter']) && is_array($data['filter'])) {
             $filter = $data['filter'];
@@ -452,6 +454,22 @@ class SqlService
 
         if (isset($data['sum']) && !empty($data['sum'])) {
             $sum = sprintf('sum(%s) as total', $data['sum']);
+        }
+
+        if (isset($data['count']) && !empty($data['count'])) {
+            $count = sprintf('count(%s) as count', $data['count']);
+        }
+
+        if (isset($data['group']) && !is_array($data['group'])) {
+            $groups = [$data['group']];
+        }
+
+        if (isset($data['group']) && is_array($data['group'])) {
+            $groups = $data['group'];
+        }
+
+        if (isset($data['columns']) && is_array($data['columns'])) {
+            $columns = $data['columns'];
         }
 
         $active = $this->schema->getActiveFieldName();
@@ -738,6 +756,34 @@ class SqlService
             }
         }
 
+        //add grouping
+        // TODO: add the regex specified in order BUT
+        // allow insert of mysql defined functions like
+        // DATE_FORMAT(column, '%Y') etc
+        foreach ($groups as $group) {
+            $search->groupBy($group);
+        }
+
+        // if there is grouping and there is a sum or count field,
+        // we will assume that this is not a global thing
+        if ($groups && ($sum || $count)) {
+            if (!$columns) {
+                $columns[] = '*';
+            }
+
+            if ($count) {
+                $columns[] = $count;
+            }
+
+            if ($sum) {
+                $columns[] = $sum;
+            }
+        }
+
+        if ($columns) {
+            $search->setColumns($columns);
+        }
+
         $rows = $search->getRows();
 
         foreach ($rows as $i => $results) {
@@ -786,7 +832,8 @@ class SqlService
             'total' => $search->getTotal()
         ];
 
-        if ($sum) {
+        // if there's no grouping, then sum it all up
+        if ($sum && !$groups) {
             $total = $search
                 ->setColumns($sum)
                 ->getRow();
