@@ -154,7 +154,7 @@ $this->on('system-model-detail', function ($request, $response) {
     $results = null;
 
     //if no flag
-    if (!$request->hasGet('nocache')) {
+    if (!$request->hasStage('nocache')) {
         //get it from cache
         $results = $modelRedis->getDetail($key . '-' . $id);
     }
@@ -162,7 +162,7 @@ $this->on('system-model-detail', function ($request, $response) {
     //if no results
     if (!$results) {
         //if no flag
-        if (!$request->hasGet('noindex')) {
+        if (!$request->hasStage('noindex')) {
             //get it from index
             $results = $modelElastic->get($key, $id);
         }
@@ -344,7 +344,7 @@ $this->on('system-model-search', function ($request, $response) {
     $results = false;
 
     //if no flag
-    if (!$request->hasGet('nocache')) {
+    if (!$request->hasStage('nocache')) {
         //get it from cache
         $results = $modelRedis->getSearch($data);
     }
@@ -352,7 +352,7 @@ $this->on('system-model-search', function ($request, $response) {
     //if no results
     if (!$results) {
         //if no flag
-        if (!$request->hasGet('noindex')) {
+        if (!$request->hasStage('noindex')) {
             //get it from index
             $results = $modelElastic->search($data);
         }
