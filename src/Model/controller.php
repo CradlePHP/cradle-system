@@ -1245,59 +1245,12 @@ $this->get('/admin/system/model/:schema/export/:type', function ($request, $resp
     //get schema data
     $schema = Schema::i($request->getStage('schema'));
 
-    //if exist get schema
-    if ($request->hasStage('relation')) {
-        $relation = $request->getStage('relation');
-    }
-
-    // get schema relations
-    $relations = $schema->getRelations(1);
-
-    $filterable = [];
-
-    // loop and collect relations primary
-    if (!empty($relations)) {
-        foreach ($relations as $relation) {
-            $filterable[] = $relation['primary'];
-        }
-    }
-
     //filter possible filter options
     //we do this to prevent SQL injections
-    if (is_array($request->getStage('filter'))) {
-        $filterable = array_merge($filterable, $schema->getFilterableFieldNames());
-
-        //allow relation primary
-        if (isset($relation['schema']['primary'])) {
-            $filterable[] = $relation['schema']['primary'];
-        }
-
-        foreach ($request->getStage('filter') as $key => $value) {
-            if (!in_array($key, $filterable)) {
-                $request->removeStage('filter', $key);
-            }
-        }
-    }
-
-    //filter possible sort options
-    //we do this to prevent SQL injections
-    if (is_array($request->getStage('order'))) {
-        $sortable = $schema->getSortableFieldNames();
-
-        foreach ($request->getStage('order') as $key => $value) {
-            if (!in_array($key, $sortable)) {
-                $request->removeStage('order', $key);
-            }
-        }
-    }
-
-    //filter possible filter options
-    //we do this to prevent SQL injections
-    //check if filter column has empty value
     if (is_array($request->getStage('filter'))) {
         foreach ($request->getStage('filter') as $key => $value) {
             //if invalid key format or there is no value
-            if (!preg_match('/^[a-zA-Z0-9_]+$/', $key) || !strlen($value)) {
+            if (!preg_match('/^[a-zA-Z0-9_\.]+$/', $key) || !strlen($value)) {
                 $request->removeStage('filter', $key);
             }
         }
@@ -1305,10 +1258,9 @@ $this->get('/admin/system/model/:schema/export/:type', function ($request, $resp
 
     //filter possible sort options
     //we do this to prevent SQL injections
-    //check if filter column has empty value
     if (is_array($request->getStage('order'))) {
         foreach ($request->getStage('order') as $key => $value) {
-            if (!preg_match('/^[a-zA-Z0-9_]+$/', $key)) {
+            if (!preg_match('/^[a-zA-Z0-9_\.]+$/', $key)) {
                 $request->removeStage('order', $key);
             }
         }

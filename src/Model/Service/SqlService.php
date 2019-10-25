@@ -17,6 +17,8 @@ use Cradle\Module\Utility\Service\AbstractSqlService;
 use Cradle\Package\System\Schema;
 use Cradle\Package\System\Exception as SystemException;
 
+use Cradle\Storm\Search;
+
 /**
  * Model SQL Service
  *
@@ -120,36 +122,12 @@ class SqlService
      *
      * @return array
      */
-    public function get($key, $id)
+    public function get($key, $id = null)
     {
-        if (is_null($this->schema)) {
-            throw SystemException::forNoSchema();
-        }
-
-        $search = $this
-            ->resource
-            ->search($this->schema->getName())
-            ->addFilter($key . ' = %s', $id);
-
-        // get json fields
-        $fields = $this->schema->getJsonFieldNames();
-
-        //get 1:1 relations
-        $relations = $this->schema->getRelations(1);
-
-        foreach ($relations as $table => $relation) {
-            $search
-                ->innerJoinUsing(
-                    $table,
-                    $relation['primary1']
-                )
-                ->innerJoinUsing(
-                    $relation['name'],
-                    $relation['primary2']
-                );
-
-            $relatedJson = Schema::i($relation['name'])->getJsonFieldNames();
-            $fields = array_merge($fields, $relatedJson);
+        if ($key instanceof Search) {
+            $search = $key;
+        } else {
+            $search = $this->getQuery($key, $id);
         }
 
         $results = $search->getRow();
@@ -162,11 +140,13 @@ class SqlService
         $key = $this->schema->getPrimaryFieldName();
         $id = $results[$key];
 
-        foreach ($fields as $field) {
-            if (isset($results[$field]) && $results[$field]) {
-                $results[$field] = json_decode($results[$field], true);
-            } else {
-                $results[$field] = [];
+        if ($search->jsonFields) {
+            foreach ($search->jsonFields as $field) {
+                if (isset($results[$field]) && $results[$field]) {
+                    $results[$field] = json_decode($results[$field], true);
+                } else {
+                    $results[$field] = [];
+                }
             }
         }
 
@@ -319,6 +299,52 @@ class SqlService
     }
 
     /**
+     * Get detail from database
+     *
+     * @param *array $object
+     * @param *int   $id
+     *
+     * @return Search
+     */
+    public function getQuery($key, $id)
+    {
+        if (is_null($this->schema)) {
+            throw SystemException::forNoSchema();
+        }
+
+        $search = $this
+            ->resource
+            ->search($this->schema->getName())
+            ->addFilter($key . ' = %s', $id);
+
+        // get json fields
+        $fields = $this->schema->getJsonFieldNames();
+
+        //get 1:1 relations
+        $relations = $this->schema->getRelations(1);
+
+        foreach ($relations as $table => $relation) {
+            $search
+                ->innerJoinUsing(
+                    $table,
+                    $relation['primary1']
+                )
+                ->innerJoinUsing(
+                    $relation['name'],
+                    $relation['primary2']
+                );
+
+            $relatedJson = Schema::i($relation['name'])->getJsonFieldNames();
+            $fields = array_merge($fields, $relatedJson);
+        }
+
+        //add JSON fields
+        $search->jsonFields = $fields;
+
+        return $search;
+    }
+
+    /**
      * Returns the SQL resource
      *
      * @return Resource
@@ -385,12 +411,92 @@ class SqlService
     /**
      * Search in database
      *
-     * @param *array $object
      * @param array  $data
      *
      * @return array
      */
-    public function search(array $data = [])
+    public function search($data = [])
+    {
+        if ($data instanceof Search) {
+            $search = $data;
+        } else {
+            if (!is_array($data)) {
+                $data = [];
+            }
+
+            $search = $this->searchQuery($data);
+        }
+
+        $rows = $search->getRows();
+
+        foreach ($rows as $i => $results) {
+            if (isset($search->jsonFields)) {
+                foreach ($search->jsonFields as $field) {
+                    if (isset($results[$field]) && $results[$field]) {
+                        $rows[$i][$field] = json_decode($results[$field], true);
+                    } else {
+                        $rows[$i][$field] = [];
+                    }
+                }
+            }
+
+            //custom formats & formulas
+            foreach ($this->schema->getFields() as $field) {
+                if ($field['detail']['format'] === 'formula') {
+                    $helper = cradle('global')
+                        ->handlebars()
+                        ->getHelper('formula');
+
+                    $rows[$i][$field['name']] = $helper(
+                        $field['detail']['parameters'],
+                        $results,
+                        false
+                    );
+
+                    continue;
+                }
+
+                if ($field['detail']['format'] === 'custom') {
+                    $helper = cradle('global')
+                        ->handlebars()
+                        ->getHelper('compile');
+
+                    $rows[$i][$field['name']] = $helper(
+                        $field['detail']['parameters'],
+                        $results
+                    );
+
+                    continue;
+                }
+            }
+        }
+
+        //return response format
+        $response =  [
+            'rows' => $rows,
+            'total' => $search->getTotal()
+        ];
+
+        // if there's no grouping, then sum it all up
+        if ($sum && !$groups) {
+            $total = $search
+                ->setColumns($sum)
+                ->getRow();
+
+            $response['sum_field'] = $total['total'] ? $total['total'] : 0;
+        }
+
+        return $response;
+    }
+
+    /**
+     * Search in database
+     *
+     * @param array  $data
+     *
+     * @return Search
+     */
+    public function searchQuery(array $data = [])
     {
         if (is_null($this->schema)) {
             throw SystemException::forNoSchema();
@@ -413,27 +519,12 @@ class SqlService
             $filter = $data['filter'];
         }
 
-        //Legacy TODO: remove
-        if (isset($data['like_filter']) && is_array($data['like_filter'])) {
-            $like = $data['like_filter'];
-        }
-
         if (isset($data['like']) && is_array($data['like'])) {
             $like = $data['like'];
         }
 
-        //Legacy TODO: remove
-        if (isset($data['in_filter']) && is_array($data['in_filter'])) {
-            $in = $data['in_filter'];
-        }
-
         if (isset($data['in']) && is_array($data['in'])) {
             $in = $data['in'];
-        }
-
-        //Legacy TODO: remove
-        if (isset($data['json_filter']) && is_array($data['json_filter'])) {
-            $json = $data['json_filter'];
         }
 
         if (isset($data['span']) && is_array($data['span'])) {
@@ -475,6 +566,11 @@ class SqlService
         $active = $this->schema->getActiveFieldName();
         if ($active && !isset($filter[$active])) {
             $filter[$active] = 1;
+        }
+
+        //if they want both the active and inactive
+        if (isset($filter[$active]) && $filter[$active] == -1) {
+            unset($filter[$active]);
         }
 
         $table = $this->schema->getName();
@@ -662,30 +758,6 @@ class SqlService
             }
         }
 
-        //Legacy TODO: remove
-        // add json filters
-        foreach ($json as $column => $values) {
-            //it should be a json column type
-            if (!in_array($column, $this->schema->getJsonFieldNames())) {
-                continue;
-            }
-
-            // values should be array
-            if (!is_array($values)) {
-                $values = [$values];
-            }
-
-            $or = [];
-            $where = [];
-            foreach ($values as $value) {
-                $where[] = "JSON_SEARCH(LOWER($column), 'one', %s) IS NOT NULL";
-                $or[] = '%' . strtolower($value) . '%';
-            }
-
-            array_unshift($or, '(' . implode(' OR ', $where) . ')');
-            call_user_func([$search, 'addFilter'], ...$or);
-        }
-
         //add spans
         foreach ($span as $column => $value) {
             if (!empty($value)) {
@@ -784,64 +856,10 @@ class SqlService
             $search->setColumns($columns);
         }
 
-        $rows = $search->getRows();
+        //manually add fields
+        $search->jsonFields = $fields;
 
-        foreach ($rows as $i => $results) {
-            foreach ($fields as $field) {
-                if (isset($results[$field]) && $results[$field]) {
-                    $rows[$i][$field] = json_decode($results[$field], true);
-                } else {
-                    $rows[$i][$field] = [];
-                }
-            }
-
-            //custom formats & formulas
-            foreach ($this->schema->getFields() as $field) {
-                if ($field['detail']['format'] === 'formula') {
-                    $helper = cradle('global')
-                        ->handlebars()
-                        ->getHelper('formula');
-
-                    $rows[$i][$field['name']] = $helper(
-                        $field['detail']['parameters'],
-                        $results,
-                        false
-                    );
-
-                    continue;
-                }
-
-                if ($field['detail']['format'] === 'custom') {
-                    $helper = cradle('global')
-                        ->handlebars()
-                        ->getHelper('compile');
-
-                    $rows[$i][$field['name']] = $helper(
-                        $field['detail']['parameters'],
-                        $results
-                    );
-
-                    continue;
-                }
-            }
-        }
-
-        //return response format
-        $response =  [
-            'rows' => $rows,
-            'total' => $search->getTotal()
-        ];
-
-        // if there's no grouping, then sum it all up
-        if ($sum && !$groups) {
-            $total = $search
-                ->setColumns($sum)
-                ->getRow();
-
-            $response['sum_field'] = $total['total'] ? $total['total'] : 0;
-        }
-
-        return $response;
+        return $search;
     }
 
     /**
