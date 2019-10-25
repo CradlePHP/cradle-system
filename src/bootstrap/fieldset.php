@@ -6,7 +6,7 @@
  * distributed with this package.
  */
 
-return function($request, $response) {
+return function ($request, $response) {
     $package = $this->package('global');
 
     //set the fieldset path

@@ -43,7 +43,8 @@ class Helpers
      *
      * @return Fieldset|false
      */
-    public static function getFieldset($name) {
+    public static function getFieldset($name)
+    {
         if (!isset(self::$fieldsets[$name])) {
             try {
                 self::$fieldsets[$name] = Fieldset::i($name);
@@ -62,7 +63,8 @@ class Helpers
      *
      * @return Schema
      */
-    public static function getSchema($name) {
+    public static function getSchema($name)
+    {
         if (!isset(self::$schemas[$name])) {
             try {
                 self::$schemas[$name] = Schema::i($name);
@@ -81,7 +83,8 @@ class Helpers
      *
      * @return Schema
      */
-    public static function getFormatTemplate($name) {
+    public static function getFormatTemplate($name)
+    {
         $file = sprintf(
             '%s/Model/template/format/%s.html',
             __DIR__,
@@ -106,7 +109,8 @@ class Helpers
      *
      * @return Schema
      */
-    public static function fieldNameToDotNotation($name) {
+    public static function fieldNameToDotNotation($name)
+    {
         return trim(
             str_replace(
                 '..',

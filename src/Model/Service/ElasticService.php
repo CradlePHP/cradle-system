@@ -17,6 +17,7 @@ use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 
 use Cradle\Module\Utility\Service\ElasticServiceInterface;
 use Cradle\Module\Utility\Service\AbstractElasticService;
+use Cradle\Package\System\Schema as SystemSchema;
 
 /**
  * Model ElasticSearch Service
@@ -81,7 +82,7 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         if (!is_array($body) || empty($body)) {
             return false;
         }
-        
+
         try {
             return $this->resource->index([
                 'index' => $this->schema->getName(),
@@ -115,19 +116,14 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
         }
 
         $model = $data['schema'];
-        // check schema data
-        $path = cradle()->package('global')->path('config') . '/admin/schema/' . $model . '.php';
-        if (!file_exists($path)) {
-            return false;
-        }
 
         // 4. Process Data
         $schema = SystemSchema::i($model);
         
-        if(is_null($schema)) {
+        if (is_null($schema)) {
             throw SystemException::forNoSchema();
         }
-        
+
         $searchable = $schema->getSearchableFieldNames();
         $primary = $schema->getPrimaryFieldName();
         
@@ -294,6 +290,4 @@ class ElasticService extends AbstractElasticService implements ElasticServiceInt
             return false;
         }
     }
-
-    
 }

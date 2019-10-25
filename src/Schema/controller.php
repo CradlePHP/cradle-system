@@ -100,6 +100,7 @@ $this->get('/admin/system/schema/search', function ($request, $response) {
 $this->get('/admin/system/schema/create', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
+    $global = $this->package('global');
     $data = ['item' => $request->getPost()];
 
     //if this is a return back from processing
@@ -118,11 +119,31 @@ $this->get('/admin/system/schema/create', function ($request, $response) {
         //can we update ?
         if ($response->isError()) {
             //add a flash
-            $this->package('global')->flash($response->getMessage(), 'error');
-            return $this->package('global')->redirect('/admin/system/schema/search');
+            $global->flash($response->getMessage(), 'error');
+            return $global->redirect('/admin/system/schema/search');
         }
 
         $data['item'] = $response->getResults();
+
+        //remove locks
+        unset($data['item']['disable']);
+
+        if (isset($data['item']['fields'])
+            && is_array($data['item']['fields'])
+        ) {
+            foreach ($data['item']['fields'] as $i => $field) {
+                unset($data['item']['fields'][$i]['disable']);
+            }
+        }
+
+        if (isset($data['item']['relations'])
+            && is_array($data['item']['relations'])
+        ) {
+            foreach ($data['item']['relations'] as $i => $relation) {
+                unset($data['item']['relations'][$i]['disable']);
+            }
+        }
+
     }
 
     //add CSRF
@@ -138,10 +159,10 @@ $this->get('/admin/system/schema/create', function ($request, $response) {
     $data['action'] = 'create';
 
     //determine the title
-    $data['title'] = $this->package('global')->translate('Create System Schema');
+    $data['title'] = $global->translate('Create System Schema');
 
     //add custom page helpers
-    $this->package('global')
+    $global
         ->handlebars()
         ->registerHelper('is_array', function ($value, $option) {
             if (is_array($value)) {
@@ -210,6 +231,7 @@ $this->get('/admin/system/schema/create', function ($request, $response) {
 $this->get('/admin/system/schema/update/:name', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
+    $global = $this->package('global');
     //pass the item with only the post data
     $data = ['item' => $request->getPost()];
 
@@ -237,8 +259,8 @@ $this->get('/admin/system/schema/update/:name', function ($request, $response) {
             }
 
             //add a flash
-            $this->package('global')->flash($response->getMessage(), 'error');
-            return $this->package('global')->redirect($redirect);
+            $global->flash($response->getMessage(), 'error');
+            return $global->redirect($redirect);
         }
 
         $data['item'] = $response->getResults();
@@ -262,10 +284,10 @@ $this->get('/admin/system/schema/update/:name', function ($request, $response) {
     $data['action'] = 'update';
 
     //determine the title
-    $data['title'] = $this->package('global')->translate('Updating System Schema');
+    $data['title'] = $global->translate('Updating System Schema');
 
     //add custom page helpers
-    $this->package('global')
+    $global
         ->handlebars()
         ->registerHelper('is_array', function ($value, $option) {
             if (is_array($value)) {
@@ -400,11 +422,12 @@ $this->post('/admin/system/schema/create', function ($request, $response) {
     );
 
     //it was good
+    $global = $this->package('global');
     //add a flash
-    $this->package('global')->flash('System Schema was Created', 'success');
+    $global->flash('System Schema was Created', 'success');
 
     //redirect
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**
@@ -496,11 +519,12 @@ $this->post('/admin/system/schema/update/:name', function ($request, $response) 
     }
 
     //it was good
+    $global = $this->package('global');
     //add a flash
-    $this->package('global')->flash('System Schema was Updated', 'success');
+    $global->flash('System Schema was Updated', 'success');
 
     //redirect
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**
@@ -533,13 +557,14 @@ $this->get('/admin/system/schema/remove/:name', function ($request, $response) {
         return;
     }
 
+    $global = $this->package('global');
     if ($response->isError()) {
         //add a flash
-        $this->package('global')->flash($response->getMessage(), 'error');
+        $global->flash($response->getMessage(), 'error');
     } else {
         //add a flash
-        $message = $this->package('global')->translate('System Schema was Removed');
-        $this->package('global')->flash($message, 'success');
+        $message = $global->translate('System Schema was Removed');
+        $global->flash($message, 'success');
 
         //record logs
         $this->log(
@@ -555,7 +580,7 @@ $this->get('/admin/system/schema/remove/:name', function ($request, $response) {
         );
     }
 
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**
@@ -588,13 +613,14 @@ $this->get('/admin/system/schema/restore/:name', function ($request, $response) 
         return;
     }
 
+    $global = $this->package('global');
     if ($response->isError()) {
         //add a flash
-        $this->package('global')->flash($response->getMessage(), 'error');
+        $global->flash($response->getMessage(), 'error');
     } else {
         //add a flash
-        $message = $this->package('global')->translate('System Schema was Restored');
-        $this->package('global')->flash($message, 'success');
+        $message = $global->translate('System Schema was Restored');
+        $global->flash($message, 'success');
 
         //record logs
         $this->log(
@@ -610,7 +636,7 @@ $this->get('/admin/system/schema/restore/:name', function ($request, $response) 
         );
     }
 
-    $this->package('global')->redirect($redirect);
+    $global->redirect($redirect);
 });
 
 /**
@@ -619,11 +645,12 @@ $this->get('/admin/system/schema/restore/:name', function ($request, $response) 
  * @param Request $request
  * @param Response $response`
  */
-$this->get('/admin/system/schema/export', function($request, $response) {
+$this->get('/admin/system/schema/export', function ($request, $response) {
+    $global = $this->package('global');
     //get the name
     $name = $request->getStage('name');
     //get the config path
-    $path = $this->package('global')->path('config') . '/schema/';
+    $path = $global->path('config') . '/schema/';
     //default redirect
     $redirect = '/admin/system/schema/search';
 
@@ -640,8 +667,8 @@ $this->get('/admin/system/schema/export', function($request, $response) {
         //file does not exists?
         if (!file_exists($file)) {
             //add a flash
-            $this->package('global')->flash('Not Found', 'error');
-            return $this->package('global')->redirect($redirect);
+            $global->flash('Not Found', 'error');
+            return $global->redirect($redirect);
         }
 
         //get the filename
@@ -663,8 +690,8 @@ $this->get('/admin/system/schema/export', function($request, $response) {
     //check if ZipArchive is installed
     if (!class_exists('ZipArchive')) {
         //add a flash
-        $this->package('global')->flash('ZipArchive module not found', 'error');
-        return $this->package('global')->redirect($redirect);
+        $global->flash('ZipArchive module not found', 'error');
+        return $global->redirect($redirect);
     }
 
     //create zip archive
@@ -675,15 +702,15 @@ $this->get('/admin/system/schema/export', function($request, $response) {
     //try to open
     if (!$zip->open($tmp, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
         //add a flash
-        $this->package('global')->flash('Failed to create archive', 'error');
-        return $this->package('global')->redirect($redirect);
+        $global->flash('Failed to create archive', 'error');
+        return $global->redirect($redirect);
     }
 
     //create an empty directory
     $zip->addEmptyDir('schema');
 
     //collect all .php files and add it
-    foreach(glob($path . '*.php') as $file) {
+    foreach (glob($path . '*.php') as $file) {
         //determin json filename
         $name = str_replace('.php', '.json', basename($file));
         //read the content
@@ -699,8 +726,8 @@ $this->get('/admin/system/schema/export', function($request, $response) {
     //check if file exists
     if (!file_exists($tmp)) {
         //add a flash
-        $this->package('global')->flash('Failed to create archive', 'error');
-        return $this->package('global')->redirect($redirect);
+        $global->flash('Failed to create archive', 'error');
+        return $global->redirect($redirect);
     }
 
     //prepare response
@@ -719,7 +746,7 @@ $this->get('/admin/system/schema/export', function($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->get('/admin/system/schema/import', function($request, $response) {
+$this->get('/admin/system/schema/import', function ($request, $response) {
     //----------------------------//
     // 1. Prepare Data
     $data = ['item' => $request->getPost()];
@@ -789,11 +816,12 @@ $this->get('/admin/system/schema/import', function($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->post('/admin/system/schema/import', function($request, $response) {
+$this->post('/admin/system/schema/import', function ($request, $response) {
+    $global = $this->package('global');
     //get the content
     $schema = $request->getStage('schema');
     //get the config path
-    $config = $this->package('global')->path('config') . '/schema/';
+    $config = $global->path('config') . '/schema/';
     //get the type
     $type = substr($schema, 5, strpos($schema, ';base64') - 5);
     //get the route
@@ -880,9 +908,9 @@ $this->post('/admin/system/schema/import', function($request, $response) {
 
         //it was good
         //add a flash
-        $this->package('global')->flash('System Schema was Imported', 'success');
+        $global->flash('System Schema was Imported', 'success');
         //redirect
-        return $this->package('global')->redirect($redirect);
+        return $global->redirect($redirect);
     }
 
     //get temporary folder
@@ -912,13 +940,13 @@ $this->post('/admin/system/schema/import', function($request, $response) {
     $errors = [];
 
     //loop through files
-    for($i = 0; $i < $zip->numFiles; $i++){
+    for ($i = 0; $i < $zip->numFiles; $i++) {
         //get the filename
         $filename = $zip->getNameIndex($i);
 
         //root or not under schema?
         if ($filename === 'schema/'
-        || strpos($filename , 'schema/') === false) {
+        || strpos($filename, 'schema/') === false) {
             continue;
         }
 
@@ -982,7 +1010,7 @@ $this->post('/admin/system/schema/import', function($request, $response) {
 
     //it was good
     //add a flash
-    $this->package('global')->flash('System Schema was Imported', 'success');
+    $global->flash('System Schema was Imported', 'success');
     //redirect
-    return $this->package('global')->redirect($redirect);
+    return $global->redirect($redirect);
 });
