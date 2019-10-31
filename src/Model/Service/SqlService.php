@@ -195,7 +195,7 @@ class SqlService
                         $this->innerJoinOn($relation['name'], $on);
                     },
                     //this is the normal way
-                    function () use (&$relation, &$search) {
+                    function () use (&$relation) {
                         $this->innerJoinUsing($relation['name'], $relation['primary2']);
 
                         $relationSchema = Schema::i($relation['name']);
