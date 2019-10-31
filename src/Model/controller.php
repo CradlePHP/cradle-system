@@ -778,7 +778,7 @@ $this->post('/admin/system/model/:schema/create', function ($request, $response)
         }
 
         //if no value
-        if ($request->hasStage($name) && !$request->getStage($name)) {
+        if ($request->hasStage($name) && $request->getStage($name) === '') {
             //make it null
             $request->setStage($name, null);
             continue;
@@ -908,25 +908,9 @@ $this->post('/admin/system/model/:schema/update/:id', function ($request, $respo
         }
 
         //if no value
-        if ($request->hasStage($name) && !$request->getStage($name)) {
+        if ($request->hasStage($name) && $request->getStage($name) === '') {
             //make it null
             $request->setStage($name, null);
-            continue;
-        }
-
-        if (//if there is a default
-            isset($field['default'])
-            && trim($field['default'])
-            // and there's no stage
-            && $request->hasStage($name)
-            && !$request->getStage($name)
-        ) {
-            if (strtoupper($field['default']) === 'NOW()') {
-                $field['default'] = date('Y-m-d H:i:s');
-            }
-
-            //set the default
-            $request->setStage($name, $field['default']);
             continue;
         }
     }

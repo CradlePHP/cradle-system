@@ -186,6 +186,7 @@ class Formatter
                     break;
                 case 'active':
                 case 'checkbox':
+                case 'switch':
                     if ($data[$name]) {
                         $data[$name] = 1;
                     } else {
