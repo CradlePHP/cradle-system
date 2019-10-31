@@ -108,6 +108,42 @@ class Schema extends Fieldset
     }
 
     /**
+     * Returns all the possible json field names
+     *
+     * @return Array
+     */
+    public function getAllJsonFieldNames() {
+        $jsonFields = $this->getJsonFieldNames();
+        $name = $this->getName();
+
+        //consider forward relations
+        $relations = $this->getRelations();
+        foreach ($relations as $joinTable => $relation) {
+            //skip circular post_post
+            if ($name === $relation['name']) {
+                continue;
+            }
+
+            $relatedJson = Schema::i($relation['name'])->getJsonFieldNames();
+            $jsonFields = array_merge($jsonFields, $relatedJson);
+        }
+
+        //consider reverse relations
+        $relations = $this->getReverseRelations();
+        foreach ($relations as $joinTable => $relation) {
+            //skip circular post_post
+            if ($relation['source']['name'] === $relation['name']) {
+                continue;
+            }
+
+            $relatedJson = Schema::i($relation['source']['name'])->getJsonFieldNames();
+            $jsonFields = array_merge($jsonFields, $relatedJson);
+        }
+
+        return $jsonFields;
+    }
+
+    /**
      * Returns created field
      *
      * @return string|false
