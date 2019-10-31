@@ -165,7 +165,6 @@ $this->on('system-schema-file-create', function ($request, $response) {
     // 3. Prepare Data
     // filter relations
 
-
     //----------------------------//
     // 4. Process Data
     $path = $this->package('global')->path('schema');
@@ -222,7 +221,6 @@ $this->on('system-schema-elastic-create', function ($request, $response) {
     $schema->service('elastic')->map();
     //populate elastic
     $schema->service('elastic')->populate();
-
     //return response format
     $response->setError(false)->setResults($data);
 });
