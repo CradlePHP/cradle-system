@@ -131,7 +131,7 @@
                                 {{/each}}
                                 {{#format 'list' ../schema.name this}}
                                     {{#each formats}}
-                                        {{#in 'number,price,formula' config.format}}
+                                        {{#in 'number,price,formula' config.list.format}}
                                             <td class="text-right">
                                                 {{#in ../../../schema.filterable name}}
                                                     <a href="?{{query 'filter' name raw}}">

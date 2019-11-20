@@ -66,6 +66,10 @@ $this->on('system-schema-create', function ($request, $response) {
         return;
     }
 
+    $payload['request']->removeStage('csrf');
+    $payload['request']->removeStage('original');
+    $payload['request']->removeStage('redirect_uri');
+
     //file create
     $this->trigger(
         'system-schema-file-create',
@@ -493,8 +497,9 @@ $this->on('system-schema-update', function ($request, $response) {
     //update table
     $systemSql->update($data);
 
-    //add the original
-    $data['original'] = $original;
+    $payload['request']->removeStage('csrf');
+    $payload['request']->removeStage('original');
+    $payload['request']->removeStage('redirect_uri');
 
     //reset the cache
     $this->package('global')->schema($table, $data);
