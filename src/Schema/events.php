@@ -494,12 +494,20 @@ $this->on('system-schema-update', function ($request, $response) {
     //this/these will be used a lot
     $systemSql = $schema->service('sql');
 
+    if (isset($data['csrf'])) {
+        unset($data['csrf']);
+    }
+
+    if (isset($data['original'])) {
+        unset($data['original']);
+    }
+
+    if (isset($data['redirect_uri'])) {
+        unset($data['redirect_uri']);
+    }
+
     //update table
     $systemSql->update($data);
-
-    $payload['request']->removeStage('csrf');
-    $payload['request']->removeStage('original');
-    $payload['request']->removeStage('redirect_uri');
 
     //reset the cache
     $this->package('global')->schema($table, $data);
