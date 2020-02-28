@@ -47,14 +47,10 @@ class Validator
         }
 
         if (isset($data['name'])) {
-            $exists = false;
-            try {
-                $exists = Fieldset::i($data['name'])->getAll();
-            } catch (Exception $e) {
-            }
+            $exists = cradle('global')->fieldset($data['name']);
 
-            if ($exists) {
-                $errors['name'] = 'Keyword is already in used.';
+            if (!empty($exists)) {
+                $errors['name'] = 'Keyword is already used.';
             }
         }
 

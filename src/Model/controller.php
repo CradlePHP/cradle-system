@@ -789,7 +789,7 @@ $this->post('/admin/system/model/:schema/create', function ($request, $response)
             && trim($field['default'])
             // and there's no stage
             && $request->hasStage($name)
-            && !$request->getStage($name)
+            && $request->getStage($name) === ''
         ) {
             if (strtoupper($field['default']) === 'NOW()') {
                 $field['default'] = date('Y-m-d H:i:s');
