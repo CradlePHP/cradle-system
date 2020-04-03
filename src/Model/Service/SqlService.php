@@ -142,7 +142,11 @@ class SqlService
 
         $jsonFields = $this->schema->getAllJsonFieldNames();
         foreach ($jsonFields as $field) {
-            if (isset($results[$field]) && $results[$field]) {
+            if (!isset($results[$field])) {
+                continue;
+            }
+
+            if ($results[$field]) {
                 $results[$field] = json_decode($results[$field], true);
             } else {
                 $results[$field] = [];
@@ -152,16 +156,27 @@ class SqlService
         //get 1:0 relations
         $relations = $this->schema->getRelations(0);
         foreach ($relations as $table => $relation) {
+            $relationSchema = Schema::i($relation['name']);
             $row = $this
                 ->resource
                 ->search($table)
-                ->innerJoinUsing($relation['name'], $relation['primary2'])
+                ->innerJoinOn($relation['name'], sprintf(
+                    '%s.%s=%s.%s',
+                    $relation['name'],
+                    $relationSchema->getPrimaryFieldName(),
+                    $table,
+                    $relation['primary2']
+                ))
                 ->addFilter($relation['primary1'] . ' = %s', $id)
                 ->getRow();
 
             $jsonFields = Schema::i($relation['name'])->getJsonFieldNames();
             foreach ($jsonFields as $field) {
-                if (isset($row[$field]) && trim($row[$field])) {
+                if (!isset($row[$field])) {
+                    continue;
+                }
+
+                if ($row[$field]) {
                     $row[$field] = json_decode($row[$field], true);
                 } else {
                     $row[$field] = [];
@@ -221,7 +236,11 @@ class SqlService
 
             foreach ($rows as $i => $row) {
                 foreach ($jsonFields as $field) {
-                    if (isset($row[$field]) && trim($row[$field])) {
+                    if (!isset($row[$field])) {
+                        continue;
+                    }
+
+                    if ($row[$field]) {
                         $row[$field] = json_decode($row[$field], true);
                     } else {
                         $row[$field] = [];
