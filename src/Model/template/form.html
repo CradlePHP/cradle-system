@@ -121,7 +121,7 @@
                             {{else}}
                                 data-url="/admin/{{name}}/search?q={QUERY}&render=false"
                             {{/in}}
-                            data-value="{{primary2}}"
+                            data-value="{{#schema name}}{{primary}}{{/schema}}"
                         ></div>
                         {{#has ../errors primary2}}
                             <span class="help-text">{{scope ../errors primary2}}</span>
@@ -181,7 +181,7 @@
                             {{else}}
                                 data-url="/admin/{{name}}/search?q={QUERY}&render=false"
                             {{/in}}
-                            data-value="{{primary2}}"
+                            data-value="{{#schema name}}{{primary}}{{/schema}}"
                         ></div>
                         {{#has ../errors primary2}}
                             <span class="help-text">{{scope ../errors primary2}}</span>
