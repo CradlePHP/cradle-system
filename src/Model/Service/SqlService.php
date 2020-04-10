@@ -437,7 +437,11 @@ class SqlService
 
         foreach ($rows as $i => $results) {
             foreach ($jsonFields as $field) {
-                if (isset($results[$field]) && $results[$field]) {
+                if (!isset($results[$field])) {
+                    continue;
+                }
+
+                if ($results[$field]) {
                     $rows[$i][$field] = json_decode($results[$field], true);
                 } else {
                     $rows[$i][$field] = [];
