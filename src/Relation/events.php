@@ -19,6 +19,12 @@ use Cradle\Sql\SqlException;
  */
 $this->on('system-relation-link', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     //get data from stage
     $data = [];
@@ -26,8 +32,19 @@ $this->on('system-relation-link', function ($request, $response) {
         $data = $request->getStage();
     }
 
-    if (!isset($data['schema1'], $data['schema2'])) {
-        throw Exception::forNoSchema();
+    $errors = [];
+    if (!isset($data['schema1'])) {
+        $errors['schema1'] = 'Schema is required.';
+    }
+
+    if (!isset($data['schema2'])) {
+        $errors['schema2'] = 'Schema is required.';
+    }
+
+    if (!empty($errors)) {
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->set('json', 'validation', $errors);
     }
 
     $schema = Schema::i($data['schema1']);
@@ -88,6 +105,12 @@ $this->on('system-relation-link', function ($request, $response) {
  */
 $this->on('system-relation-unlink', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     //get data from stage
     $data = [];
@@ -95,8 +118,19 @@ $this->on('system-relation-unlink', function ($request, $response) {
         $data = $request->getStage();
     }
 
-    if (!isset($data['schema1'], $data['schema2'])) {
-        throw Exception::forNoSchema();
+    $errors = [];
+    if (!isset($data['schema1'])) {
+        $errors['schema1'] = 'Schema is required.';
+    }
+
+    if (!isset($data['schema2'])) {
+        $errors['schema2'] = 'Schema is required.';
+    }
+
+    if (!empty($errors)) {
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->set('json', 'validation', $errors);
     }
 
     $schema = Schema::i($data['schema1']);
@@ -157,6 +191,12 @@ $this->on('system-relation-unlink', function ($request, $response) {
  */
 $this->on('system-relation-unlink-all', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     //get data from stage
     $data = [];
@@ -164,8 +204,19 @@ $this->on('system-relation-unlink-all', function ($request, $response) {
         $data = $request->getStage();
     }
 
-    if (!isset($data['schema1'], $data['schema2'])) {
-        throw Exception::forNoSchema();
+    $errors = [];
+    if (!isset($data['schema1'])) {
+        $errors['schema1'] = 'Schema is required.';
+    }
+
+    if (!isset($data['schema2'])) {
+        $errors['schema2'] = 'Schema is required.';
+    }
+
+    if (!empty($errors)) {
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->set('json', 'validation', $errors);
     }
 
     $schema = Schema::i($data['schema1']);

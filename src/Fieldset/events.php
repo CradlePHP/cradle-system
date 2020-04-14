@@ -17,6 +17,12 @@ use Cradle\Package\System\Fieldset;
  */
 $this->on('system-fieldset-create', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $data = [];
     if ($request->hasStage()) {
@@ -110,6 +116,12 @@ $this->on('system-fieldset-create', function ($request, $response) {
  */
 $this->on('system-fieldset-detail', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $data = [];
     if ($request->hasStage()) {
@@ -151,6 +163,12 @@ $this->on('system-fieldset-detail', function ($request, $response) {
  * @param Response $response
  */
 $this->on('system-fieldset-remove', function ($request, $response) {
+    //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
     //----------------------------//
     // 1. Get Data
     //get the system detail
@@ -197,6 +215,12 @@ $this->on('system-fieldset-remove', function ($request, $response) {
  */
 $this->on('system-fieldset-restore', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $request->setStage('name', '_' . $request->getStage('name'));
     //get the system detail
@@ -237,6 +261,12 @@ $this->on('system-fieldset-restore', function ($request, $response) {
  * @param Response $response
  */
 $this->on('system-fieldset-search', function ($request, $response) {
+    //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
     //----------------------------//
     // 1. Get Data
     $data = [];
@@ -295,6 +325,12 @@ $this->on('system-fieldset-search', function ($request, $response) {
  * @param Response $response
  */
 $this->on('system-fieldset-update', function ($request, $response) {
+    //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
     //----------------------------//
     // 1. Get Data
     //get the system detail

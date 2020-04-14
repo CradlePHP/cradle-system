@@ -17,6 +17,12 @@ use Cradle\Package\System\Exception;
  */
 $this->on('system-model-create', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $data = [];
     if ($request->hasStage()) {
@@ -24,7 +30,9 @@ $this->on('system-model-create', function ($request, $response) {
     }
 
     if (!isset($data['schema'])) {
-        throw Exception::forNoSchema();
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->addValidation('schema', 'Schema is required.');
     }
 
     $schema = Schema::i($data['schema']);
@@ -112,6 +120,12 @@ $this->on('system-model-create', function ($request, $response) {
  */
 $this->on('system-model-detail', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $data = [];
     if ($request->hasStage()) {
@@ -119,7 +133,9 @@ $this->on('system-model-detail', function ($request, $response) {
     }
 
     if (!isset($data['schema'])) {
-        throw Exception::forNoSchema();
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->addValidation('schema', 'Schema is required.');
     }
 
     $schema = Schema::i($data['schema']);
@@ -194,6 +210,12 @@ $this->on('system-model-detail', function ($request, $response) {
  */
 $this->on('system-model-remove', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     //get the object detail
     $this->trigger('system-model-detail', $request, $response);
@@ -209,7 +231,9 @@ $this->on('system-model-remove', function ($request, $response) {
     $data = $response->getResults();
 
     if (!$request->hasStage('schema')) {
-        throw Exception::forNoSchema();
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->addValidation('schema', 'Schema is required.');
     }
 
     $schema = Schema::i($request->getStage('schema'));
@@ -261,6 +285,12 @@ $this->on('system-model-remove', function ($request, $response) {
  */
 $this->on('system-model-restore', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     //get the object detail
     $this->trigger('system-model-detail', $request, $response);
@@ -276,7 +306,9 @@ $this->on('system-model-restore', function ($request, $response) {
     $data = $response->getResults();
 
     if (!$request->hasStage('schema')) {
-        throw Exception::forNoSchema();
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->addValidation('schema', 'Schema is required.');
     }
 
     $schema = Schema::i($request->getStage('schema'));
@@ -316,6 +348,12 @@ $this->on('system-model-restore', function ($request, $response) {
  */
 $this->on('system-model-search', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $data = [];
     if ($request->hasStage()) {
@@ -323,7 +361,9 @@ $this->on('system-model-search', function ($request, $response) {
     }
 
     if (!isset($data['schema'])) {
-        throw Exception::forNoSchema();
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->addValidation('schema', 'Schema is required.');
     }
 
     $schema = Schema::i($data['schema']);
@@ -381,6 +421,12 @@ $this->on('system-model-search', function ($request, $response) {
  */
 $this->on('system-model-update', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     //get the object detail
     $this->trigger('system-model-detail', $request, $response);
@@ -400,7 +446,9 @@ $this->on('system-model-update', function ($request, $response) {
     }
 
     if (!isset($data['schema'])) {
-        throw Exception::forNoSchema();
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->addValidation('schema', 'Schema is required.');
     }
 
     $schema = Schema::i($data['schema']);
@@ -582,6 +630,12 @@ $this->on('system-model-update', function ($request, $response) {
  */
 $this->on('system-model-import', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $data = [];
     if ($request->hasStage()) {
@@ -596,7 +650,9 @@ $this->on('system-model-import', function ($request, $response) {
     ];
 
     if (!isset($data['schema'])) {
-        throw Exception::forNoSchema();
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->addValidation('schema', 'Schema is required.');
     }
 
     $schema = Schema::i($data['schema']);

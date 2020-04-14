@@ -17,6 +17,12 @@ use Cradle\Package\System\Schema;
  */
 $this->on('system-schema-create', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $data = [];
     if ($request->hasStage()) {
@@ -100,6 +106,12 @@ $this->on('system-schema-create', function ($request, $response) {
  */
 $this->on('system-schema-sql-create', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $data = [];
     if ($request->hasStage()) {
@@ -157,6 +169,12 @@ $this->on('system-schema-sql-create', function ($request, $response) {
  */
 $this->on('system-schema-file-create', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $data = [];
     if ($request->hasStage()) {
@@ -188,6 +206,12 @@ $this->on('system-schema-file-create', function ($request, $response) {
  * @param Response $response
  */
 $this->on('system-schema-elastic-create', function ($request, $response) {
+    //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
     //----------------------------//
     // 1. Get Data
     $data = [];
@@ -237,6 +261,12 @@ $this->on('system-schema-elastic-create', function ($request, $response) {
  */
 $this->on('system-schema-detail', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $data = [];
     if ($request->hasStage()) {
@@ -278,6 +308,12 @@ $this->on('system-schema-detail', function ($request, $response) {
  * @param Response $response
  */
 $this->on('system-schema-remove', function ($request, $response) {
+    //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
     //----------------------------//
     // 1. Get Data
     //get the system detail
@@ -332,6 +368,12 @@ $this->on('system-schema-remove', function ($request, $response) {
  */
 $this->on('system-schema-restore', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $request->setStage('name', '_' . $request->getStage('name'));
     //get the system detail
@@ -379,6 +421,12 @@ $this->on('system-schema-restore', function ($request, $response) {
  * @param Response $response
  */
 $this->on('system-schema-search', function ($request, $response) {
+    //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
     //----------------------------//
     // 1. Get Data
     $data = [];
@@ -436,6 +484,12 @@ $this->on('system-schema-search', function ($request, $response) {
  * @param Response $response
  */
 $this->on('system-schema-update', function ($request, $response) {
+    //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
     //----------------------------//
     // 1. Get Data
     //get the system detail
