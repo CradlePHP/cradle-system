@@ -888,14 +888,14 @@ class SqlService
     }
 
     /**
-     * Unlinks all references in a table from another table
+     * Unlinks the parent from its children
      *
      * @param *string $relation
      * @param *int    $primary
      *
      * @return array
      */
-    public function unlinkAll($relation, $primary)
+    public function unlinkAllChildren($relation, $primary)
     {
         if (is_null($this->schema)) {
             throw SystemException::forNoSchema();
@@ -911,17 +911,60 @@ class SqlService
 
         $relation = $relations[$table];
 
-        $filter = sprintf('%s = %%s', $relation['primary1']);
-
-        return $this
+        $results = $this
             ->resource
             ->search($table)
-            ->addFilter($filter, $primary)
+            ->addFilter(sprintf('%s = %%s', $relation['primary1']), $primary)
             ->getCollection()
-            ->each(function ($i, $model) use (&$table) {
-                $model->remove($table);
-            })
             ->get();
+
+        $this->resource->deleteRows($table, sprintf(
+            '%s = %s',
+            $relation['primary1'],
+            $primary
+        ));
+
+        return $results;
+    }
+
+    /**
+     * Unlinks children from its parents
+     *
+     * @param *string $relation
+     * @param *int    $primary
+     *
+     * @return array
+     */
+    public function unlinkAllParents($relation, $primary)
+    {
+        if (is_null($this->schema)) {
+            throw SystemException::forNoSchema();
+        }
+
+        $name = $this->schema->getName();
+        $relations = $this->schema->getRelations();
+        $table = $name . '_' . $relation;
+
+        if (!isset($relations[$table])) {
+            throw SystemException::forNoRelation($name, $relation);
+        }
+
+        $relation = $relations[$table];
+
+        $results = $this
+            ->resource
+            ->search($table)
+            ->addFilter(sprintf('%s = %%s', $relation['primary2']), $primary)
+            ->getCollection()
+            ->get();
+
+        $this->resource->deleteRows($table, sprintf(
+            '%s = %s',
+            $relation['primary2'],
+            $primary
+        ));
+
+        return $results;
     }
 
     /**
