@@ -249,6 +249,10 @@ class SqlService
             ->search($table)
             ->setRange(self::DEFAULT_RANGE);
 
+        if (isset($data['columns']) && $data['columns']) {
+            $search->setColumns($data['columns']);
+        }
+
         if (isset($data['range']) && is_numeric($data['range'])) {
             $search->setRange($data['range']);
         }
