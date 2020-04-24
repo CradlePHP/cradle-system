@@ -249,7 +249,7 @@ class SqlService
             ->search($table)
             ->setRange(self::DEFAULT_RANGE);
 
-        if (isset($data['range']) && is_numeric($data['range']) && $data['range']) {
+        if (isset($data['range']) && is_numeric($data['range'])) {
             $search->setRange($data['range']);
         }
 
