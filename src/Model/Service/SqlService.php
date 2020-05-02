@@ -281,6 +281,12 @@ class SqlService
         //add like filters
         $this->searchWhereLike($search, $data, $jsons);
 
+        // add Null filters
+        $this->searchWhereNull($search, $data, $jsons);
+
+        // add Not Null filters
+        $this->searchWhereNotNull($search, $data, $jsons);
+
         // add in filters
         $this->searchWhereIn($search, $data, $jsons);
 
@@ -867,6 +873,94 @@ class SqlService
             $path = preg_replace('/([^\.]+\s[^\.]+)/', '""$1""', $path);
             $column = sprintf('JSON_EXTRACT(%s, "$%s")', $name, $path);
             $search->addFilter($column . ' LIKE %s', '%' . $value . '%');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Adds IS NULL to the where clause
+     *
+     * @param *Search $data
+     * @param *array  $data
+     * @param *array  $jsons
+     *
+     * @return SqlService
+     */
+    protected function searchWhereNull(Search $search, array $data, array $jsons): SqlService
+    {
+        if (!isset($data['null']) || !is_array($data['null'])) {
+            return $this;
+        }
+
+        foreach ($data['null'] as $column) {
+            if (preg_match('/^[a-zA-Z0-9-_]+$/', $column)) {
+                $search->addFilter($column . ' IS NULL');
+                continue;
+            }
+
+            //by chance is it a json filter?
+            if (strpos($column, '.') === false) {
+                continue;
+            }
+
+            //get the name
+            $name = substr($column, 0, strpos($column, '.'));
+            //name should be a json column type
+            if (!in_array($name, $jsons)) {
+               continue;
+            }
+
+            //this is like product_attributes.HDD
+            $path = substr($column, strpos($column, '.'));
+            $path = preg_replace('/\.*([0-9]+)/', '[$1]', $path);
+            $path = preg_replace('/([^\.]+\s[^\.]+)/', '""$1""', $path);
+            $column = sprintf('JSON_EXTRACT(%s, "$%s")', $name, $path);
+            $search->addFilter($column . ' IS NULL');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Adds IS NOT NULL to the where clause
+     *
+     * @param *Search $data
+     * @param *array  $data
+     * @param *array  $jsons
+     *
+     * @return SqlService
+     */
+    protected function searchWhereNotNull(Search $search, array $data, array $jsons): SqlService
+    {
+        if (!isset($data['notnull']) || !is_array($data['notnull'])) {
+            return $this;
+        }
+
+        foreach ($data['notnull'] as $column) {
+            if (preg_match('/^[a-zA-Z0-9-_]+$/', $column)) {
+                $search->addFilter($column . ' IS NOT NULL');
+                continue;
+            }
+
+            //by chance is it a json filter?
+            if (strpos($column, '.') === false) {
+                continue;
+            }
+
+            //get the name
+            $name = substr($column, 0, strpos($column, '.'));
+            //name should be a json column type
+            if (!in_array($name, $jsons)) {
+               continue;
+            }
+
+            //this is like product_attributes.HDD
+            $path = substr($column, strpos($column, '.'));
+            $path = preg_replace('/\.*([0-9]+)/', '[$1]', $path);
+            $path = preg_replace('/([^\.]+\s[^\.]+)/', '""$1""', $path);
+            $column = sprintf('JSON_EXTRACT(%s, "$%s")', $name, $path);
+            $search->addFilter($column . ' IS NOT NULL');
         }
 
         return $this;
