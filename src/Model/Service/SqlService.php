@@ -1162,9 +1162,9 @@ class SqlService
             return $this;
         }
 
-        foreach ($data['order'] as $sort => $direction) {
-            if (preg_match('/^[a-zA-Z0-9-_]+$/', $sort)) {
-                $search->addSort($sort, $direction);
+        foreach ($data['order'] as $column => $direction) {
+            if (preg_match('/^[a-zA-Z0-9-_]+$/', $column)) {
+                $search->addSort($column, $direction);
                 continue;
             }
 
