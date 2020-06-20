@@ -20,8 +20,8 @@
         "php-coveralls/php-coveralls": "~2.1.0"
     },
     "require": {
-        "cradlephp/storm": "~2.2.2",
-        "cradlephp/cradle-admin": "~2.2.0",
+        "cradlephp/storm": "~2.3.0",
+        "cradlephp/cradle-admin": "~2.3.0",
         "predis/predis": "1.1.1",
         "elasticsearch/elasticsearch": "2.2.2",
         "erusev/parsedown": "1.7.1"
