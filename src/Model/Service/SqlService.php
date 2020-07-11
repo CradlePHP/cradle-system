@@ -1202,40 +1202,40 @@ class SqlService
      */
     protected function searchWithGrouping(Search $search, array $data): SqlService
     {
-        if (!isset($data['group'])) {
-            return $this;
+        if (isset($data['group'])) {
+            if (!is_array($data['group'])) {
+                $data['group'] = [$data['group']];
+            }
+
+            // TODO: add the regex specified in order BUT
+            // allow insert of mysql defined functions like
+            // DATE_FORMAT(column, '%Y') etc
+            foreach ($data['group'] as $group) {
+                $search->groupBy($group);
+            }
         }
 
-        if (!is_array($data['group'])) {
-            $data['group'] = [$data['group']];
-        }
-
-        // TODO: add the regex specified in order BUT
-        // allow insert of mysql defined functions like
-        // DATE_FORMAT(column, '%Y') etc
-        foreach ($data['group'] as $group) {
-            $search->groupBy($group);
-        }
-
-        $columns[] = '*';
-        if (isset($data['columns']) && is_array($data['columns'])) {
-            $columns = $data['columns'];
+        $columns = ['*'];
+        if (isset($data['columns'])) {
+            if (is_array($data['columns'])) {
+                $columns = $data['columns'];
+            } else if (is_string($data['columns']) && trim($data['columns'])) {
+                $columns = [ $data['columns'] ];
+            }
         }
 
         if (isset($data['sum']) && preg_match('/^[a-zA-Z0-9-_]+$/', $data['sum'])) {
-            $columns[] = sprintf('sum(%s) as total', $data['sum']);
+            $columns = [sprintf('sum(%s) as total', $data['sum'])];
         }
 
         if (isset($data['count']) && preg_match('/^[a-zA-Z0-9-_]+$/', $data['count'])) {
-            $columns[] = sprintf('count(%s) as count', $data['count']);
+            $columns = [sprintf('count(%s) as count', $data['count'])];
         }
 
         // if there is grouping and there is a sum or count field,
         // we will assume that this is not a global thing
 
-        if (!empty($columns)) {
-            $search->setColumns($columns);
-        }
+        $search->setColumns($columns);
 
         return $this;
     }
