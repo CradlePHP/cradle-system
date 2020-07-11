@@ -441,19 +441,6 @@ class SqlService
             'total' => $search->getTotal()
         ];
 
-        // if there's no grouping, then sum it all up
-        if (is_array($data)) {
-            $hasSum = isset($data['sum']) && !empty($data['sum']);
-            $hasGroup = isset($data['group']) && !empty($data['group']);
-            if ($hasSum && !$hasGroup) {
-                $total = $search
-                    ->setColumns($sum)
-                    ->getRow();
-
-                $response['sum_field'] = $total['total'] ? $total['total'] : 0;
-            }
-        }
-
         return $response;
     }
 
