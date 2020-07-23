@@ -17,6 +17,12 @@ use Cradle\Package\System\Exception;
  */
 $this->on('system-model-create', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $data = [];
     if ($request->hasStage()) {
@@ -24,7 +30,9 @@ $this->on('system-model-create', function ($request, $response) {
     }
 
     if (!isset($data['schema'])) {
-        throw Exception::forNoSchema();
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->addValidation('schema', 'Schema is required.');
     }
 
     $schema = Schema::i($data['schema']);
@@ -112,6 +120,12 @@ $this->on('system-model-create', function ($request, $response) {
  */
 $this->on('system-model-detail', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $data = [];
     if ($request->hasStage()) {
@@ -119,7 +133,9 @@ $this->on('system-model-detail', function ($request, $response) {
     }
 
     if (!isset($data['schema'])) {
-        throw Exception::forNoSchema();
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->addValidation('schema', 'Schema is required.');
     }
 
     $schema = Schema::i($data['schema']);
@@ -194,6 +210,12 @@ $this->on('system-model-detail', function ($request, $response) {
  */
 $this->on('system-model-remove', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     //get the object detail
     $this->trigger('system-model-detail', $request, $response);
@@ -209,7 +231,9 @@ $this->on('system-model-remove', function ($request, $response) {
     $data = $response->getResults();
 
     if (!$request->hasStage('schema')) {
-        throw Exception::forNoSchema();
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->addValidation('schema', 'Schema is required.');
     }
 
     $schema = Schema::i($request->getStage('schema'));
@@ -261,6 +285,12 @@ $this->on('system-model-remove', function ($request, $response) {
  */
 $this->on('system-model-restore', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     //get the object detail
     $this->trigger('system-model-detail', $request, $response);
@@ -276,7 +306,9 @@ $this->on('system-model-restore', function ($request, $response) {
     $data = $response->getResults();
 
     if (!$request->hasStage('schema')) {
-        throw Exception::forNoSchema();
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->addValidation('schema', 'Schema is required.');
     }
 
     $schema = Schema::i($request->getStage('schema'));
@@ -316,6 +348,12 @@ $this->on('system-model-restore', function ($request, $response) {
  */
 $this->on('system-model-search', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $data = [];
     if ($request->hasStage()) {
@@ -323,7 +361,9 @@ $this->on('system-model-search', function ($request, $response) {
     }
 
     if (!isset($data['schema'])) {
-        throw Exception::forNoSchema();
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->addValidation('schema', 'Schema is required.');
     }
 
     $schema = Schema::i($data['schema']);
@@ -381,6 +421,12 @@ $this->on('system-model-search', function ($request, $response) {
  */
 $this->on('system-model-update', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     //get the object detail
     $this->trigger('system-model-detail', $request, $response);
@@ -400,7 +446,9 @@ $this->on('system-model-update', function ($request, $response) {
     }
 
     if (!isset($data['schema'])) {
-        throw Exception::forNoSchema();
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->addValidation('schema', 'Schema is required.');
     }
 
     $schema = Schema::i($data['schema']);
@@ -500,54 +548,6 @@ $this->on('system-model-update', function ($request, $response) {
         }
     }
 
-    //only for root reverse relation
-    if (!isset($data['relation_recursive'])) {
-        //loop through reverse relations
-        foreach ($reverseRelations as $table => $relation) {
-            //deal with same table name
-            if ($relation['source']['name'] === $relation['name']
-                //skip history
-                || $relation['source']['name'] === 'history'
-                ) {
-                continue;
-            }
-            //get primmary id
-            $primaryId = $results['schema']. '_id';
-            //get dynamic schema
-            $schema = Schema::i($relation['source']['name']);
-            //set schema sql
-            $schemaSql = $schema->model()->service('sql');
-            //filter by primary id
-            $filter['filter'][$primaryId] =  $results[$results['schema']. '_id'];
-            //set range to 0
-            $filter['range'] = 0;
-            //get rows
-            $rows = $schemaSql->search($filter);
-
-            //loop elastic update
-            if ($rows) {
-                foreach ($rows['rows'] as $key => $row) {
-                    $payload = $this->makePayload();
-
-                    //set dynamic column id
-                    $columnId = $relation['source']['name']. '_id';
-                    $payload['request']
-                        ->setStage('schema', $relation['source']['name'])
-                        ->setStage('relation_recursive', true)
-                        ->setStage($columnId, $row[$columnId]);
-
-                    //set queue data
-                    $queueData = $payload['request']->getStage();
-                    $queuePackage = $this->package('cradlephp/cradle-queue');
-                    if (!$queuePackage->queue('system-model-update', $queueData)) {
-                        //update manually after the connection
-                        $this->trigger('system-model-update', $payload['request'], $payload['response']);
-                    }
-                }
-            }
-        }
-    }
-
     //index object
     $modelElastic->update($results[$primary]);
 
@@ -582,6 +582,12 @@ $this->on('system-model-update', function ($request, $response) {
  */
 $this->on('system-model-import', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     $data = [];
     if ($request->hasStage()) {
@@ -596,7 +602,9 @@ $this->on('system-model-import', function ($request, $response) {
     ];
 
     if (!isset($data['schema'])) {
-        throw Exception::forNoSchema();
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->addValidation('schema', 'Schema is required.');
     }
 
     $schema = Schema::i($data['schema']);

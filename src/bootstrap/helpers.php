@@ -455,6 +455,10 @@ return function ($request, $response) {
         return $options['fn'](['formats' => $formats]);
     });
 
+    $handlebars->registerHelper('schema_parse', function ($schema, $options) {
+        return $options['fn'](Schema::i($schema)->getAll());
+    });
+
     $handlebars->registerHelper('schema_row', function ($schema, $row, $key) {
         $schema = Schema::i($schema);
 

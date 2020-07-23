@@ -96,9 +96,6 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
         }
     }
 
-    //determine valid relations
-    $data['valid_relations'] = [];
-
     //if there's active filter, get its value
     //for search purposes
     if (isset($data['filter'])) {
@@ -111,9 +108,10 @@ $this->get('/admin/system/model/:schema/search', function ($request, $response) 
         }
     }
 
-    $this->trigger('system-schema-search', $request, $response);
-
-    foreach ($response->getResults('rows') as $relation) {
+    //determine valid relations
+    $data['valid_relations'] = [];
+    $schemas = $this->method('system-schema-search');
+    foreach ($schemas['rows'] as $relation) {
         $data['valid_relations'][] = $relation['name'];
     }
 
@@ -264,8 +262,8 @@ $this->get('/admin/system/model/:schema/create', function ($request, $response) 
 
     //determine valid relations
     $data['valid_relations'] = [];
-    $this->trigger('system-schema-search', $request, $response);
-    foreach ($response->getResults('rows') as $relation) {
+    $schemas = $this->method('system-schema-search');
+    foreach ($schemas['rows'] as $relation) {
         $data['valid_relations'][] = $relation['name'];
     }
 
@@ -437,8 +435,8 @@ $this->get('/admin/system/model/:schema/update/:id', function ($request, $respon
 
     //determine valid relations
     $data['valid_relations'] = [];
-    $this->trigger('system-schema-search', $request, $response);
-    foreach ($response->getResults('rows') as $relation) {
+    $schemas = $this->method('system-schema-search');
+    foreach ($schemas['rows'] as $relation) {
         $data['valid_relations'][] = $relation['name'];
     }
 
@@ -582,8 +580,8 @@ $this->get('/admin/system/model/:schema/detail/:id', function ($request, $respon
 
     //determine valid relations
     $data['valid_relations'] = [];
-    $this->trigger('system-schema-search', $request, $response);
-    foreach ($response->getResults('rows') as $relation) {
+    $schemas = $this->method('system-schema-search');
+    foreach ($schemas['rows'] as $relation) {
         $data['valid_relations'][] = $relation['name'];
     }
 

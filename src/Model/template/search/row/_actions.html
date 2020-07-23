@@ -35,6 +35,28 @@
         <i class="fa fa-edit"></i>
     </a>
 
+    {{#each ../schema.relations}}
+        {{#in '2,3' many}}
+            {{#if ../../relation.suggestion}}
+                <a
+                    class="text-info"
+                    title="{{_ 'View %s' plural}}"
+                    href="../../../{{source.name}}/{{scope ../this source.primary}}/search/{{name}}"
+                >
+                    <i class="{{icon}}"></i>
+                </a>
+            {{else}}
+                <a
+                    class="text-info"
+                    title="{{_ 'View %s' plural}}"
+                    href="{{scope ../this source.primary}}/search/{{name}}"
+                >
+                    <i class="{{icon}}"></i>
+                </a>
+            {{/if}}
+        {{/in}}
+    {{/each}}
+
     {{#relations ../schema.name 3 'reverse'}}
         <a
             class="text-info"
@@ -47,28 +69,6 @@
         >
             <i class="{{source.icon}}"></i>
         </a>
-    {{else}}
-        {{#each ../schema.relations}}
-            {{#in '2,3' many}}
-                {{#if ../../relation.suggestion}}
-                    <a
-                        class="text-info"
-                        title="{{_ 'View %s' plural}}"
-                        href="../../../{{source.name}}/{{scope ../this source.primary}}/search/{{name}}"
-                    >
-                        <i class="{{icon}}"></i>
-                    </a>
-                {{else}}
-                    <a
-                        class="text-info"
-                        title="{{_ 'View %s' plural}}"
-                        href="{{scope ../this source.primary}}/search/{{name}}"
-                    >
-                        <i class="{{icon}}"></i>
-                    </a>
-                {{/if}}
-            {{/in}}
-        {{/each}}
     {{/relations}}
 
     {{#if ../relation.suggestion}}

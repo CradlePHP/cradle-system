@@ -19,6 +19,12 @@ use Cradle\Sql\SqlException;
  */
 $this->on('system-relation-link', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     //get data from stage
     $data = [];
@@ -26,8 +32,19 @@ $this->on('system-relation-link', function ($request, $response) {
         $data = $request->getStage();
     }
 
-    if (!isset($data['schema1'], $data['schema2'])) {
-        throw Exception::forNoSchema();
+    $errors = [];
+    if (!isset($data['schema1'])) {
+        $errors['schema1'] = 'Schema is required.';
+    }
+
+    if (!isset($data['schema2'])) {
+        $errors['schema2'] = 'Schema is required.';
+    }
+
+    if (!empty($errors)) {
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->set('json', 'validation', $errors);
     }
 
     $schema = Schema::i($data['schema1']);
@@ -88,6 +105,12 @@ $this->on('system-relation-link', function ($request, $response) {
  */
 $this->on('system-relation-unlink', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     //get data from stage
     $data = [];
@@ -95,8 +118,19 @@ $this->on('system-relation-unlink', function ($request, $response) {
         $data = $request->getStage();
     }
 
-    if (!isset($data['schema1'], $data['schema2'])) {
-        throw Exception::forNoSchema();
+    $errors = [];
+    if (!isset($data['schema1'])) {
+        $errors['schema1'] = 'Schema is required.';
+    }
+
+    if (!isset($data['schema2'])) {
+        $errors['schema2'] = 'Schema is required.';
+    }
+
+    if (!empty($errors)) {
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->set('json', 'validation', $errors);
     }
 
     $schema = Schema::i($data['schema1']);
@@ -157,6 +191,12 @@ $this->on('system-relation-unlink', function ($request, $response) {
  */
 $this->on('system-relation-unlink-all', function ($request, $response) {
     //----------------------------//
+    // 0. Abort on Errors
+    if ($response->isError()) {
+        return;
+    }
+
+    //----------------------------//
     // 1. Get Data
     //get data from stage
     $data = [];
@@ -164,33 +204,62 @@ $this->on('system-relation-unlink-all', function ($request, $response) {
         $data = $request->getStage();
     }
 
-    if (!isset($data['schema1'], $data['schema2'])) {
-        throw Exception::forNoSchema();
+    $errors = [];
+    if (!isset($data['schema1'])) {
+        $errors['schema1'] = 'Schema is required.';
     }
 
-    $schema = Schema::i($data['schema1']);
-    $primary = $schema->getPrimaryFieldName();
+    if (!isset($data['schema2'])) {
+        $errors['schema2'] = 'Schema is required.';
+    }
+
+    if (!empty($errors)) {
+        return $response
+            ->setError(true, 'Invalid Parameters')
+            ->set('json', 'validation', $errors);
+    }
+
+    $schema1 = Schema::i($data['schema1']);
+    $schema2 = Schema::i($data['schema2']);
+    $schema1Primary = $schema1->getPrimaryFieldName();
+    $schema2Primary = $schema2->getPrimaryFieldName();
 
     //----------------------------//
     // 2. Validate Data
-    if (!isset($data[$primary])) {
+    if (!isset($data[$schema1Primary]) && !isset($data[$schema2Primary])) {
         return $response->setError(true, 'No ID provided');
     }
 
     //----------------------------//
     // 3. Process Data
     //this/these will be used a lot
-    $modelSql = $schema->model()->service('sql');
-    $modelRedis = $schema->model()->service('redis');
-    $modelElastic = $schema->model()->service('elastic');
+    $modelSql = $schema1->model()->service('sql');
 
-    $results = $modelSql->unlinkAll(
-        $data['schema2'],
-        $data[$primary]
-    );
+    if (isset($data[$schema1Primary])) {
+        $modelRedis = $schema1->model()->service('redis');
+        $modelElastic = $schema1->model()->service('elastic');
 
-    //index post
-    $modelElastic->update($data[$primary]);
+        $results = $modelSql->unlinkAllChildren(
+            $data['schema2'],
+            $data[$schema1Primary]
+        );
+
+        //index post
+        $modelElastic->update($data[$schema1Primary]);
+    }
+
+    if (isset($data[$schema2Primary])) {
+        $modelRedis = $schema2->model()->service('redis');
+        $modelElastic = $schema2->model()->service('elastic');
+
+        $results = $modelSql->unlinkAllParents(
+            $data['schema2'],
+            $data[$schema2Primary]
+        );
+
+        //index post
+        $modelElastic->update($data[$schema2Primary]);
+    }
 
     //invalidate cache
     $modelRedis->removeSearch();
