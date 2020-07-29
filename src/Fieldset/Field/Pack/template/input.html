@@ -1,0 +1,10 @@
+<input
+  autocomplete="{{name}}"
+  class="form-control system-form-control"
+  name="{{name}}"
+  type="text"
+  value="{{value}}"
+  {{#each attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+/>

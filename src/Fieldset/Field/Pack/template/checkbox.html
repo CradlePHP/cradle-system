@@ -1,0 +1,35 @@
+<input
+  class="system-form-control"
+  name="{{name}}"
+  type="hidden"
+  value="0"
+/>
+<label class="checkbox checkbox-2">
+  {{#when value '==' 1}}
+    <input
+      class="system-form-control"
+      name="{{name}}"
+      type="checkbox"
+      value="1"
+      checked
+      {{#each.attributes}}
+        {{#when @key '!==' 'placeholder'}}
+          {{@key}}="{{this}}"
+        {{/when}}
+      {{/each}}
+    />
+  {{else}}
+    <input
+      class="system-form-control"
+      name="{{name}}"
+      type="checkbox"
+      value="1"
+      {{#each.attributes}}
+        {{#when @key '!==' 'placeholder'}}
+          {{@key}}="{{this}}"
+        {{/when}}
+      {{/each}}
+    />
+  {{/when}}
+  <span>{{attributes.placeholder}}</span>
+</label>

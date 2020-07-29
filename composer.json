@@ -1,34 +1,31 @@
 {
-    "name": "cradlephp/cradle-system",
-    "type": "cradle-package",
-    "description": "Schema, Relations, Object events and controllers for Cradle",
-    "minimum-stability": "dev",
-    "keywords": [
-        "cradle",
-        "cradlephp"
-    ],
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Christian Blanquera",
-            "email": "cblanquera@openovate.com"
-        }
-    ],
-    "require-dev": {
-        "phpunit/phpunit": "7.0.2",
-        "squizlabs/php_codesniffer": "3.2.3",
-        "php-coveralls/php-coveralls": "~2.1.0"
-    },
-    "require": {
-        "cradlephp/storm": "~2.2.2",
-        "cradlephp/cradle-admin": "~2.2.0",
-        "predis/predis": "1.1.1",
-        "elasticsearch/elasticsearch": "2.2.2",
-        "erusev/parsedown": "1.7.1"
-    },
-    "autoload": {
-        "psr-4": {
-            "Cradle\\Package\\System\\": "src/"
-        }
+  "name": "cradlephp/cradle-system",
+  "type": "cradle-package",
+  "description": "Schema, Relations, Object events and controllers for Cradle",
+  "minimum-stability": "dev",
+  "keywords": [
+    "cradle",
+    "cradlephp"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Christian Blanquera",
+      "email": "cblanquera@openovate.com"
     }
+  ],
+  "require-dev": {
+    "phpunit/phpunit": "7.0.2",
+    "squizlabs/php_codesniffer": "3.2.3",
+    "php-coveralls/php-coveralls": "~2.1.0"
+  },
+  "require": {
+    "cradlephp/storm": "~3.0.0",
+    "cradlephp/package": "~3.0.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Cradle\\Package\\System\\": "src/"
+    }
+  }
 }

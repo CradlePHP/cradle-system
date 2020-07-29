@@ -1,0 +1,7 @@
+<textarea
+  class="form-control system-form-control"
+  name="{{name}}"
+  {{#each attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+>{{{value}}}</textarea>
