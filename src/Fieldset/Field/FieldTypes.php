@@ -30,4 +30,5 @@ class FieldTypes
   const TYPE_URL_LIST = 'url[]';
 
   const TYPE_OPTION = 'option';
+  const TYPE_CUSTOM = 'custom';
 }

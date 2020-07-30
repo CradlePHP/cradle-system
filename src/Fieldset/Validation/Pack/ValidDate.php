@@ -6,22 +6,22 @@ use Cradle\Package\System\Fieldset\Validation\ValidationTypes;
 use Cradle\Package\System\Fieldset\Validation\AbstractValidator;
 use Cradle\Package\System\Fieldset\Validation\ValidatorInterface;
 
-class NotEmpty extends AbstractValidator implements ValidatorInterface
+class ValidDate extends AbstractValidator implements ValidatorInterface
 {
   /**
    * @const string NAME Config name
    */
-  const NAME = 'empty';
+  const NAME = 'date';
 
   /**
    * @const string LABEL Config label
    */
-  const LABEL = 'Not Empty';
+  const LABEL = 'Valid Date';
 
   /**
    * @const string TYPE Config Type
    */
-  const TYPE = ValidationTypes::TYPE_GENERAL;
+  const TYPE = ValidationTypes::TYPE_DATE;
 
   /**
    * Renders the executes the validation for model forms
@@ -32,6 +32,6 @@ class NotEmpty extends AbstractValidator implements ValidatorInterface
    */
   public function valid($value = null): bool
   {
-    return !!$value;
+    return preg_match('/^[0-9]{4}\-[0-9]{2}\-[0-9]{2}$/', $value);
   }
 }

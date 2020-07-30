@@ -56,11 +56,27 @@ FieldHandler::register($this('resolver')->resolve(
 ));
 
 FieldHandler::register($this('resolver')->resolve(
+  Cradle\Package\System\Fieldset\Field\Pack\Number::class
+));
+
+FieldHandler::register($this('resolver')->resolve(
   Cradle\Package\System\Fieldset\Field\Pack\Textarea::class
 ));
 
 FieldHandler::register($this('resolver')->resolve(
   Cradle\Package\System\Fieldset\Field\Pack\Select::class
+));
+
+FieldHandler::register($this('resolver')->resolve(
+  Cradle\Package\System\Fieldset\Field\Pack\Active::class
+));
+
+FieldHandler::register($this('resolver')->resolve(
+  Cradle\Package\System\Fieldset\Field\Pack\Created::class
+));
+
+FieldHandler::register($this('resolver')->resolve(
+  Cradle\Package\System\Fieldset\Field\Pack\Updated::class
 ));
 
 ValidationHandler::register($this('resolver')->resolve(
@@ -74,7 +90,7 @@ ValidationHandler::register($this('resolver')->resolve(
 ValidationHandler::register($this('resolver')->resolve(
   Cradle\Package\System\Fieldset\Validation\Pack\NotEqual::class
 ));
-/*
+
 ValidationHandler::register($this('resolver')->resolve(
   Cradle\Package\System\Fieldset\Validation\Pack\ValidOption::class
 ));
@@ -110,7 +126,10 @@ ValidationHandler::register($this('resolver')->resolve(
 ValidationHandler::register($this('resolver')->resolve(
   Cradle\Package\System\Fieldset\Validation\Pack\ValidExpression::class
 ));
-*/
+
+FormatHandler::register($this('resolver')->resolve(
+  Cradle\Package\System\Fieldset\Format\Pack\None::class
+));
 
 FormatHandler::register($this('resolver')->resolve(
   Cradle\Package\System\Fieldset\Format\Pack\Lowercase::class
@@ -130,6 +149,10 @@ FormatHandler::register($this('resolver')->resolve(
 
 FormatHandler::register($this('resolver')->resolve(
   Cradle\Package\System\Fieldset\Format\Pack\YesNo::class
+));
+
+FormatHandler::register($this('resolver')->resolve(
+  Cradle\Package\System\Fieldset\Format\Pack\Date::class
 ));
 
 //bootstrap

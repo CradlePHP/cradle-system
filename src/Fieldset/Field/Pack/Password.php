@@ -28,6 +28,10 @@ class Password extends Text
    */
   public function prepare($value)
   {
+    if (is_null($value)) {
+      return $value;
+    }
+
     return password_hash($value, PASSWORD_DEFAULT);
   }
 }

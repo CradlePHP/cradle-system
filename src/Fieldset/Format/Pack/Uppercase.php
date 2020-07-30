@@ -11,7 +11,7 @@ class Uppercase extends AbstractFormatter implements FormatterInterface
   /**
    * @const string NAME Config name
    */
-  const NAME = 'uppercase';
+  const NAME = 'upper';
 
   /**
    * @const string LABEL Config label

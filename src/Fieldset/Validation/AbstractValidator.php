@@ -22,7 +22,7 @@ abstract class AbstractValidator
   const TYPE = ValidationTypes::TYPE_GENERAL;
 
   /**
-   * @var array $parameters List of parametrs to consider when formatting
+   * @var array $parameters List of parametrs to consider when validating
    */
   protected $parameters = [];
 

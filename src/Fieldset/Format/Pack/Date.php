@@ -49,7 +49,7 @@ class Date extends AbstractFormatter implements FormatterInterface
    */
   public function format($value = null): ?string
   {
-    $parameters = $this->parameters[0];
+    $parameters = $this->parameters;
     if (!isset($parameters[0])) {
       $parameters[0] = 'Y-m-d H:i:s';
     }

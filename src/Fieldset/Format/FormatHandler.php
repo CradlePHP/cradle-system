@@ -27,7 +27,7 @@ class FormatHandler
    *
    * @return ?FormatterInterface
    */
-  public static function getFormat(string $name): ?FormatterInterface
+  public static function getFormatter(string $name): ?FormatterInterface
   {
     if (isset(self::$formatters[$name])) {
       return self::$formatters[$name];

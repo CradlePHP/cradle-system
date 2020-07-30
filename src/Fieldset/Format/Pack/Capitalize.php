@@ -11,7 +11,7 @@ class Capitalize extends AbstractFormatter implements FormatterInterface
   /**
    * @const string NAME Config name
    */
-  const NAME = 'capitalize';
+  const NAME = 'capital';
 
   /**
    * @const string LABEL Config label

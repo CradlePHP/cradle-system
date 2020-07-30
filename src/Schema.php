@@ -78,7 +78,7 @@ class Schema extends Fieldset
    *
    * @return string
    */
-  public function getPrimaryFieldName(): string
+  public function getPrimaryName(): string
   {
     return $this->getName() . '_id';
   }
@@ -99,7 +99,7 @@ class Schema extends Fieldset
     }
 
     $table = $this->getName();
-    $primary1 = $this->getPrimaryFieldName();
+    $primary1 = $this->getPrimaryName();
 
     $results = [];
     foreach ($relations as $relation) {
@@ -172,6 +172,8 @@ class Schema extends Fieldset
         || !trim($reversed[0]->get('primary1'))
         || !trim($reversed[0]->get('primary2'))
         || !trim($reversed[0]->get('many'))
+        //dont do post_post
+        || $reversed[0]->getName() === $table
       ) {
         continue;
       }

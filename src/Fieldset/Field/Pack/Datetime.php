@@ -2,7 +2,7 @@
 
 namespace Cradle\Package\System\Fieldset\Field\Pack;
 
-class Datetime extends Text
+class Datetime extends Date
 {
   /**
    * @const string NAME Config name
@@ -28,18 +28,10 @@ class Datetime extends Text
    */
   public function prepare($value)
   {
-    return date('Y-m-d H:i:s', strtotime($value));
-  }
+    if (is_null($value)) {
+      return $value;
+    }
 
-  /**
-   * Validation check
-   *
-   * @param *mixed $value
-   *
-   * @return bool
-   */
-  public function valid($value): bool
-  {
-    return preg_match('/^[0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/', $value);
+    return date('Y-m-d H:i:s', strtotime($value));
   }
 }

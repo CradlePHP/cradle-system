@@ -8,22 +8,22 @@ use Cradle\Package\System\Fieldset\Validation\ValidationTypes;
 use Cradle\Package\System\Fieldset\Validation\AbstractValidator;
 use Cradle\Package\System\Fieldset\Validation\ValidatorInterface;
 
-class NotEqual extends AbstractValidator implements ValidatorInterface
+class ValidExpression extends AbstractValidator implements ValidatorInterface
 {
   /**
    * @const string NAME Config name
    */
-  const NAME = 'ne';
+  const NAME = 'expression';
 
   /**
    * @const string LABEL Config label
    */
-  const LABEL = 'Not Equal';
+  const LABEL = 'Valid Expression';
 
   /**
    * @const string TYPE Config Type
    */
-  const TYPE = ValidationTypes::TYPE_NUMBER;
+  const TYPE = ValidationTypes::TYPE_GENERAL;
 
   /**
    * When they choose this validator in a schema form,
@@ -35,7 +35,7 @@ class NotEqual extends AbstractValidator implements ValidatorInterface
   {
     return [
       FieldHandler::getField('text')->setAttributes([
-        'placeholder' => 'Enter Number'
+        'placeholder' => 'Enter Regular Expression'
       ])
     ];
   }
@@ -49,6 +49,6 @@ class NotEqual extends AbstractValidator implements ValidatorInterface
    */
   public function valid($value = null): bool
   {
-    return isset($this->parameters[0]) && $this->parameters[0] == $value;
+    return isset($this->parameters[0]) && preg_match($this->parameters[0], $value);
   }
 }

@@ -17,7 +17,7 @@ class Number extends Text
   /**
    * @const string TYPE HTML input field type
    */
-  const TYPE = 'email';
+  const TYPE = 'number';
 
   /**
    * Validation check
@@ -28,13 +28,16 @@ class Number extends Text
    */
   public function valid($value): bool
   {
-    return preg_match('/^(?:(?:(?:[^@,"\[\]\x5c\x00-\x20\x7f-\xff\.]|\x5c(?=[@,"\[\]'.
-    '\x5c\x00-\x20\x7f-\xff]))(?:[^@,"\[\]\x5c\x00-\x20\x7f-\xff\.]|(?<=\x5c)[@,"\[\]'.
-    '\x5c\x00-\x20\x7f-\xff]|\x5c(?=[@,"\[\]\x5c\x00-\x20\x7f-\xff])|\.(?=[^\.])){1,62'.
-    '}(?:[^@,"\[\]\x5c\x00-\x20\x7f-\xff\.]|(?<=\x5c)[@,"\[\]\x5c\x00-\x20\x7f-\xff])|'.
-    '[^@,"\[\]\x5c\x00-\x20\x7f-\xff\.]{1,2})|"(?:[^"]|(?<=\x5c)"){1,62}")@(?:(?!.{64})'.
-    '(?:[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.?|[a-zA-Z0-9]\.?)+\.(?:xn--[a-zA-Z0-9]'.
-    '+|[a-zA-Z]{2,6})|\[(?:[0-1]?\d?\d|2[0-4]\d|25[0-5])(?:\.(?:[0-1]?\d?\d|2[0-4]\d|25'.
-    '[0-5])){3}\])$/', $value);
+    return is_numeric($value)
+      && (
+        !isset($this->attributes['min'])
+        || !is_numeric($this->attributes['min'])
+        || $this->attributes['min'] <= $value
+      )
+      && (
+        !isset($this->attributes['max'])
+        || !is_numeric($this->attributes['max'])
+        || $this->attributes['max'] >= $value
+      );
   }
 }

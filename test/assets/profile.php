@@ -6,29 +6,29 @@ return array (
   'group' => 'Users',
   'icon' => 'fas fa-user',
   'detail' => 'Generic user profiles designed to separate public data from sensitive data like passwords. Best used with auth tables.',
-  'fields' => 
+  'fields' =>
   array (
-    0 => 
+    0 =>
     array (
       'label' => 'Image',
       'name' => 'image',
-      'field' => 
+      'field' =>
       array (
         'type' => 'image',
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'image',
-        'parameters' => 
+        'parameters' =>
         array (
           0 => '50',
           1 => '50',
         ),
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'image',
-        'parameters' => 
+        'parameters' =>
         array (
           0 => '100',
           1 => '100',
@@ -36,36 +36,36 @@ return array (
       ),
       'default' => '',
     ),
-    1 => 
+    1 =>
     array (
       'label' => 'First Name',
       'name' => 'name',
-      'field' => 
+      'field' =>
       array (
         'type' => 'text',
-        'attributes' => 
+        'attributes' =>
         array (
           'placeholder' => 'eg. John',
         ),
       ),
-      'validation' => 
+      'validation' =>
       array (
-        0 => 
+        0 =>
         array (
           'method' => 'required',
           'message' => 'First Name is Required',
         ),
-        1 => 
+        1 =>
         array (
           'method' => 'empty',
           'message' => 'Cannot be empty',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'none',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'none',
       ),
@@ -74,61 +74,61 @@ return array (
       'filterable' => '1',
       'disable' => '1',
     ),
-    2 => 
+    2 =>
     array (
       'label' => 'Last Name',
       'name' => 'last_name',
-      'field' => 
+      'field' =>
       array (
         'type' => 'text',
-        'attributes' => 
+        'attributes' =>
         array (
           'placeholder' => 'eg. Doe',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'capital',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'capital',
       ),
       'default' => '',
       'searchable' => '1',
     ),
-    3 => 
+    3 =>
     array (
       'label' => 'Gender',
       'name' => 'gender',
-      'field' => 
+      'field' =>
       array (
         'type' => 'select',
-        'options' => 
+        'options' =>
         array (
-          0 => 
+          0 =>
           array (
             'key' => 'na',
             'value' => 'Choose an Option',
           ),
-          1 => 
+          1 =>
           array (
             'key' => 'male',
             'value' => 'Male',
           ),
-          2 => 
+          2 =>
           array (
             'key' => 'female',
             'value' => 'Female',
           ),
         ),
       ),
-      'validation' => 
+      'validation' =>
       array (
-        0 => 
+        0 =>
         array (
           'method' => 'one',
-          'parameters' => 
+          'parameters' =>
           array (
             0 => 'male',
             1 => 'female',
@@ -136,31 +136,31 @@ return array (
           'message' => 'Should be na, male or female',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'lower',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'lower',
       ),
       'default' => 'na',
       'filterable' => '1',
     ),
-    4 => 
+    4 =>
     array (
       'label' => 'Birthday',
       'name' => 'birthday',
-      'field' => 
+      'field' =>
       array (
         'type' => 'date',
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'date',
         'parameters' => 'F d, Y',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'date',
         'parameters' => 'F d, Y',
@@ -168,41 +168,41 @@ return array (
       'default' => '',
       'sortable' => '1',
     ),
-    5 => 
+    5 =>
     array (
       'label' => 'About Me',
       'name' => 'bio',
-      'field' => 
+      'field' =>
       array (
         'type' => 'wysiwyg',
-        'attributes' => 
+        'attributes' =>
         array (
           'rows' => '5',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'hide',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'html',
       ),
       'default' => '',
     ),
-    6 => 
+    6 =>
     array (
       'label' => 'Active',
       'name' => 'active',
-      'field' => 
+      'field' =>
       array (
         'type' => 'active',
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'hide',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'hide',
       ),
@@ -210,19 +210,19 @@ return array (
       'sortable' => '1',
       'disable' => '1',
     ),
-    7 => 
+    7 =>
     array (
       'label' => 'Created',
       'name' => 'created',
-      'field' => 
+      'field' =>
       array (
         'type' => 'created',
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'none',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'none',
       ),
@@ -230,19 +230,19 @@ return array (
       'sortable' => '1',
       'disable' => '1',
     ),
-    8 => 
+    8 =>
     array (
       'label' => 'Updated',
       'name' => 'updated',
-      'field' => 
+      'field' =>
       array (
         'type' => 'updated',
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'none',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'none',
       ),
@@ -251,14 +251,14 @@ return array (
       'disable' => '1',
     ),
   ),
-  'relations' => 
+  'relations' =>
   array (
-    0 => 
+    0 =>
     array (
       'many' => '2',
       'name' => 'address',
     ),
-    1 => 
+    1 =>
     array (
       'many' => '2',
       'name' => 'file',

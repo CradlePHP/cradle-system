@@ -6,17 +6,17 @@ use Cradle\Package\System\Fieldset\Validation\ValidationTypes;
 use Cradle\Package\System\Fieldset\Validation\AbstractValidator;
 use Cradle\Package\System\Fieldset\Validation\ValidatorInterface;
 
-class NotEmpty extends AbstractValidator implements ValidatorInterface
+class ValidOption extends AbstractValidator implements ValidatorInterface
 {
   /**
    * @const string NAME Config name
    */
-  const NAME = 'empty';
+  const NAME = 'one';
 
   /**
    * @const string LABEL Config label
    */
-  const LABEL = 'Not Empty';
+  const LABEL = 'Valid Option';
 
   /**
    * @const string TYPE Config Type
@@ -32,6 +32,6 @@ class NotEmpty extends AbstractValidator implements ValidatorInterface
    */
   public function valid($value = null): bool
   {
-    return !!$value;
+    return in_array($value, $this->parameters);
   }
 }

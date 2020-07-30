@@ -33,13 +33,197 @@ class Cradle_Package_System_Fieldset_Test extends TestCase
 
   /**
    * @covers Cradle\Package\System\Fieldset::getFields
+   * @covers Cradle\Package\System\Fieldset::getTypes
    */
   public function testGetFields()
   {
     $fields = $this->object->getFields();
+    $this->assertTrue(isset($fields['profile_image']));
+    $this->assertTrue(isset($fields['profile_name']));
+    $this->assertTrue(isset($fields['profile_last_name']));
+    $this->assertTrue(isset($fields['profile_gender']));
+    $this->assertTrue(isset($fields['profile_birthday']));
+    $this->assertTrue(isset($fields['profile_bio']));
+    $this->assertTrue(isset($fields['profile_active']));
+    $this->assertTrue(isset($fields['profile_created']));
+    $this->assertTrue(isset($fields['profile_updated']));
 
-    print_r($fields);
+    $fields = $this->object->getFields('string');
+    $this->assertTrue(!isset($fields['profile_image']));
+    $this->assertTrue(isset($fields['profile_name']));
+    $this->assertTrue(isset($fields['profile_last_name']));
+    $this->assertTrue(isset($fields['profile_gender']));
+    $this->assertTrue(!isset($fields['profile_birthday']));
+    $this->assertTrue(!isset($fields['profile_bio']));
+    $this->assertTrue(!isset($fields['profile_active']));
+    $this->assertTrue(!isset($fields['profile_created']));
+    $this->assertTrue(!isset($fields['profile_updated']));
+
+    $fields = $this->object->getFields('date', 'datetime', 'time');
+    $this->assertTrue(!isset($fields['profile_image']));
+    $this->assertTrue(!isset($fields['profile_name']));
+    $this->assertTrue(!isset($fields['profile_last_name']));
+    $this->assertTrue(!isset($fields['profile_gender']));
+    $this->assertTrue(isset($fields['profile_birthday']));
+    $this->assertTrue(!isset($fields['profile_bio']));
+    $this->assertTrue(!isset($fields['profile_active']));
+    $this->assertTrue(isset($fields['profile_created']));
+    $this->assertTrue(isset($fields['profile_updated']));
+
+    $fields = $this->object->getFields('number');
+    $this->assertTrue(!isset($fields['profile_image']));
+    $this->assertTrue(!isset($fields['profile_name']));
+    $this->assertTrue(!isset($fields['profile_last_name']));
+    $this->assertTrue(!isset($fields['profile_gender']));
+    $this->assertTrue(!isset($fields['profile_birthday']));
+    $this->assertTrue(!isset($fields['profile_bio']));
+    $this->assertTrue(isset($fields['profile_active']));
+    $this->assertTrue(!isset($fields['profile_created']));
+    $this->assertTrue(!isset($fields['profile_updated']));
   }
 
+  /**
+   * @covers Cradle\Package\System\Fieldset::getForm
+   */
+  public function testGetForm()
+  {
+    $form = $this->object->getForm();
+    $this->assertTrue(!isset($form['profile_image']));
+    $this->assertTrue(isset($form['profile_name']));
+    $this->assertTrue(isset($form['profile_last_name']));
+    $this->assertTrue(isset($form['profile_gender']));
+    $this->assertTrue(isset($form['profile_birthday']));
+    $this->assertTrue(!isset($form['profile_bio']));
+    $this->assertTrue(!isset($form['profile_active']));
+    $this->assertTrue(!isset($form['profile_created']));
+    $this->assertTrue(!isset($form['profile_updated']));
+  }
 
+  /**
+   * @covers Cradle\Package\System\Fieldset::getErrors
+   */
+  public function testGetErrors()
+  {
+    $errors = $this->object->getErrors([
+      'profile_name' => null,
+      'profile_last_name' => null,
+      'profile_gender' => null,
+      'profile_bio' => null,
+      'profile_birthday' => null,
+    ]);
+
+    $this->assertTrue(!isset($errors['profile_image']));
+    $this->assertTrue(isset($errors['profile_name']));
+    $this->assertTrue(!isset($errors['profile_last_name']));
+    $this->assertTrue(isset($errors['profile_gender']));
+    $this->assertTrue(isset($errors['profile_birthday']));
+    $this->assertTrue(!isset($errors['profile_bio']));
+    $this->assertTrue(!isset($errors['profile_active']));
+    $this->assertTrue(!isset($errors['profile_created']));
+    $this->assertTrue(!isset($errors['profile_updated']));
+
+    $errors = $this->object->getErrors([
+      'profile_name' => '',
+      'profile_last_name' => null,
+      'profile_gender' => 'male',
+      'profile_bio' => null,
+      'profile_birthday' => 'bogus',
+    ]);
+
+    $this->assertTrue(!isset($errors['profile_image']));
+    $this->assertTrue(isset($errors['profile_name']));
+    $this->assertTrue(!isset($errors['profile_last_name']));
+    $this->assertTrue(!isset($errors['profile_gender']));
+    $this->assertTrue(isset($errors['profile_birthday']));
+    $this->assertTrue(!isset($errors['profile_bio']));
+    $this->assertTrue(!isset($errors['profile_active']));
+    $this->assertTrue(!isset($errors['profile_created']));
+    $this->assertTrue(!isset($errors['profile_updated']));
+
+    $errors = $this->object->getErrors([
+      'profile_name' => 'ok',
+      'profile_last_name' => null,
+      'profile_gender' => 'male',
+      'profile_bio' => null,
+      'profile_birthday' => '2020-12-01',
+    ]);
+
+    $this->assertTrue(!isset($errors['profile_image']));
+    $this->assertTrue(!isset($errors['profile_name']));
+    $this->assertTrue(!isset($errors['profile_last_name']));
+    $this->assertTrue(!isset($errors['profile_gender']));
+    $this->assertTrue(!isset($errors['profile_birthday']));
+    $this->assertTrue(!isset($errors['profile_bio']));
+    $this->assertTrue(!isset($errors['profile_active']));
+    $this->assertTrue(!isset($errors['profile_created']));
+    $this->assertTrue(!isset($errors['profile_updated']));
+  }
+
+  /**
+   * @covers Cradle\Package\System\Fieldset::prepare
+   */
+  public function testPrepare()
+  {
+    $data = $this->object->prepare([
+      'profile_name' => 'ok',
+      'profile_last_name' => null,
+      'profile_bio' => null,
+      'profile_birthday' => 'December 18, 1981',
+    ]);
+
+    $this->assertEquals('ok', $data['profile_name']);
+    $this->assertNull($data['profile_last_name']);
+    $this->assertEquals('na', $data['profile_gender']);
+    $this->assertEquals('1981-12-18', $data['profile_birthday']);
+    $this->assertEquals(1, $data['profile_active']);
+    $this->assertContains(date('Y-m'), $data['profile_created']);
+    $this->assertContains(date('Y-m'), $data['profile_updated']);
+
+    $data = $this->object->prepare([
+      'profile_name' => 'ok',
+      'profile_last_name' => null,
+      'profile_bio' => null,
+      'profile_birthday' => 'December 18, 1981',
+      'profile_gender' => 'male',
+      'profile_active' => false, //should be 0
+      'profile_created' => '2020-12-18 01:01:01', //should not change
+      'profile_updated' => '2020-12-18 01:01:01' //should ignore this
+    ]);
+
+    $this->assertEquals('ok', $data['profile_name']);
+    $this->assertNull($data['profile_last_name']);
+    $this->assertEquals('male', $data['profile_gender']);
+    $this->assertEquals('1981-12-18', $data['profile_birthday']);
+    $this->assertEquals(0, $data['profile_active']);
+    $this->assertEquals('2020-12-18 01:01:01', $data['profile_created']);
+    $this->assertContains(date('Y-m'), $data['profile_updated']);
+  }
+
+  /**
+   * @covers Cradle\Package\System\Fieldset::format
+   */
+  public function testFormat()
+  {
+    $data = $this->object->format([
+      'foo' => 'bar',
+      'profile_name' => 'ok',
+      'profile_last_name' => null,
+      'profile_bio' => null,
+      'profile_birthday' => '2020-12-18 00:00:00',
+      'profile_gender' => 'MALE',
+      'profile_active' => true,
+      'profile_created' => 'December 18, 1981',
+      'profile_updated' => 'December 18, 1982',
+    ]);
+
+    $this->assertEquals('bar', $data['foo']);
+    $this->assertEquals('ok', $data['profile_name']);
+    $this->assertEquals('', $data['profile_last_name']);
+    $this->assertEquals('male', $data['profile_gender']);
+    $this->assertEquals('December 18, 2020', $data['profile_birthday']);
+    $this->assertEquals('', $data['profile_bio']);
+    $this->assertEquals(1, $data['profile_active']);
+    $this->assertContains('December 18, 1981', $data['profile_created']);
+    $this->assertContains('December 18, 1982', $data['profile_updated']);
+  }
 }

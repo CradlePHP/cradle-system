@@ -5,6 +5,21 @@ namespace Cradle\Package\System\Fieldset\Field;
 abstract class AbstractField
 {
   /**
+   * @const bool FORCE_FILTERABLE Whether or not to force the field to filterable
+   */
+  const FORCE_FILTERABLE = false;
+
+  /**
+   * @const bool FORCE_SEARCHABLE Whether or not to force the field to searchable
+   */
+  const FORCE_SEARCHABLE = false;
+
+  /**
+   * @const bool FORCE_SORTABLE Whether or not to force the field to sortable
+   */
+  const FORCE_SORTABLE = false;
+
+  /**
    * @const bool HAS_ATTRIBUTES Whether or not to show attribute fieldset
    * on the schema form if the field was chosen
    */

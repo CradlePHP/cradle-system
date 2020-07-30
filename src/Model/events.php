@@ -7,7 +7,81 @@
  */
 
 use Cradle\Package\System\Schema;
-use Cradle\Package\System\Model\Validator;
+
+/**
+ * System Model [Schema] Create Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this('event')->on('system-model-%s-create', function ($request, $response) {
+  $meta = $this('event')->getEventEmitter()->getMeta();
+
+  if (isset($meta['variables'][0])) {
+    $request->setStage('schema', $meta['variables'][0]);
+    $this('event')->emit('system-model-create', $request, $response);
+  }
+});
+
+/**
+ * System Model [Schema] Detail Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this('event')->on('system-model-%s-detail', function ($request, $response) {
+  $meta = $this('event')->getEventEmitter()->getMeta();
+
+  if (isset($meta['variables'][0])) {
+    $request->setStage('schema', $meta['variables'][0]);
+    $this('event')->emit('system-model-detail', $request, $response);
+  }
+});
+
+/**
+ * System Model [Schema] Remove Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this('event')->on('system-model-%s-remove', function ($request, $response) {
+  $meta = $this('event')->getEventEmitter()->getMeta();
+
+  if (isset($meta['variables'][0])) {
+    $request->setStage('schema', $meta['variables'][0]);
+    $this('event')->emit('system-model-remove', $request, $response);
+  }
+});
+
+/**
+ * System Model [Schema] Restore Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this('event')->on('system-model-%s-restore', function ($request, $response) {
+  $meta = $this('event')->getEventEmitter()->getMeta();
+
+  if (isset($meta['variables'][0])) {
+    $request->setStage('schema', $meta['variables'][0]);
+    $this('event')->emit('system-model-restore', $request, $response);
+  }
+});
+
+/**
+ * System Model [Schema] Update Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this('event')->on('system-model-%s-update', function ($request, $response) {
+  $meta = $this('event')->getEventEmitter()->getMeta();
+
+  if (isset($meta['variables'][0])) {
+    $request->setStage('schema', $meta['variables'][0]);
+    $this('event')->emit('system-model-update', $request, $response);
+  }
+});
 
 /**
  * System Model Create Job
@@ -15,7 +89,7 @@ use Cradle\Package\System\Model\Validator;
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-model-create', function ($request, $response) {
+$this('event')->on('system-model-create', function ($request, $response) {
   //----------------------------//
   // 0. Abort on Errors
   if ($response->isError()) {
@@ -39,7 +113,7 @@ $this->on('system-model-create', function ($request, $response) {
 
   //----------------------------//
   // 2. Validate Data
-  $errors = Validator::i($schema)->getCreateErrors($data);
+  $errors = $schema->getErrors($data);
 
   //if there are errors
   if (!empty($errors)) {
@@ -50,27 +124,43 @@ $this->on('system-model-create', function ($request, $response) {
 
   //----------------------------//
   // 3. Prepare Data
-  $data = $schema
-    ->model()
-    ->formatter()
-    ->formatData($data);
+  $data = $schema->prepare($data);
 
   //----------------------------//
   // 4. Process Data
-  //trigger store create
-  $results = $this->method('system-model-create-store', $data, $response);
-  //if there's an error
+  $payload = $this('io')->makePayload(false);
+  $emitter = $this('event');
+
+  if ($request->meta('mysql')) {
+    $payload['request']->meta('mysql', $request->meta('mysql'));
+  }
+
+  if ($request->meta('storm')) {
+    $payload['request']->meta('storm', $request->meta('storm'));
+  }
+
+  if ($request->meta('storm-insert')) {
+    $payload['request']->meta('storm-insert', $request->meta('storm-insert'));
+  }
+
+  $payload['request']->setStage([
+    'table' => $data['schema'],
+    'data' => $data
+  ]);
+
+  $emitter->method('storm-insert', $payload['request'], $response);
+
   if ($response->isError()) {
-    //dont continue
     return;
   }
 
+  //get the results
+  $results = $response->getResults();
   //get the primary name
-  $primary = $schema->getPrimaryFieldName();
+  $primary = $schema->getPrimaryName();
 
   //loop through all forward relations
-  $relations = $schema->getRelations();
-  foreach ($relations as $table => $relation) {
+  foreach ($schema->getRelations() as $table => $relation) {
     //set the 2nd primary
     $primary2 = $relation['primary2'];
     //if id is invalid
@@ -84,27 +174,18 @@ $this->on('system-model-create', function ($request, $response) {
       $data[$primary2] = [$data[$primary2]];
     }
 
-    //loop through yje IDs
-    foreach ($data[$primary2] as $id) {
-      //if id is not a number
-      if (!is_numeric($id)) {
-        //skip
-        continue;
-      }
-
-      //link relations
-      $this->method('system-relation-link', [
-        'schema1' => $data['schema'],
-        'schema2' => $relation['name'],
-        $primary => $results[$primary],
-        $primary2 => $id,
-      ]);
-    }
+    //link relations
+    $emitter->method('system-relation-link', [
+      'schema1' => $data['schema'],
+      'schema2' => $relation['name'],
+      $primary => $results[$primary],
+      //should consider array of ids
+      $primary2 => $data[$primary2],
+    ]);
   }
 
   //loop through all reverse relations
-  $relations = $schema->getReverseRelations();
-  foreach ($relations as $table => $relation) {
+  foreach ($schema->getReverseRelations() as $table => $relation) {
     //set the 2nd primary
     $primary2 = $relation['primary2'];
     //if id is invalid
@@ -118,32 +199,20 @@ $this->on('system-model-create', function ($request, $response) {
       $data[$primary2] = [$data[$primary2]];
     }
 
-    //loop through yje IDs
-    foreach ($data[$primary2] as $id) {
-      //if id is not a number
-      if (!is_numeric($id)) {
-        //skip
-        continue;
-      }
-
-      //link relations
-      $this->method('system-relation-link', [
-        'schema1' => $data['schema'],
-        'schema2' => $relation['name'],
-        $primary => $results[$primary],
-        $primary2 => $id,
-      ]);
-    }
+    //link relations
+    $emitter->method('system-relation-link', [
+      'schema1' => $data['schema'],
+      'schema2' => $relation['name'],
+      $primary => $results[$primary],
+      //should consider array of ids
+      $primary2 => $data[$primary2],
+    ]);
   }
 
-  //fix the results and put back the arrays
-  $results = $schema
-    ->model()
-    ->formatter()
-    ->expandData($results);
-
-  //return response format
-  $response->setError(false)->setResults($results);
+  //lastly return the detail
+  $emitter->method('system-model-detail', [
+    $primary => $results[$primary]
+  ], $response);
 });
 
 /**
@@ -152,38 +221,214 @@ $this->on('system-model-create', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-model-detail', function ($request, $response) {
+$this('event')->on('system-model-detail', function ($request, $response) {
   //----------------------------//
   // 0. Abort on Errors
-  if ($response->isError()) {
+  if ($response->isError() || $response->hasResults()) {
     return;
   }
 
   //----------------------------//
   // 1. Get Data
-  //----------------------------//
-  // 2. Validate Data
-  if ($request->getStage('schema')) {
+  $data = [];
+  if ($request->hasStage()) {
+    $data = $request->getStage();
+  }
+
+  if (!isset($data['schema'])) {
     return $response
       ->setError(true, 'Invalid Parameters')
       ->addValidation('schema', 'Schema is required.');
   }
 
-  //----------------------------//
-  // 3. Prepare Data
-  //no preparation needed
-  //----------------------------//
-  // 4. Process Data
-  //trigger store detail
-  $this->trigger('system-model-detail-store', $request, $response);
+  $schema = Schema::i($data['schema']);
+  //get the primary name
+  $primary = $schema->getPrimaryName();
 
-  //if there's an error
-  if ($response->isError()) {
-    //dont continue
-    return;
+  //determine key and value
+  $key = $value = null;
+  //the obvious thing is primary
+  if (array_key_exists($primary, $data)) {
+    $key = $primary;
+    $value = $data[$primary];
+  } else {
+    //look for any unique keys
+    foreach ($schema->getFields('unique') as $name => $field) {
+      if (array_key_exists($name, $data)) {
+        $key = $name;
+        $value = $data[$name];
+        break;
+      }
+    }
   }
 
-  $response->setError(false);
+  //----------------------------//
+  // 2. Validate Data
+  //we need an id
+  if (!$value) {
+    return $response->setError(true, 'Invalid ID');
+  }
+
+  //----------------------------//
+  // 3. Prepare Data
+  $system = $this->package('/module/cradle-system');
+
+  //allow columns
+  if (!isset($data['columns'])) {
+    $data['columns'] = '*';
+  }
+
+  //compute joins
+  if (!isset($data['join'])) {
+    $data['join'] = [];
+  }
+
+  $columns = $data['columns'];
+  //eg. joins = [['type' => 'inner', 'table' => 'product', 'where' => 'product_id']]
+  $joins = $system->getInnerJoins($schema, $data['join']);
+  //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
+  $filters = [['where' => $key . ' =%s', 'binds' => [$value]]];
+
+  //----------------------------//
+  // 4. Process Data
+  $payload = $this('io')->makePayload(false);
+  $emitter = $this('event');
+
+  if ($request->meta('mysql')) {
+    $payload['request']->meta('mysql', $request->meta('mysql'));
+  }
+
+  if ($request->meta('storm')) {
+    $payload['request']->meta('storm', $request->meta('storm'));
+  }
+
+  if ($request->meta('storm-search')) {
+    $payload['request']->meta('storm-search', $request->meta('storm-search'));
+  }
+
+  $payload['request']->setStage([
+    'table' => $data['schema'],
+    'columns' => $columns,
+    'joins' => $joins,
+    'filters' => $filters,
+    'start' => 0,
+    'range' => 1
+  ]);
+
+  $results = $emitter->method('storm-search', $payload['request']);
+
+  if (!isset($results[0])) {
+    return $response->setError(true, 'Not Found');
+  }
+
+  //organize all the results
+  $results = $system->organizeRow($results[0]);
+  $id = $results[$data['schema']][$primary];
+
+  //next, attach all the joins
+  $joins = $system->getJoinFilters($schema, $data['join']);
+  //attach forward joins
+  foreach ($schema->getRelations() as $relationTable => $relation) {
+    $name = $group = $relation->getName();
+    $primary2 = $relation->getPrimaryName();
+    //we already joined 1:1, dont do it again
+    //if it's not on the join list
+    if ($relation['many'] == 1 || !in_array($name, $joins)) {
+      continue;
+    }
+
+    //case for post_post
+    if ($name === $data['schema']) {
+      $group = '_children';
+    }
+
+    //make a default
+    $results[$group] = null;
+
+    //make a separate payload
+    $payload = $this('io')->makePayload(false);
+
+    if ($request->meta('mysql')) {
+      $payload['request']->meta('mysql', $request->meta('mysql'));
+    }
+
+    if ($request->meta('storm')) {
+      $payload['request']->meta('storm', $request->meta('storm'));
+    }
+
+    //filter settings
+    $payload['request']->setStage([
+      'table' => $name,
+      //eg. joins = [['type' => 'inner', 'table' => 'product', 'where' => 'product_id']]
+      'joins' => [
+        ['type' => 'inner', 'table' => $relationTable, 'where' => $primary2],
+        ['type' => 'inner', 'table' => $data['schema'], 'where' => $primary]
+      ],
+      //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
+      'filters' => [
+        ['where' => $primary . ' =%s', 'binds' => [$id]]
+      ],
+      'range' => 0
+    ]);
+
+    //if 1:0
+    if ($relation['many'] == 0) {
+      //we only need one
+      $payload['request']->setStage('range', 1);
+    }
+
+    $child = $emitter->method('storm-search', $payload['request']);
+
+    //if 1:0
+    if ($relation['many'] == 0 && isset($child[0])) {
+      //we only need one
+      $results[$group] = $child[0];
+      continue;
+    }
+
+    $results[$group] = $child;
+  }
+
+  //attach reverse joins
+  foreach ($schema->getReverseRelations() as $relation) {
+    $name = $relation->getName();
+    $primary2 = $relation->getPrimaryName();
+    //only join 1:N and N:N
+    //if it's not on the join list
+    if ($relation['many'] < 2 || !in_array($name, $joins)) {
+      continue;
+    }
+
+    //make a separate payload
+    $payload = $this('io')->makePayload(false);
+
+    if ($request->meta('mysql')) {
+      $payload['request']->meta('mysql', $request->meta('mysql'));
+    }
+
+    if ($request->meta('storm')) {
+      $payload['request']->meta('storm', $request->meta('storm'));
+    }
+
+    //filter settings
+    $payload['request']->setStage([
+      'table' => $name,
+      //eg. joins = [['type' => 'inner', 'table' => 'product', 'where' => 'product_id']]
+      'joins' => [
+        ['type' => 'inner', 'table' => $relationTable, 'where' => $primary2],
+        ['type' => 'inner', 'table' => $data['schema'], 'where' => $primary]
+      ],
+      //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
+      'filters' => [
+        ['where' => $primary . ' =%s', 'binds' => [$id]]
+      ],
+      'range' => 0
+    ]);
+
+    $results[$name] = $emitter->method('storm-search', $payload['request']);
+  }
+
+  $response->setError(false)->setResults($results);
 });
 
 /**
@@ -192,7 +437,7 @@ $this->on('system-model-detail', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-model-remove', function ($request, $response) {
+$this('event')->on('system-model-remove', function ($request, $response) {
   //----------------------------//
   // 0. Abort on Errors
   if ($response->isError()) {
@@ -202,7 +447,7 @@ $this->on('system-model-remove', function ($request, $response) {
   //----------------------------//
   // 1. Get Data
   //get the object detail
-  $this->trigger('system-model-detail', $request, $response);
+  $this('event')->trigger('system-model-detail', $request, $response);
 
   //----------------------------//
   // 2. Validate Data
@@ -222,8 +467,8 @@ $this->on('system-model-remove', function ($request, $response) {
 
   $schema = Schema::i($request->getStage('schema'));
 
-  $primary = $schema->getPrimaryFieldName();
-  $active = $schema->getActiveFieldName();
+  $primary = $schema->getPrimaryName();
+  $active = $schema->getFields('active');
 
   //----------------------------//
   // 4. Process Data
@@ -267,7 +512,7 @@ $this->on('system-model-remove', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-model-restore', function ($request, $response) {
+$this('event')->on('system-model-restore', function ($request, $response) {
   //----------------------------//
   // 0. Abort on Errors
   if ($response->isError()) {
@@ -297,7 +542,7 @@ $this->on('system-model-restore', function ($request, $response) {
 
   $schema = Schema::i($request->getStage('schema'));
 
-  $primary = $schema->getPrimaryFieldName();
+  $primary = $schema->getPrimaryName();
   $active = $schema->getActiveFieldName();
 
   //----------------------------//
@@ -330,7 +575,7 @@ $this->on('system-model-restore', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-model-update', function ($request, $response) {
+$this('event')->on('system-model-update', function ($request, $response) {
   //----------------------------//
   // 0. Abort on Errors
   if ($response->isError()) {
@@ -396,7 +641,7 @@ $this->on('system-model-update', function ($request, $response) {
   $results = $modelSql->update($data);
 
   //get the primary value
-  $primary = $schema->getPrimaryFieldName();
+  $primary = $schema->getPrimaryName();
   $relations = $schema->getRelations();
   $reverseRelations = $schema->getReverseRelations();
 

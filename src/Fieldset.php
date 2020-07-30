@@ -93,12 +93,12 @@ class Fieldset extends Registry
    */
   public function format(array $data, string $format = 'list'): array
   {
-    $formatted = [];
+    $formatted = $data;
     //loop through each field
     $fields = $this->getFields();
     foreach ($fields as $key => $field) {
       //if it's not set
-      if (!isset($data[$key])) {
+      if (!array_key_exists($key, $data)) {
         continue;
       }
 
@@ -149,7 +149,7 @@ class Fieldset extends Registry
       $key = $table . '_' . $field['name'];
       $field['types'] = $this->getTypes($field);
       //quick way of filtering
-      if (!empty($types) && empty(array_intersect($ypes, $field['types']))) {
+      if (!empty($types) && empty(array_intersect($types, $field['types']))) {
         continue;
       }
       $results[$key] = $field;
@@ -178,9 +178,9 @@ class Fieldset extends Registry
       }
 
       //load up the field
-      $field = FieldHandler::getField($field['field']['type']);
+      $fieldSchema = FieldHandler::getField($field['field']['type']);
       //if no field
-      if (!$field) {
+      if (!$fieldSchema) {
         continue;
       }
 
@@ -190,20 +190,20 @@ class Fieldset extends Registry
       }
 
       //set name
-      $field->setName($key);
+      $fieldSchema->setName($key);
 
       //set attributes
       if (isset($field['field']['attributes'])
         && is_array($field['field']['attributes'])
       ) {
-        $field->setAttributes($field['field']['attributes']);
+        $fieldSchema->setAttributes($field['field']['attributes']);
       }
 
       //set options
       if (isset($field['field']['options'])
         && is_array($field['field']['options'])
       ) {
-        $field->setOptions($field['field']['options']);
+        $fieldSchema->setOptions($field['field']['options']);
       }
 
       //set parameters
@@ -212,10 +212,10 @@ class Fieldset extends Registry
           $field['field']['parameters'] = [$field['field']['parameters']];
         }
 
-        $field->setParameters($field['field']['parameters']);
+        $fieldSchema->setParameters($field['field']['parameters']);
       }
 
-      $form[$key] = $field->render($data[$key]);
+      $form[$key] = $fieldSchema->render($data[$key]);
     }
 
     return $form;
@@ -245,6 +245,21 @@ class Fieldset extends Registry
     //loop through each field
     $fields = $this->getFields();
     foreach ($fields as $key => $field) {
+      //make sure there is a value we can compare
+      if (!array_key_exists($key, $data)) {
+        $data[$key] = null;
+        //if the value is not set, dont field validate..
+      } else {
+        //load up the field
+        $fieldSchema = FieldHandler::getField($field['field']['type']);
+        //if it's not valid
+        if ($fieldSchema && !$fieldSchema->valid($data[$key])) {
+          //set an error
+          $errors[$key] = 'Invalid field format';
+          continue;
+        }
+      }
+
       //if there is no validation
       if (!isset($field['validation'])
         || !is_array($field['validation'])
@@ -252,11 +267,6 @@ class Fieldset extends Registry
       ) {
         //it's obviously valid
         continue;
-      }
-
-      //make sure there is a value we can compare
-      if (!isset($data[$key])) {
-        $data[$key] = null;
       }
 
       //for each validation
@@ -294,6 +304,7 @@ class Fieldset extends Registry
         if (!$validator->valid($data[$key])) {
           //set an error
           $errors[$key] = $message;
+          break;
         }
       }
     }
@@ -314,31 +325,18 @@ class Fieldset extends Registry
     //loop through each field
     $fields = $this->getFields();
     foreach ($fields as $key => $field) {
-      //if it's not set and dont use defaults
-      if (!isset($data[$key]) && !$defaults) {
-        continue;
-      }
-
-      //if it's not set there are no defaults
-      if (!isset($data[$key])
-        && (
-          !isset($field['default'])
-          || !$field['default']
-        )
-      ) {
-        continue;
-      }
-
       //if it's not set
-      if (!isset($data[$key]) ) {
+      if (!array_key_exists($key, $data)
+        && isset($field['default'])
+        && $field['default']
+      ) {
         //use the default
-        $prepped[$key] = $field['default'];
-        continue;
+        $data[$key] = $field['default'];
       }
 
       //if there is no type
       if (!isset($field['field']['type'])) {
-        //it's obviously valid
+        //it's obviously not valid
         continue;
       }
 
