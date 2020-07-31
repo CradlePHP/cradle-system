@@ -5,9 +5,10 @@
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
+require_once __DIR__ . '/src/Collection/events.php';
 require_once __DIR__ . '/src/Schema/events.php';
 //require_once __DIR__ . '/src/Schema/controller.php';
-//require_once __DIR__ . '/src/Model/events.php';
+require_once __DIR__ . '/src/Model/events.php';
 //require_once __DIR__ . '/src/Model/controller.php';
 //require_once __DIR__ . '/src/Fieldset/events.php';
 //require_once __DIR__ . '/src/Fieldset/controller.php';

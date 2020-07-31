@@ -20,7 +20,7 @@
     "php-coveralls/php-coveralls": "~2.1.0"
   },
   "require": {
-    "cradlephp/cradle-storm": "~3.0.0"
+    "cradlephp/package": "~3.0.0"
   },
   "autoload": {
     "psr-4": {

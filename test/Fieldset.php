@@ -20,7 +20,7 @@ class Cradle_Package_System_Fieldset_Test extends TestCase
    */
   protected function setUp()
   {
-    $this->object = new Fieldset(include __DIR__ . '/assets/profile.php');
+    $this->object = new Fieldset(include __DIR__ . '/assets/config/schema/profile.php');
   }
 
   /**

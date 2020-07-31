@@ -11,13 +11,16 @@ use Cradle\Package\System\Schema\Validator;
 use Cradle\Package\System\Schema;
 use Cradle\Package\System\SystemException;
 
+use Cradle\IO\Request\RequestInterface;
+use Cradle\IO\Response\ResponseInterface;
+
 /**
  * System Schema Create Job
  *
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-schema-create', function ($request, $response) {
+$this('event')->on('system-schema-create', function (RequestInterface $request, ResponseInterface $response) {
   //----------------------------//
   // 0. Abort on Errors
   if ($response->isError() || $response->hasResults()) {
@@ -52,18 +55,13 @@ $this->on('system-schema-create', function ($request, $response) {
     }
   }
 
-  //----------------------------//
-  // 3. Prepare Data
   // filter relations
   if (isset($data['relations'])) {
     // filter out empty relations
-    $data['relations'] = array_filter(
-      $data['relations'],
-      function ($relation) {
-        // make sure we have relation name
-        return $relation['name'] !== '' ? true : false;
-      }
-    );
+    $data['relations'] = array_filter($data['relations'], function ($relation) {
+      // make sure we have relation name
+      return isset($relation['name']) && trim($relation['name']);
+    });
 
     foreach ($data['relations'] as $key => $relation) {
       $data['relations'][$key]['name'] = strtolower($relation['name']);
@@ -71,15 +69,51 @@ $this->on('system-schema-create', function ($request, $response) {
   }
 
   //----------------------------//
+  // 2. Validate Data
+  $errors = Validator::getCreateErrors($data);
+
+  //if there are errors
+  if (!empty($errors)) {
+    return $response
+      ->setError(true, 'Invalid Parameters')
+      ->set('json', 'validation', $errors);
+  }
+
+  //----------------------------//
+  // 3. Prepare Data
+  //load the emitter
+  $emitter = $this('event');
+  //make a new payload
+  $payload = $request->clone(true);
+  //get schema path
+  $path = $this('global')->path('schema');
+
+  //----------------------------//
   // 4. Process Data
   //make a schema folder
-  $path = $this('global')->path('schema');
   if (!is_dir($path)) {
     mkdir($path, 0777);
   }
 
   //save to file
-  $results = Schema::i($data)->save()->get();
+  $schema = Schema::i($data);
+  $results = $schema->save()->get();
+
+  //add the results
+  $payload->setStage($results);
+  //set the primary name
+  $payload->setStage('primary', $schema->getPrimaryName());
+  //re-add the fields with all possible types
+  $payload->setStage('fields', $schema->getFields());
+  //re-add the relations
+  $payload->setStage('relations', $schema->getRelations());
+
+  //trigger the store create
+  $emitter->emit('system-store-create', $payload, $response);
+
+  if ($response->isError()) {
+    return;
+  }
 
   //return response format
   $response->setError(false)->setResults($results);
@@ -91,7 +125,7 @@ $this->on('system-schema-create', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-schema-detail', function ($request, $response) {
+$this('event')->on('system-schema-detail', function (RequestInterface $request, ResponseInterface $response) {
   //----------------------------//
   // 0. Abort on Errors
   if ($response->isError() || $response->hasResults()) {
@@ -139,7 +173,7 @@ $this->on('system-schema-detail', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-schema-remove', function ($request, $response) {
+$this('event')->on('system-schema-remove', function (RequestInterface $request, ResponseInterface $response) {
   //----------------------------//
   // 0. Abort on Errors
   if ($response->isError() || $response->hasResults()) {
@@ -148,6 +182,7 @@ $this->on('system-schema-remove', function ($request, $response) {
 
   //----------------------------//
   // 1. Get Data
+
   //get the system detail
   $this->trigger('system-schema-detail', $request, $response);
 
@@ -159,25 +194,43 @@ $this->on('system-schema-remove', function ($request, $response) {
 
   //----------------------------//
   // 3. Prepare Data
+  //load the emitter
+  $emitter = $this('event');
+
+  //get data from results
   $data = $response->getResults();
+  //load schema
+  $schema = Schema::i($data);
+  //get table
+  $table = $schema->getName();
+  //set restorable
+  $restorable = $request->getStage('mode') !== 'permanent';
+  //get the schema path
+  $path = $this->package('global')->path('schema');
+  //generate a source path
+  $source = sprintf('%s/%s.php', $path, $table);
+  //generate a destination path
+  $destination = sprintf('%s/_%s.php', $path, $table);
 
   //----------------------------//
   // 4. Process Data
-  $schema = Schema::i($data);
-  $table = $schema->getName();
-
-  $restorable = true;
-  if ($request->getStage('mode') === 'permanent') {
-    $restorable = false;
+  if (!$restorable) {
+    unlink($source);
+  } else if (file_exists($source)) {
+    rename($source, $destination);
+  } else {
+    return $response->setError(true, 'Source file missing');
   }
 
-  $path = $this->package('global')->path('schema') . '/' . $table . '.php';
+  //make sure schema is set
+  $request->setStage('schema', $schema->getName());
+  //make sure restorable is set
+  $request->setStage('restorable', $restorable);
+  //trigger the store drop
+  $emitter->emit('system-store-drop', $request, $response);
 
-  if (!$restorable) {
-    unlink($path);
-  } else if (file_exists($path)) {
-    $new = $this->package('global')->path('schema') . '/_' . $table . '.php';
-    rename($path, $new);
+  if ($response->isError()) {
+    return;
   }
 
   $response->setError(false)->setResults($schema->get());
@@ -189,7 +242,7 @@ $this->on('system-schema-remove', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-schema-restore', function ($request, $response) {
+$this('event')->on('system-schema-restore', function (RequestInterface $request, ResponseInterface $response) {
   //----------------------------//
   // 0. Abort on Errors
   if ($response->isError() || $response->hasResults()) {
@@ -211,18 +264,39 @@ $this->on('system-schema-restore', function ($request, $response) {
 
   //----------------------------//
   // 3. Prepare Data
+  //load the emitter
+  $emitter = $this('event');
+
+  //get data from results
   $data = $response->getResults();
+  //load schema
+  $schema = Schema::i($data);
+  //get table
+  $table = $schema->getName();
+  //get the schema path
+  $path = $this->package('global')->path('schema');
+  //generate a source path
+  $source = sprintf('%s/_%s.php', $path, $table);
+  //generate a destination path
+  $destination = sprintf('%s/%s.php', $path, $table);
 
   //----------------------------//
   // 4. Process Data
-  $schema = Schema::i($data);
-  $table = $schema->getName();
+  if (file_exists($source)) {
+    rename($source, $destination);
+  } else {
+    return $response->setError(true, 'Source file missing');
+  }
 
-  $path = $this->package('global')->path('schema') . '/_' . $table . '.php';
+  //make sure schema is set
+  $request->setStage('schema', $schema->getName());
+  //make sure restorable is set
+  $request->setStage('restorable', $restorable);
+  //trigger the store recover
+  $emitter->emit('system-store-recover', $request, $response);
 
-  if (file_exists($path)) {
-    $new = $this->package('global')->path('schema') . '/' . $table . '.php';
-    rename($path, $new);
+  if ($response->isError()) {
+    return;
   }
 
   $response->setError(false)->setResults($schema->get());
@@ -234,7 +308,7 @@ $this->on('system-schema-restore', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-schema-search', function ($request, $response) {
+$this('event')->on('system-schema-search', function (RequestInterface $request, ResponseInterface $response) {
   //----------------------------//
   // 0. Abort on Errors
   if ($response->isError() || $response->hasResults()) {
@@ -271,7 +345,7 @@ $this->on('system-schema-search', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this->on('system-schema-update', function ($request, $response) {
+$this('event')->on('system-schema-update', function (RequestInterface $request, ResponseInterface $response) {
   //----------------------------//
   // 0. Abort on Errors
   if ($response->isError() || $response->hasResults()) {
@@ -280,17 +354,6 @@ $this->on('system-schema-update', function ($request, $response) {
 
   //----------------------------//
   // 1. Get Data
-  //get the system detail
-  $this->trigger('system-schema-detail', $request, $response);
-
-  //if there's an error
-  if ($response->isError()) {
-    return;
-  }
-
-  //get the original for later
-  $original = $response->getResults();
-
   //get data from stage
   $data = [];
   if ($request->hasStage()) {
@@ -318,8 +381,29 @@ $this->on('system-schema-update', function ($request, $response) {
     }
   }
 
+  // filter relations
+  if (isset($data['relations'])) {
+    // filter out empty relations
+    $data['relations'] = array_filter($data['relations'], function ($relation) {
+      // make sure we have relation name
+      return isset($relation['name']) && trim($relation['name']);
+    });
+
+    foreach ($data['relations'] as $key => $relation) {
+      $data['relations'][$key]['name'] = strtolower($relation['name']);
+    }
+  }
+
   //----------------------------//
   // 2. Validate Data
+  //get the system detail
+  $this->trigger('system-schema-detail', $request, $response);
+
+  //if there's an error
+  if ($response->isError()) {
+    return;
+  }
+
   $errors = Validator::getUpdateErrors($data);
 
   //if there are errors
@@ -331,25 +415,43 @@ $this->on('system-schema-update', function ($request, $response) {
 
   //----------------------------//
   // 3. Prepare Data
-  // filter relations
-  if (isset($data['relations'])) {
-    // filter out empty relations
-    $data['relations'] = array_filter(
-      $data['relations'],
-      function ($relation) {
-        // make sure we have relation name
-        return $relation['name'] !== '' ? true : false;
-      }
-    );
-
-    foreach ($data['relations'] as $key => $relation) {
-      $data['relations'][$key]['name'] = strtolower($relation['name']);
-    }
-  }
+  //get the original for later
+  $original = Schema::i($response->getResults());
 
   //----------------------------//
   // 4. Process Data
-  $results = Schema::i($data)->save()->set('original', $original)->get();
+  //load the emitter
+  $emitter = $this('event');
+  //make a new payload
+  $payload = $request->clone(true);
+
+  $results = Schema::i($data)
+    ->save()
+    ->set('original', $original->get())
+    ->get();
+
+  //add the results
+  $payload->setStage($results);
+  //make sure schema is set
+  $payload->setStage('schema', $schema->getName());
+  //set the primary name
+  $payload->setStage('primary', $schema->getPrimaryName());
+  //re-add the fields with all possible types
+  $payload->setStage('fields', $schema->getFields());
+  //re-add the relations
+  $payload->setStage('relations', $schema->getRelations());
+
+  //re-add original field types
+  $payload->setStage('original', 'fields', $original->getFields());
+  //re-add original relations
+  $payload->setStage('original', 'relations', $original->getRelations());
+
+  //trigger the store create
+  $emitter->emit('system-store-alter', $payload, $response);
+
+  if ($response->isError()) {
+    return;
+  }
 
   //return response format
   $response->setError(false)->setResults($results);

@@ -14,6 +14,7 @@
   <testsuites>
     <testsuite name="Cradle System Test">
       <file>test/Fieldset.php</file>
+      <file>test/Schema/events.php</file>
     </testsuite>
   </testsuites>
   <filter>

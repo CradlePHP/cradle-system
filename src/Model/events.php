@@ -7,81 +7,10 @@
  */
 
 use Cradle\Package\System\Schema;
+use Cradle\Package\System\SystemException;
 
-/**
- * System Model [Schema] Create Job
- *
- * @param Request $request
- * @param Response $response
- */
-$this('event')->on('system-model-%s-create', function ($request, $response) {
-  $meta = $this('event')->getEventEmitter()->getMeta();
-
-  if (isset($meta['variables'][0])) {
-    $request->setStage('schema', $meta['variables'][0]);
-    $this('event')->emit('system-model-create', $request, $response);
-  }
-});
-
-/**
- * System Model [Schema] Detail Job
- *
- * @param Request $request
- * @param Response $response
- */
-$this('event')->on('system-model-%s-detail', function ($request, $response) {
-  $meta = $this('event')->getEventEmitter()->getMeta();
-
-  if (isset($meta['variables'][0])) {
-    $request->setStage('schema', $meta['variables'][0]);
-    $this('event')->emit('system-model-detail', $request, $response);
-  }
-});
-
-/**
- * System Model [Schema] Remove Job
- *
- * @param Request $request
- * @param Response $response
- */
-$this('event')->on('system-model-%s-remove', function ($request, $response) {
-  $meta = $this('event')->getEventEmitter()->getMeta();
-
-  if (isset($meta['variables'][0])) {
-    $request->setStage('schema', $meta['variables'][0]);
-    $this('event')->emit('system-model-remove', $request, $response);
-  }
-});
-
-/**
- * System Model [Schema] Restore Job
- *
- * @param Request $request
- * @param Response $response
- */
-$this('event')->on('system-model-%s-restore', function ($request, $response) {
-  $meta = $this('event')->getEventEmitter()->getMeta();
-
-  if (isset($meta['variables'][0])) {
-    $request->setStage('schema', $meta['variables'][0]);
-    $this('event')->emit('system-model-restore', $request, $response);
-  }
-});
-
-/**
- * System Model [Schema] Update Job
- *
- * @param Request $request
- * @param Response $response
- */
-$this('event')->on('system-model-%s-update', function ($request, $response) {
-  $meta = $this('event')->getEventEmitter()->getMeta();
-
-  if (isset($meta['variables'][0])) {
-    $request->setStage('schema', $meta['variables'][0]);
-    $this('event')->emit('system-model-update', $request, $response);
-  }
-});
+use Cradle\IO\Request\RequestInterface;
+use Cradle\IO\Response\ResponseInterface;
 
 /**
  * System Model Create Job
@@ -89,7 +18,7 @@ $this('event')->on('system-model-%s-update', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this('event')->on('system-model-create', function ($request, $response) {
+$this('event')->on('system-model-create', function (RequestInterface $request, ResponseInterface $response) {
   //----------------------------//
   // 0. Abort on Errors
   if ($response->isError()) {
@@ -103,16 +32,23 @@ $this('event')->on('system-model-create', function ($request, $response) {
     $data = $request->getStage();
   }
 
+  //----------------------------//
+  // 2. Validate Data
+  //must have schema
   if (!isset($data['schema'])) {
     return $response
       ->setError(true, 'Invalid Parameters')
       ->addValidation('schema', 'Schema is required.');
   }
 
-  $schema = Schema::i($data['schema']);
+  try { //to load schema
+    $schema = Schema::load($data['schema']);
+  } catch (SystemException $e) {
+    return $response
+      ->setError(true, 'Invalid Parameters')
+      ->addValidation('schema', $e->getMessage());
+  }
 
-  //----------------------------//
-  // 2. Validate Data
   $errors = $schema->getErrors($data);
 
   //if there are errors
@@ -124,33 +60,25 @@ $this('event')->on('system-model-create', function ($request, $response) {
 
   //----------------------------//
   // 3. Prepare Data
-  $data = $schema->prepare($data);
+  //load the emitter
+  $emitter = $this('event');
+  //make a new payload
+  $payload = $request->clone(true);
+
+  //dont allow to set the primary id
+  unset($data[$schema->getPrimaryName()]);
+
+  //set the payload
+  $payload->setStage([
+    'table' => $data['schema'],
+    'data' => $schema->prepare($data)
+  ]);
 
   //----------------------------//
   // 4. Process Data
-  $payload = $this('io')->makePayload(false);
-  $emitter = $this('event');
+  $emitter->method('system-store-insert', $payload, $response);
 
-  if ($request->meta('mysql')) {
-    $payload['request']->meta('mysql', $request->meta('mysql'));
-  }
-
-  if ($request->meta('storm')) {
-    $payload['request']->meta('storm', $request->meta('storm'));
-  }
-
-  if ($request->meta('storm-insert')) {
-    $payload['request']->meta('storm-insert', $request->meta('storm-insert'));
-  }
-
-  $payload['request']->setStage([
-    'table' => $data['schema'],
-    'data' => $data
-  ]);
-
-  $emitter->method('storm-insert', $payload['request'], $response);
-
-  if ($response->isError()) {
+  if ($response->isError() || !$response->hasResults()) {
     return;
   }
 
@@ -221,7 +149,7 @@ $this('event')->on('system-model-create', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this('event')->on('system-model-detail', function ($request, $response) {
+$this('event')->on('system-model-detail', function (RequestInterface $request, ResponseInterface $response) {
   //----------------------------//
   // 0. Abort on Errors
   if ($response->isError() || $response->hasResults()) {
@@ -235,13 +163,33 @@ $this('event')->on('system-model-detail', function ($request, $response) {
     $data = $request->getStage();
   }
 
+  //allow columns
+  if (!isset($data['columns'])) {
+    $data['columns'] = '*';
+  }
+
+  //compute joins
+  if (!isset($data['join'])) {
+    $data['join'] = [];
+  }
+
+  //----------------------------//
+  // 2. Validate Data
+  //must have schema
   if (!isset($data['schema'])) {
     return $response
       ->setError(true, 'Invalid Parameters')
       ->addValidation('schema', 'Schema is required.');
   }
 
-  $schema = Schema::i($data['schema']);
+  try { //to load schema
+    $schema = Schema::load($data['schema']);
+  } catch (SystemException $e) {
+    return $response
+      ->setError(true, 'Invalid Parameters')
+      ->addValidation('schema', $e->getMessage());
+  }
+
   //get the primary name
   $primary = $schema->getPrimaryName();
 
@@ -255,15 +203,14 @@ $this('event')->on('system-model-detail', function ($request, $response) {
     //look for any unique keys
     foreach ($schema->getFields('unique') as $name => $field) {
       if (array_key_exists($name, $data)) {
-        $key = $name;
-        $value = $data[$name];
         break;
       }
     }
+
+    $key = $name;
+    $value = $data[$name];
   }
 
-  //----------------------------//
-  // 2. Validate Data
   //we need an id
   if (!$value) {
     return $response->setError(true, 'Invalid ID');
@@ -271,42 +218,22 @@ $this('event')->on('system-model-detail', function ($request, $response) {
 
   //----------------------------//
   // 3. Prepare Data
-  $system = $this->package('/module/cradle-system');
+  //load system package
+  $system = $this('cradlephp/cradle-system');
+  //load the emitter
+  $emitter = $this('event');
+  //make a new payload
+  $payload = $request->clone(true);
 
-  //allow columns
-  if (!isset($data['columns'])) {
-    $data['columns'] = '*';
-  }
-
-  //compute joins
-  if (!isset($data['join'])) {
-    $data['join'] = [];
-  }
-
+  //get columns
   $columns = $data['columns'];
   //eg. joins = [['type' => 'inner', 'table' => 'product', 'where' => 'product_id']]
   $joins = $system->getInnerJoins($schema, $data['join']);
   //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
   $filters = [['where' => $key . ' =%s', 'binds' => [$value]]];
 
-  //----------------------------//
-  // 4. Process Data
-  $payload = $this('io')->makePayload(false);
-  $emitter = $this('event');
-
-  if ($request->meta('mysql')) {
-    $payload['request']->meta('mysql', $request->meta('mysql'));
-  }
-
-  if ($request->meta('storm')) {
-    $payload['request']->meta('storm', $request->meta('storm'));
-  }
-
-  if ($request->meta('storm-search')) {
-    $payload['request']->meta('storm-search', $request->meta('storm-search'));
-  }
-
-  $payload['request']->setStage([
+  //set the payload
+  $payload->setStage([
     'table' => $data['schema'],
     'columns' => $columns,
     'joins' => $joins,
@@ -315,7 +242,13 @@ $this('event')->on('system-model-detail', function ($request, $response) {
     'range' => 1
   ]);
 
-  $results = $emitter->method('storm-search', $payload['request']);
+  //----------------------------//
+  // 4. Process Data
+  $results = $emitter->method('system-store-search', $payload, $response);
+
+  if ($response->isError()) {
+    return;
+  }
 
   if (!isset($results[0])) {
     return $response->setError(true, 'Not Found');
@@ -345,19 +278,11 @@ $this('event')->on('system-model-detail', function ($request, $response) {
     //make a default
     $results[$group] = null;
 
-    //make a separate payload
-    $payload = $this('io')->makePayload(false);
-
-    if ($request->meta('mysql')) {
-      $payload['request']->meta('mysql', $request->meta('mysql'));
-    }
-
-    if ($request->meta('storm')) {
-      $payload['request']->meta('storm', $request->meta('storm'));
-    }
+    //make a new payload
+    $payload = $request->clone(true);
 
     //filter settings
-    $payload['request']->setStage([
+    $payload->setStage([
       'table' => $name,
       //eg. joins = [['type' => 'inner', 'table' => 'product', 'where' => 'product_id']]
       'joins' => [
@@ -374,10 +299,10 @@ $this('event')->on('system-model-detail', function ($request, $response) {
     //if 1:0
     if ($relation['many'] == 0) {
       //we only need one
-      $payload['request']->setStage('range', 1);
+      $payload->setStage('range', 1);
     }
 
-    $child = $emitter->method('storm-search', $payload['request']);
+    $child = $emitter->method('storm-search', $payload);
 
     //if 1:0
     if ($relation['many'] == 0 && isset($child[0])) {
@@ -399,19 +324,11 @@ $this('event')->on('system-model-detail', function ($request, $response) {
       continue;
     }
 
-    //make a separate payload
-    $payload = $this('io')->makePayload(false);
-
-    if ($request->meta('mysql')) {
-      $payload['request']->meta('mysql', $request->meta('mysql'));
-    }
-
-    if ($request->meta('storm')) {
-      $payload['request']->meta('storm', $request->meta('storm'));
-    }
+    //make a new payload
+    $payload = $request->clone(true);
 
     //filter settings
-    $payload['request']->setStage([
+    $payload->setStage([
       'table' => $name,
       //eg. joins = [['type' => 'inner', 'table' => 'product', 'where' => 'product_id']]
       'joins' => [
@@ -425,7 +342,7 @@ $this('event')->on('system-model-detail', function ($request, $response) {
       'range' => 0
     ]);
 
-    $results[$name] = $emitter->method('storm-search', $payload['request']);
+    $results[$name] = $emitter->method('storm-search', $payload);
   }
 
   $response->setError(false)->setResults($results);
@@ -437,7 +354,7 @@ $this('event')->on('system-model-detail', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this('event')->on('system-model-remove', function ($request, $response) {
+$this('event')->on('system-model-remove', function (RequestInterface $request, ResponseInterface $response) {
   //----------------------------//
   // 0. Abort on Errors
   if ($response->isError()) {
@@ -447,7 +364,7 @@ $this('event')->on('system-model-remove', function ($request, $response) {
   //----------------------------//
   // 1. Get Data
   //get the object detail
-  $this('event')->trigger('system-model-detail', $request, $response);
+  $this('event')->emit('system-model-detail', $request, $response);
 
   //----------------------------//
   // 2. Validate Data
@@ -457,53 +374,48 @@ $this('event')->on('system-model-remove', function ($request, $response) {
 
   //----------------------------//
   // 3. Prepare Data
-  $data = $response->getResults();
+  //load the emitter
+  $emitter = $this('event');
+  //make a new payload
+  $payload = $request->clone(true);
 
-  if (!$request->hasStage('schema')) {
-    return $response
-      ->setError(true, 'Invalid Parameters')
-      ->addValidation('schema', 'Schema is required.');
-  }
-
-  $schema = Schema::i($request->getStage('schema'));
-
+  //we will use the original as the results later
+  $original = $response->getResults();
+  //get the schema, no need to try cuz of system-model-detail
+  $schema = Schema::load($request->getStage('schema'));
+  //get the primary column name
   $primary = $schema->getPrimaryName();
+  //get the ID of the model
+  $id = $response->getResults($primary);
+  //we need active to determine if we should update or delete
   $active = $schema->getFields('active');
+  //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
+  $filters = [['where' => $primary . ' = %s', 'binds' => [ $id ]]];
+
+  //set the payload
+  $payload->setStage([
+    'table' => $data['schema'],
+    'filters' => $filters
+  ]);
 
   //----------------------------//
   // 4. Process Data
-  //this/these will be used a lot
-  $modelSql = $schema->model()->service('sql');
-  $modelRedis = $schema->model()->service('redis');
-  $modelElastic = $schema->model()->service('elastic');
-
-  //save to database
-  if ($active) {
-    $payload = [];
-    $payload[$primary] = $data[$primary];
-    $payload[$active] = 0;
-
-    $results = $modelSql->update($payload);
+  if (!empty($active)) {
+    //get the active field name
+    $active = array_keys($active)[0];
+    $payload->setStage('data', $active, 0);
+    //update
+    $emitter->method('system-store-update', $payload, $response);
   } else {
-    $results = $modelSql->remove($data[$primary]);
+    //delete
+    $emitter->method('system-store-delete', $payload, $response);
   }
 
-  //remove from index
-  $modelElastic->remove($data[$primary]);
-
-  //invalidate cache
-  $uniques = $schema->getUniqueFieldNames();
-  foreach ($uniques as $unique) {
-    if (isset($data[$unique])) {
-      $modelRedis->removeDetail($unique . '-' . $data[$unique]);
-    }
+  if ($response->isError() || !$response->hasResults()) {
+    return;
   }
 
-  $modelRedis->removeSearch();
-
-  //add the schema to the results, so we know which table was changed
-  $results['schema'] = $request->getStage('schema');
-  $response->setError(false)->setResults($results);
+  $response->setError(false)->setResults($original);
 });
 
 /**
@@ -512,7 +424,7 @@ $this('event')->on('system-model-remove', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this('event')->on('system-model-restore', function ($request, $response) {
+$this('event')->on('system-model-restore', function (RequestInterface $request, ResponseInterface $response) {
   //----------------------------//
   // 0. Abort on Errors
   if ($response->isError()) {
@@ -522,7 +434,7 @@ $this('event')->on('system-model-restore', function ($request, $response) {
   //----------------------------//
   // 1. Get Data
   //get the object detail
-  $this->trigger('system-model-detail', $request, $response);
+  $this('event')->emit('system-model-detail', $request, $response);
 
   //----------------------------//
   // 2. Validate Data
@@ -530,43 +442,48 @@ $this('event')->on('system-model-restore', function ($request, $response) {
     return;
   }
 
-  //----------------------------//
-  // 3. Prepare Data
-  $data = $response->getResults();
-
-  if (!$request->hasStage('schema')) {
-    return $response
-      ->setError(true, 'Invalid Parameters')
-      ->addValidation('schema', 'Schema is required.');
+  //get the schema, no need to try cuz of system-model-detail
+  $schema = Schema::load($request->getStage('schema'));
+  //get active
+  $active = $schema->getFields('active');
+  if (empty($active)) {
+    return $response->setError(true, 'Cannot be restored');
   }
 
-  $schema = Schema::i($request->getStage('schema'));
+  //----------------------------//
+  // 3. Prepare Data
+  //load the emitter
+  $emitter = $this('event');
+  //make a new payload
+  $payload = $request->clone(true);
 
+  //we will use the original as the results later
+  $original = $response->getResults();
+  //get the primary column name
   $primary = $schema->getPrimaryName();
-  $active = $schema->getActiveFieldName();
+  //get the ID of the model
+  $id = $response->getResults($primary);
+  //get the active field name
+  $active = array_keys($active)[0];
+  //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
+  $filters = [['where' => $primary . ' = %s', 'binds' => [ $id ]]];
+
+  //set the payload
+  $payload->setStage([
+    'table' => $data['schema'],
+    'data' => [ $active => 1 ],
+    'filters' => $filters
+  ]);
 
   //----------------------------//
   // 4. Process Data
-  //this/these will be used a lot
-  $modelSql = $schema->model()->service('sql');
-  $modelRedis = $schema->model()->service('redis');
-  $modelElastic = $schema->model()->service('elastic');
+  $emitter->method('system-store-update', $payload, $response);
 
-  //save to database
-  $payload = [];
-  $payload[$primary] = $data[$primary];
-  $payload[$active] = 1;
+  if ($response->isError() || !$response->hasResults()) {
+    return;
+  }
 
-  $results = $modelSql->update($payload);
-
-  //create index
-  $modelElastic->create($data[$primary]);
-
-  //invalidate cache
-  $modelRedis->removeSearch();
-
-  $results['schema'] = $request->getStage('schema');
-  $response->setError(false)->setResults($results);
+  $response->setResults($original);
 });
 
 /**
@@ -575,7 +492,7 @@ $this('event')->on('system-model-restore', function ($request, $response) {
  * @param Request $request
  * @param Response $response
  */
-$this('event')->on('system-model-update', function ($request, $response) {
+$this('event')->on('system-model-update', function (RequestInterface $request, ResponseInterface $response) {
   //----------------------------//
   // 0. Abort on Errors
   if ($response->isError()) {
@@ -584,196 +501,133 @@ $this('event')->on('system-model-update', function ($request, $response) {
 
   //----------------------------//
   // 1. Get Data
-  //get the object detail
-  $this->trigger('system-model-detail', $request, $response);
-
-  //if there's an error
-  if ($response->isError()) {
-    return;
-  }
-
-  //get the original for later
-  $original = $response->getResults();
-
-  //get data from stage
   $data = [];
   if ($request->hasStage()) {
     $data = $request->getStage();
   }
 
-  if (!isset($data['schema'])) {
-    return $response
-      ->setError(true, 'Invalid Parameters')
-      ->addValidation('schema', 'Schema is required.');
-  }
-
-  $schema = Schema::i($data['schema']);
+  //get the object detail
+  $this('event')->emit('system-model-detail', $request, $response);
 
   //----------------------------//
   // 2. Validate Data
-  $errors = $schema
-    ->model()
-    ->validator()
-    ->getUpdateErrors($data);
-
-  //if there are errors
-  if (!empty($errors)) {
-    return $response
-      ->setError(true, 'Invalid Parameters')
-      ->set('json', 'validation', $errors);
+  if ($response->isError()) {
+    return;
   }
 
   //----------------------------//
   // 3. Prepare Data
-  $data = $schema
-    ->model()
-    ->formatter()
-    ->formatData($data);
+  //load the emitter
+  $emitter = $this('event');
+  //make a new payload
+  $payload = $request->clone(true);
+
+  //we will use the original as the results later
+  $original = $response->getResults();
+  //get the schema, no need to try cuz of system-model-detail
+  $schema = Schema::load($request->getStage('schema'));
+  //get the primary column name
+  $primary = $schema->getPrimaryName();
+  //get the ID of the model
+  $id = $response->getResults($primary);
+  //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
+  $filters = [['where' => $primary . ' = %s', 'binds' => [ $id ]]];
+
+  //prepare data
+  $prepared = $schema->prepare($data);
+  //dont allow to update the primary id
+  unset($prepared[$schema->getPrimaryName()]);
+
+  //set the payload
+  $payload->setStage([
+    'table' => $data['schema'],
+    'data' => $prepared,
+    'filters' => $filters
+  ]);
 
   //----------------------------//
   // 4. Process Data
-  //this/these will be used a lot
-  $modelSql = $schema->model()->service('sql');
-  $modelRedis = $schema->model()->service('redis');
-  $modelElastic = $schema->model()->service('elastic');
+  $emitter->method('system-store-update', $payload, $response);
 
-  //save object to database
-  $results = $modelSql->update($data);
-
-  //get the primary value
-  $primary = $schema->getPrimaryName();
-  $relations = $schema->getRelations();
-  $reverseRelations = $schema->getReverseRelations();
-
-  //loop through relations
-  foreach ($relations as $table => $relation) {
-    //if 1:N, skip
-    if ($relation['many'] > 1) {
-      continue;
-    }
-
-    $current = $response->getResults();
-    $lastId = null;
-
-    // is the relation array?
-    if (isset($current[$relation['name']])
-    && is_array($current[$relation['name']])
-    && isset($current[$relation['name']][$relation['primary2']])) {
-      // get the primary id from the array
-      $lastId = $current[$relation['name']][$relation['primary2']];
-
-    // relation already merged with the primary?
-    } else if (isset($current[$relation['primary2']])) {
-      $lastId = $current[$relation['primary2']];
-    }
-
-    //if 0:1 and no primary
-    if ($relation['many'] === 0
-      && (
-        !isset($data[$relation['primary2']])
-        || !is_numeric($data[$relation['primary2']])
-      )
-    ) {
-      //remove last id
-      $modelSql->unlink(
-        $relation['name'],
-        $primary,
-        $lastId
-      );
-
-      continue;
-    }
-
-    if (isset($data[$relation['primary2']])
-      && is_numeric($data[$relation['primary2']])
-      && $lastId != $data[$relation['primary2']]
-    ) {
-      //remove last id
-      $modelSql->unlink(
-        $relation['name'],
-        $results[$primary],
-        $lastId
-      );
-
-      //link current id
-      $modelSql->link(
-        $relation['name'],
-        $results[$primary],
-        $data[$relation['primary2']]
-      );
-    }
+  if ($response->isError() || !$response->hasResults()) {
+    return;
   }
 
-  //only for root reverse relation
-  if (!isset($data['relation_recursive'])) {
-    //loop through reverse relations
-    foreach ($reverseRelations as $table => $relation) {
-      //deal with same table name
-      if ($relation['source']['name'] === $relation['name']
-        //skip history
-        || $relation['source']['name'] === 'history'
-        ) {
-        continue;
-      }
-      //get primmary id
-      $primaryId = $results['schema']. '_id';
-      //get dynamic schema
-      $schema = Schema::i($relation['source']['name']);
-      //set schema sql
-      $schemaSql = $schema->model()->service('sql');
-      //filter by primary id
-      $filter['filter'][$primaryId] =  $results[$results['schema']. '_id'];
-      //set range to 0
-      $filter['range'] = 0;
-      //get rows
-      $rows = $schemaSql->search($filter);
+  $data['original'] = $original;
+  $response->setResults($data);
+});
 
-      //loop elastic update
-      if ($rows) {
-        foreach ($rows['rows'] as $key => $row) {
-          $payload = $this->makePayload();
+/**
+ * System Model [Schema] Create Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this('event')->on('system-model-%s-create', function (RequestInterface $request, ResponseInterface $response) {
+  $meta = $this('event')->getEventEmitter()->getMeta();
 
-          //set dynamic column id
-          $columnId = $relation['source']['name']. '_id';
-          $payload['request']
-            ->setStage('schema', $relation['source']['name'])
-            ->setStage('relation_recursive', true)
-            ->setStage($columnId, $row[$columnId]);
-
-          //set queue data
-          $queueData = $payload['request']->getStage();
-          $queuePackage = $this->package('cradlephp/cradle-queue');
-          if (!$queuePackage->queue('system-model-update', $queueData)) {
-            //update manually after the connection
-            $this->trigger('system-model-update', $payload['request'], $payload['response']);
-          }
-        }
-      }
-    }
+  if (isset($meta['variables'][0])) {
+    $request->setStage('schema', $meta['variables'][0]);
+    $this('event')->emit('system-model-create', $request, $response);
   }
+});
 
-  //index object
-  $modelElastic->update($results[$primary]);
+/**
+ * System Model [Schema] Detail Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this('event')->on('system-model-%s-detail', function (RequestInterface $request, ResponseInterface $response) {
+  $meta = $this('event')->getEventEmitter()->getMeta();
 
-  //invalidate cache
-  $uniques = $schema->getUniqueFieldNames();
-  foreach ($uniques as $unique) {
-    if (isset($data[$unique])) {
-      $modelRedis->removeDetail($unique . '-' . $data[$unique]);
-    }
+  if (isset($meta['variables'][0])) {
+    $request->setStage('schema', $meta['variables'][0]);
+    $this('event')->emit('system-model-detail', $request, $response);
   }
+});
 
-  $modelRedis->removeSearch();
+/**
+ * System Model [Schema] Remove Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this('event')->on('system-model-%s-remove', function (RequestInterface $request, ResponseInterface $response) {
+  $meta = $this('event')->getEventEmitter()->getMeta();
 
-  //fix the results and put back the arrays
-  $results = $schema
-    ->model()
-    ->formatter()
-    ->expandData($results);
+  if (isset($meta['variables'][0])) {
+    $request->setStage('schema', $meta['variables'][0]);
+    $this('event')->emit('system-model-remove', $request, $response);
+  }
+});
 
-  //add the original
-  $results['original'] = $original;
+/**
+ * System Model [Schema] Restore Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this('event')->on('system-model-%s-restore', function (RequestInterface $request, ResponseInterface $response) {
+  $meta = $this('event')->getEventEmitter()->getMeta();
 
-  //return response format
-  $response->setError(false)->setResults($results);
+  if (isset($meta['variables'][0])) {
+    $request->setStage('schema', $meta['variables'][0]);
+    $this('event')->emit('system-model-restore', $request, $response);
+  }
+});
+
+/**
+ * System Model [Schema] Update Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this('event')->on('system-model-%s-update', function (RequestInterface $request, ResponseInterface $response) {
+  $meta = $this('event')->getEventEmitter()->getMeta();
+
+  if (isset($meta['variables'][0])) {
+    $request->setStage('schema', $meta['variables'][0]);
+    $this('event')->emit('system-model-update', $request, $response);
+  }
 });
