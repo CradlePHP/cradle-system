@@ -5,15 +5,18 @@
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
-require_once __DIR__ . '/src/Collection/events.php';
-require_once __DIR__ . '/src/Schema/events.php';
-//require_once __DIR__ . '/src/Schema/controller.php';
-require_once __DIR__ . '/src/Model/events.php';
-//require_once __DIR__ . '/src/Model/controller.php';
-//require_once __DIR__ . '/src/Fieldset/events.php';
-//require_once __DIR__ . '/src/Fieldset/controller.php';
-//require_once __DIR__ . '/src/Relation/events.php';
-//require_once __DIR__ . '/src/Relation/controller.php';
+require_once __DIR__ . '/src/bootstrap/methods.php';
+
+require_once __DIR__ . '/src/events/collection.php';
+//require_once __DIR__ . '/src/events/fieldset.php';
+require_once __DIR__ . '/src/events/model.php';
+require_once __DIR__ . '/src/events/schema.php';
+
+//require_once __DIR__ . '/src/controller/schema/search.php';
+//require_once __DIR__ . '/src/controller/schema/create.php';
+//require_once __DIR__ . '/src/controller/schema/remove.php';
+//require_once __DIR__ . '/src/controller/schema/restore.php';
+//require_once __DIR__ . '/src/controller/schema/update.php';
 
 use Cradle\Package\System\Fieldset\Field\FieldHandler;
 use Cradle\Package\System\Fieldset\Validation\ValidationHandler;
@@ -155,6 +158,3 @@ FormatHandler::register($this('resolver')->resolve(
 FormatHandler::register($this('resolver')->resolve(
   Cradle\Package\System\Fieldset\Format\Pack\Date::class
 ));
-
-//bootstrap
-$this->preprocess(include __DIR__ . '/src/bootstrap/paths.php');

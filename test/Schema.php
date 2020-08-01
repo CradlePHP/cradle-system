@@ -94,6 +94,17 @@ class Cradle_Package_System_Schema_Test extends TestCase
   }
 
   /**
+   * @covers Cradle\Package\System\Schema::getSuggestion
+   */
+  public function testGetSuggestion()
+  {
+    $actual = $this->object->getSuggestion([
+      'profile_name' => 'foo bar'
+    ]);
+    $this->assertEquals('foo bar', $actual);
+  }
+
+  /**
    * @covers Cradle\Package\System\Schema::search
    */
   public function testSearch()

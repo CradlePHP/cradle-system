@@ -9,6 +9,8 @@ namespace Cradle\Package\System;
 
 use Cradle\Package\System\Schema\SchemaTypes;
 
+use Cradle\Handlebars\HandlebarsHandler;
+
 /**
  * Model Fieldset Manager. This was made
  * take advantage of pass-by-ref
@@ -173,6 +175,51 @@ class Schema extends Fieldset
     }
 
     return $results;
+  }
+
+  /**
+   * Based on the data will generate a suggestion format
+   *
+   * @param array
+   *
+   * @return string
+   */
+  public function getSuggestion(array $data): string
+  {
+    $suggestion = trim($this->get('suggestion'));
+    //if no suggestion format
+    if (!$suggestion) {
+      //use best guess
+      $suggestion = null;
+      foreach ($data as $key => $value) {
+        if (is_numeric($value)
+          || (
+            isset($value[0])
+            && is_numeric($value[0])
+          )
+        ) {
+          continue;
+        }
+
+        $suggestion = $value;
+        break;
+      }
+
+      //if still no suggestion
+      if (is_null($suggestion)) {
+        //just get the first one, i guess.
+        foreach ($data as $key => $value) {
+          $suggestion = $value;
+          break;
+        }
+      }
+
+      return $suggestion;
+    }
+
+    $handlebars = HandlebarsHandler::i();
+    $template = $handlebars->compile($suggestion);
+    return $template($data);
   }
 
   /**

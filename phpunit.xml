@@ -16,6 +16,13 @@
       <file>test/Fieldset.php</file>
       <file>test/Schema.php</file>
       <file>test/Schema/Validator.php</file>
+      <file>test/Fieldset/Validator.php</file>
+      <file>test/Fieldset/Field/AbstractField.php</file>
+      <file>test/Fieldset/Field/FieldHandler.php</file>
+      <file>test/Fieldset/Format/AbstractFormatter.php</file>
+      <file>test/Fieldset/Format/FormatHandler.php</file>
+      <file>test/Fieldset/Validation/AbstractValidator.php</file>
+      <file>test/Fieldset/Validation/ValidationHandler.php</file>
       <file>test/events/schema.php</file>
     </testsuite>
   </testsuites>
@@ -26,6 +33,13 @@
       <directory>./vendor</directory>
       <directory>./test</directory>
       <file>./src/Schema/SchemaTypes.php</file>
+      <file>./src/Fieldset/FieldsetTypes.php</file>
+      <file>./src/Fieldset/Field/FieldInterface.php</file>
+      <file>./src/Fieldset/Field/FieldTypes.php</file>
+      <file>./src/Fieldset/Format/FormatterInterface.php</file>
+      <file>./src/Fieldset/Format/FormatTypes.php</file>
+      <file>./src/Fieldset/Validation/ValidatorInterface.php</file>
+      <file>./src/Fieldset/Validation/ValidationTypes.php</file>
     </exclude>
   </whitelist>
   </filter>
