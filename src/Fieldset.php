@@ -25,21 +25,48 @@ use Cradle\Package\System\Fieldset\Format\FormatHandler;
 class Fieldset extends Registry
 {
   /**
+   * @var string $path
+   */
+  protected static $path;
+
+  /**
    * Instantiate the Fieldet given the name
    *
    * @param *string $name
+   * @param ?string $path
    *
    * @return Fieldset
    */
-  public static function load(string $name): Fieldset
+  public static function load(string $name, ?string $path = null): Fieldset
   {
-    $fielset = cradle('global')->config('fieldset/' . $name);
-
-    if (!$fielset) {
-      throw SystemException::forFieldsetNotFound($name);
+    if (is_null($path) || !is_dir($path)) {
+      $path = static::$path;
     }
 
-    return new static($fieldset);
+    if (is_null($path) || !is_dir($path)) {
+      throw SystemException::forFolderNotFound($path);
+    }
+
+    $source = sprintf('%s/%s.php', $path, $name);
+    if (!file_exists($source)) {
+      throw SystemException::forFileNotFound($source);
+    }
+
+    return new static(include $source);
+  }
+
+  /**
+   * Sets folder where fieldset is located
+   *
+   * @param *string $path
+   */
+  public static function setFolder(string $path)
+  {
+    if (!is_dir($path)) {
+      throw SystemException::forFolderNotFound($path);
+    }
+
+    static::$path = $path;
   }
 
   /**
@@ -51,9 +78,13 @@ class Fieldset extends Registry
    */
   public static function search(array $filters = []): array
   {
-    $path = $global->path('fieldset');
+    $path = self::$path;
     if (isset($filters['path']) && is_dir($filters['path'])) {
       $path = $filters['path'];
+    }
+
+    if (is_null($path) || !is_dir($path)) {
+      throw SystemException::forFolderNotFound($path);
     }
 
     $files = scandir($path);
@@ -82,6 +113,65 @@ class Fieldset extends Registry
     }
 
     return $rows;
+  }
+
+  /**
+   * Archives a fieldset
+   *
+   * @param ?string $path
+   *
+   * @return Fieldset
+   */
+  public function archive(?string $path = null): Fieldset
+  {
+    if (is_null($path) || !is_dir($path)) {
+      $path = static::$path;
+    }
+
+    if (is_null($path) || !is_dir($path)) {
+      throw SystemException::forFolderNotFound($path);
+    }
+
+    $name = $this->getName();
+
+    $source = sprintf('%s/%s.php', $path, $name);
+    if (!file_exists($source)) {
+      throw SystemException::forFileNotFound($source);
+    }
+
+    $destination = sprintf('%s/_%s.php', $path, $name);
+    if (file_exists($destination)) {
+      throw SystemException::forArchiveExists($destination);
+    }
+
+    rename($source, $destination);
+    return $this;
+  }
+
+  /**
+   * Deletes a fieldset
+   *
+   * @param ?string $path
+   *
+   * @return Fieldset
+   */
+  public function delete(?string $path = null): Fieldset
+  {
+    if (is_null($path) || !is_dir($path)) {
+      $path = static::$path;
+    }
+
+    if (is_null($path) || !is_dir($path)) {
+      throw SystemException::forFolderNotFound($path);
+    }
+
+    $source = sprintf('%s/%s.php', $path, $this->getName());
+    if (!file_exists($source)) {
+      throw SystemException::forFileNotFound($source);
+    }
+
+    unlink($source);
+    return $this;
   }
 
   /**
@@ -152,6 +242,7 @@ class Fieldset extends Registry
       if (!empty($types) && empty(array_intersect($types, $field['types']))) {
         continue;
       }
+
       $results[$key] = $field;
     }
 
@@ -226,9 +317,31 @@ class Fieldset extends Registry
    *
    * @return Fieldset
    */
-  public function save(): Fieldset
+  public function save(string $path = null): Fieldset
   {
-    cradle('global')->config('fieldset/' . $this->getName(), $this->data);
+    if (is_null($path) || !is_dir($path)) {
+      $path = static::$path;
+    }
+
+    if (is_null($path) || !is_dir($path)) {
+      throw SystemException::forFolderNotFound($path);
+    }
+
+    $destination = sprintf('%s/%s.php', $path, $this->getName());
+
+    //if it is not a file
+    if (!file_exists($destination)) {
+      //make the file
+      touch($destination);
+      chmod($destination, 0777);
+    }
+
+    // at any rate, update the config
+    file_put_contents($destination, sprintf(
+      "<?php //-->\nreturn %s;",
+      var_export($this->data, true)
+    ));
+
     return $this;
   }
 
@@ -354,6 +467,39 @@ class Fieldset extends Registry
   }
 
   /**
+   * Restores a fieldset
+   *
+   * @param ?string $path
+   *
+   * @return Fieldset
+   */
+  public function restore(?string $path = null): Fieldset
+  {
+    if (is_null($path) || !is_dir($path)) {
+      $path = static::$path;
+    }
+
+    if (is_null($path) || !is_dir($path)) {
+      throw SystemException::forFolderNotFound($path);
+    }
+
+    $name = $this->getName();
+
+    $source = sprintf('%s/_%s.php', $path, $name);
+    if (!file_exists($source)) {
+      throw SystemException::forArchiveNotFound($source);
+    }
+
+    $destination = sprintf('%s/%s.php', $path, $name);
+    if (file_exists($destination)) {
+      throw SystemException::forFileExists($destination);
+    }
+
+    rename($source, $destination);
+    return $this;
+  }
+
+  /**
    * Returns all possible advanced data types given the field
    *
    * @param *array $field
@@ -391,7 +537,7 @@ class Fieldset extends Registry
         }
 
         if ($validation['method'] === 'unique') {
-          $types[] = FieldsetTypes::TYPE_UNIQUEs;
+          $types[] = FieldsetTypes::TYPE_UNIQUE;
         }
       }
     }

@@ -21,22 +21,6 @@ use Cradle\Package\System\Schema\SchemaTypes;
 class Schema extends Fieldset
 {
   /**
-   * Instantiate the Fieldet given the name
-   *
-   * @return array
-   */
-  public static function load(string $name): Fieldset
-  {
-    $schema = cradle('global')->config('schema/' . $name);
-
-    if (!$schema) {
-      throw SystemException::forSchemaNotFound($name);
-    }
-
-    return new static($schema);
-  }
-
-  /**
    * Returns fieldset classes that match the given filters
    *
    * @param array $filters Keys can be `path`, `active`, `name`
@@ -45,10 +29,6 @@ class Schema extends Fieldset
    */
   public static function search(array $filters = []): array
   {
-    if (!isset($filters['path'])) {
-      $filters['path'] = $global->path('schema');
-    }
-
     $rows = parent::search($filters);
 
     //ex. ?filter[relation]=product
@@ -232,17 +212,6 @@ class Schema extends Fieldset
 
     $template = cradle('global')->handlebars()->compile($suggestion);
     return $template($data);
-  }
-
-  /**
-   * Saves the schema to file
-   *
-   * @return Fieldset
-   */
-  public function save(): Fieldset
-  {
-    cradle('global')->config('schema/' . $this->getName(), $this->data);
-    return $this;
   }
 
   /**
