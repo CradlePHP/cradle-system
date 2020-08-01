@@ -85,19 +85,19 @@ $this('event')->on('system-schema-create', function (RequestInterface $request, 
   $emitter = $this('event');
   //make a new payload
   $payload = $request->clone(true);
-  //get schema path
-  $path = $this('global')->path('schema');
 
   //----------------------------//
   // 4. Process Data
-  //make a schema folder
-  if (!is_dir($path)) {
-    mkdir($path, 0777);
-  }
-
   //save to file
   $schema = Schema::i($data);
-  $results = $schema->save()->get();
+
+  try {
+    $schema->save();
+  } catch (SystemException $e) {
+    return $response->setError(true, $e->getMessage());
+  }
+
+  $results = $schema->get();
 
   //add the results
   $payload->setStage($results);
@@ -182,9 +182,11 @@ $this('event')->on('system-schema-remove', function (RequestInterface $request, 
 
   //----------------------------//
   // 1. Get Data
+  //load the emitter
+  $emitter = $this('event');
 
   //get the system detail
-  $this->trigger('system-schema-detail', $request, $response);
+  $emitter->emit('system-schema-detail', $request, $response);
 
   //----------------------------//
   // 2. Validate Data
@@ -194,9 +196,6 @@ $this('event')->on('system-schema-remove', function (RequestInterface $request, 
 
   //----------------------------//
   // 3. Prepare Data
-  //load the emitter
-  $emitter = $this('event');
-
   //get data from results
   $data = $response->getResults();
   //load schema
@@ -205,22 +204,19 @@ $this('event')->on('system-schema-remove', function (RequestInterface $request, 
   $table = $schema->getName();
   //set restorable
   $restorable = $request->getStage('mode') !== 'permanent';
-  //get the schema path
-  $path = $this->package('global')->path('schema');
-  //generate a source path
-  $source = sprintf('%s/%s.php', $path, $table);
-  //generate a destination path
-  $destination = sprintf('%s/_%s.php', $path, $table);
 
   //----------------------------//
   // 4. Process Data
-  if (!$restorable) {
-    unlink($source);
-  } else if (file_exists($source)) {
-    rename($source, $destination);
-  } else {
-    return $response->setError(true, 'Source file missing');
+  try {
+    if (!$restorable) {
+      $schema->delete();
+    } else {
+      $schema->archive();
+    }
+  } catch (SystemException $e) {
+    return $response->setError(true, $e->getMessage());
   }
+
 
   //make sure schema is set
   $request->setStage('schema', $schema->getName());
@@ -251,8 +247,11 @@ $this('event')->on('system-schema-restore', function (RequestInterface $request,
 
   //----------------------------//
   // 1. Get Data
+  //load the emitter
+  $emitter = $this('event');
+
   //get the system detail
-  $this->method('system-schema-detail', [
+  $emitter->method('system-schema-detail', [
     'name' => '_' . $request->getStage('name')
   ], $response);
 
@@ -264,34 +263,23 @@ $this('event')->on('system-schema-restore', function (RequestInterface $request,
 
   //----------------------------//
   // 3. Prepare Data
-  //load the emitter
-  $emitter = $this('event');
-
   //get data from results
   $data = $response->getResults();
   //load schema
   $schema = Schema::i($data);
   //get table
   $table = $schema->getName();
-  //get the schema path
-  $path = $this->package('global')->path('schema');
-  //generate a source path
-  $source = sprintf('%s/_%s.php', $path, $table);
-  //generate a destination path
-  $destination = sprintf('%s/%s.php', $path, $table);
 
   //----------------------------//
   // 4. Process Data
-  if (file_exists($source)) {
-    rename($source, $destination);
-  } else {
-    return $response->setError(true, 'Source file missing');
+  try {
+    $schema->restore();
+  } catch (SystemException $e) {
+    return $response->setError(true, $e->getMessage());
   }
 
   //make sure schema is set
   $request->setStage('schema', $schema->getName());
-  //make sure restorable is set
-  $request->setStage('restorable', $restorable);
   //trigger the store recover
   $emitter->emit('system-store-recover', $request, $response);
 
@@ -394,11 +382,14 @@ $this('event')->on('system-schema-update', function (RequestInterface $request, 
     }
   }
 
+  //load the emitter
+  $emitter = $this('event');
+
+  //get the system detail
+  $emitter->emit('system-schema-detail', $request, $response);
+
   //----------------------------//
   // 2. Validate Data
-  //get the system detail
-  $this->trigger('system-schema-detail', $request, $response);
-
   //if there's an error
   if ($response->isError()) {
     return;
@@ -420,13 +411,18 @@ $this('event')->on('system-schema-update', function (RequestInterface $request, 
 
   //----------------------------//
   // 4. Process Data
-  //load the emitter
-  $emitter = $this('event');
   //make a new payload
   $payload = $request->clone(true);
+  //load schema
+  $schema = Schema::i($data);
 
-  $results = Schema::i($data)
-    ->save()
+  try {
+    $schema->save();
+  } catch (SystemException $e) {
+    return $response->setError(true, $e->getMessage());
+  }
+
+  $results = $schema
     ->set('original', $original->get())
     ->get();
 

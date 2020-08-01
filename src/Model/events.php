@@ -349,6 +349,129 @@ $this('event')->on('system-model-detail', function (RequestInterface $request, R
 });
 
 /**
+ * Links model to relation
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this('event')->on('system-model-link', function (RequestInterface $request, ResponseInterface $response) {
+  //----------------------------//
+  // 0. Abort on Errors
+  if ($response->isError()) {
+    return;
+  }
+
+  //----------------------------//
+  // 1. Get Data
+  //get data from stage
+  $data = [];
+  if ($request->hasStage()) {
+    $data = $request->getStage();
+  }
+
+  //----------------------------//
+  // 2. Validate Data
+  $errors = [];
+  if (!isset($data['schema1'])) {
+    $errors['schema1'] = 'Schema is required.';
+  }
+
+  try {
+    $schema = Schema::load($data['schema1']);
+  } catch (SystemException $e) {
+    $errors['schema1'] = $e->getMessage();
+  }
+
+  try {
+    $relation = $schema->getRelations(null, $data['schema2']);
+  } catch (SystemException $e) {
+    $errors['schema2'] = $e->getMessage();
+  }
+
+  //if no relation
+  if (empty($relation)) {
+    //try the other way around
+    try {
+      $schema = Schema::load($data['schema1']);
+    } catch (SystemException $e) {
+      $errors['schema2'] = $e->getMessage();
+    }
+
+    $relation = $schema->getRelations(null, $data['schema1']);
+  }
+
+  //if no relation
+  if (empty($relation)) {
+    return $response->setError(true, 'No relation.');
+  }
+
+  $primary1 = $relation['primary1'];
+  //ID should be set
+  if (!isset($data[$primary1]) && !is_numeric($data[$primary1])) {
+    $errors[$primary1] = 'Invailid ID';
+  }
+
+  $primary2 = $relation['primary2'];
+  //ID should be set
+  if (!isset($data[$primary2])) {
+    $errors[$primary2] = 'Invailid ID';
+  } else {
+    //make sure we are dealing with an array
+    if (!is_array($data[$primary2])) {
+      $data[$primary2] = [$data[$primary2]];
+    }
+
+    //make sure all IDs are numbers
+    foreach ($data[$primary2] as $id) {
+      if (!is_numeric($id)) {
+        $errors[$primary2] = 'Invailid ID';
+        break;
+      }
+    }
+  }
+
+  if (!empty($errors)) {
+    return $response
+      ->setError(true, 'Invalid Parameters')
+      ->set('json', 'validation', $errors);
+  }
+
+  //----------------------------//
+  // 3. Prepare Data
+  //load the emitter
+  $emitter = $this('event');
+  //make a new payload
+  $payload = $request->clone(true);
+  //get the relation table
+  $table = array_keys($relation)[0];
+
+  $rows = [];
+  $id1 = $data[$primary1];
+  foreach ($data[$primary2] as $id2) {
+    $rows[] = [ $primary1 => $id1, $primary2 => $id2 ];
+  }
+
+  //set the payload
+  $payload->setStage([
+    'table' => $table,
+    'rows' => $rows
+  ]);
+
+  //----------------------------//
+  // 4. Process Data
+  $emitter->method('system-store-insert', $payload, $response);
+
+  if ($response->isError()) {
+    return;
+  }
+
+  $response->setError(false)->setResults([
+    $primary1 => $request->getStage($primary1),
+    $primary2 => $request->getStage($primary2)
+  ]);
+});
+
+/**
  * System Model Remove Job
  *
  * @param Request $request
@@ -487,6 +610,133 @@ $this('event')->on('system-model-restore', function (RequestInterface $request, 
 });
 
 /**
+ * Links model to relation
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this('event')->on('system-model-unlink', function (RequestInterface $request, ResponseInterface $response) {
+  //----------------------------//
+  // 0. Abort on Errors
+  if ($response->isError()) {
+    return;
+  }
+
+  //----------------------------//
+  // 1. Get Data
+  //get data from stage
+  $data = [];
+  if ($request->hasStage()) {
+    $data = $request->getStage();
+  }
+
+  //----------------------------//
+  // 2. Validate Data
+  $errors = [];
+  if (!isset($data['schema1'])) {
+    $errors['schema1'] = 'Schema is required.';
+  }
+
+  try {
+    $schema = Schema::load($data['schema1']);
+  } catch (SystemException $e) {
+    $errors['schema1'] = $e->getMessage();
+  }
+
+  try {
+    $relation = $schema->getRelations(null, $data['schema2']);
+  } catch (SystemException $e) {
+    $errors['schema2'] = $e->getMessage();
+  }
+
+  //if no relation
+  if (empty($relation)) {
+    //try the other way around
+    try {
+      $schema = Schema::load($data['schema1']);
+    } catch (SystemException $e) {
+      $errors['schema2'] = $e->getMessage();
+    }
+
+    $relation = $schema->getRelations(null, $data['schema1']);
+  }
+
+  //if no relation
+  if (empty($relation)) {
+    return $response->setError(true, 'No relation.');
+  }
+
+  $primary1 = $relation['primary1'];
+  //ID should be set
+  if (!isset($data[$primary1]) && !is_numeric($data[$primary1])) {
+    $errors[$primary1] = 'Invailid ID';
+  }
+
+  $primary2 = $relation['primary2'];
+  //ID should be set
+  if (!isset($data[$primary2])) {
+    $errors[$primary2] = 'Invailid ID';
+  } else {
+    //make sure we are dealing with an array
+    if (!is_array($data[$primary2])) {
+      $data[$primary2] = [$data[$primary2]];
+    }
+
+    //make sure all IDs are numbers
+    foreach ($data[$primary2] as $id) {
+      if (!is_numeric($id)) {
+        $errors[$primary2] = 'Invailid ID';
+        break;
+      }
+    }
+  }
+
+  if (!empty($errors)) {
+    return $response
+      ->setError(true, 'Invalid Parameters')
+      ->set('json', 'validation', $errors);
+  }
+
+  //----------------------------//
+  // 3. Prepare Data
+  //load the emitter
+  $emitter = $this('event');
+  //make a new payload
+  $payload = $request->clone(true);
+  //get the relation table
+  $table = array_keys($relation)[0];
+
+  $where = [];
+  $id1 = $data[$primary1];
+  foreach ($data[$primary2] as $id2) {
+    $where[] = sprintf('(%s = %s AND %s = %s)', $primary1, $id1, $primary2, $id2);
+  }
+
+  //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
+  $filters = [['where' => implode(' OR ', $where), 'binds' => []]];
+
+  //set the payload
+  $payload->setStage([
+    'table' => $table,
+    'fiilter' => $filters
+  ]);
+
+  //----------------------------//
+  // 4. Process Data
+  $emitter->method('system-store-delete', $payload, $response);
+
+  if ($response->isError()) {
+    return;
+  }
+
+  $results = $request->getStage();
+  $response->setError(false)->setResults([
+    $primary1 => $request->getStage($primary1),
+    $primary2 => $request->getStage($primary2)
+  ]);
+});
+
+/**
  * System Model Update Job
  *
  * @param Request $request
@@ -588,6 +838,22 @@ $this('event')->on('system-model-%s-detail', function (RequestInterface $request
 });
 
 /**
+ * System Model [Schema] Link Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this('event')->on('system-model-%s-link-%s', function (RequestInterface $request, ResponseInterface $response) {
+  $meta = $this('event')->getEventEmitter()->getMeta();
+
+  if (isset($meta['variables'][0])) {
+    $request->setStage('schema1', $meta['variables'][0]);
+    $request->setStage('schema2', $meta['variables'][1]);
+    $this('event')->emit('system-model-link', $request, $response);
+  }
+});
+
+/**
  * System Model [Schema] Remove Job
  *
  * @param Request $request
@@ -614,6 +880,22 @@ $this('event')->on('system-model-%s-restore', function (RequestInterface $reques
   if (isset($meta['variables'][0])) {
     $request->setStage('schema', $meta['variables'][0]);
     $this('event')->emit('system-model-restore', $request, $response);
+  }
+});
+
+/**
+ * System Model [Schema] Unlink Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this('event')->on('system-model-%s-unlink-%s', function (RequestInterface $request, ResponseInterface $response) {
+  $meta = $this('event')->getEventEmitter()->getMeta();
+
+  if (isset($meta['variables'][0])) {
+    $request->setStage('schema1', $meta['variables'][0]);
+    $request->setStage('schema2', $meta['variables'][1]);
+    $this('event')->emit('system-model-unlink', $request, $response);
   }
 });
 

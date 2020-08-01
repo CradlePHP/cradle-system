@@ -20,13 +20,16 @@ class Cradle_Package_System_Collection_Events_Test extends TestCase
    */
   protected function setUp()
   {
-    $this->object = cradle('global')
-      ->path('schema', dirname(__DIR__) . '/assets/schema')
-      ->register('pdo');
+    //this is the OOP version of cradle
+    $this->object = new PackageHandler;
+    $testRoot = dirname(__DIR__);
+    $packageRoot = dirname($testRoot);
 
-    $this->object
-      ->package('pdo')
-      ->mapPackageMethods(include __DIR__.'/assets/mysql.php');
+    //set the schema folder
+    Schema::setFolder($testRoot . '/assets/config/schema');
+
+    //now register system
+    $this->object->register('cradlephp/cradle-system', $packageRoot);
   }
 
   /**
@@ -42,8 +45,13 @@ class Cradle_Package_System_Collection_Events_Test extends TestCase
   public function testCreate()
   {
     $cradle = $this->object;
-    //$cradle->emit('system-collection-create', [
-
-    //]);
+    $cradle->emit('system-collection-create', [
+      'schema' => 'profile',
+      'rows' => [
+        [
+          'profile_name' => 'foo'
+        ]
+      ]
+    ]);
   }
 }
