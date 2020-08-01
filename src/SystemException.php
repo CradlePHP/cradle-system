@@ -20,21 +20,30 @@ use Exception as BaseException;
  */
 class SystemException extends BaseException
 {
+  /**
+   * @const string ERROR_ARCHIVE_EXISTS
+   */
+  const ERROR_ARCHIVE_EXISTS = 'Unable to archive %s, archive already exists.';
 
   /**
-   * @const string ERROR_FIELDSET_NOT_FOUND Error template
+   * @const string ERROR_ARCHIVE_NOT_FOUND
    */
-  const ERROR_FIELDSET_NOT_FOUND = 'Could not find fieldset %s.';
+  const ERROR_ARCHIVE_NOT_FOUND = 'Archive %s not found';
 
   /**
-   * @const string ERROR_FIELDSET_EXISTS
+   * @const string ERROR_FILE_EXISTS
    */
-  const ERROR_FIELDSET_EXISTS = 'Unable to restore %s, fieldset already exists.';
+  const ERROR_FILE_EXISTS = 'Unable to restore %s, file already exists.';
 
   /**
-   * @const string ERROR_FIELDSET_ARCHIVE_EXISTS
+   * @const string ERROR_FILE_NOT_FOUND
    */
-  const ERROR_FIELDSET_ARCHIVE_EXISTS = 'Unable to archive %s, an archive of the fieldset already exists.';
+  const ERROR_FILE_NOT_FOUND = 'File %s not found';
+
+  /**
+   * @const string ERROR_FOLDER_NOT_FOUND
+   */
+  const ERROR_FOLDER_NOT_FOUND = 'Folder %s not found';
 
   /**
    * @const string ERROR_NO_SCHEMA Error template
@@ -42,62 +51,72 @@ class SystemException extends BaseException
   const ERROR_NO_SCHEMA = 'Schema is not loaded';
 
   /**
-   * @const string ERROR_SCHEMA_NOT_FOUND Error template
-   */
-  const ERROR_SCHEMA_NOT_FOUND = 'Could not find schema %s.';
-
-  /**
-   * @const string ERROR_SCHEMA_EXISTS
-   */
-  const ERROR_SCHEMA_EXISTS = 'Unable to restore %s, schema already exists.';
-
-  /**
-   * @const string ERROR_SCHEMA_ARCHIVE_EXISTS
-   */
-  const ERROR_SCHEMA_ARCHIVE_EXISTS = 'Unable to archive %s, an archive of the schema already exists.';
-
-  /**
    * @const string ERROR_SCHEMA_NO_RELATION
    */
   const ERROR_SCHEMA_NO_RELATION = '%s has no relation to %s';
 
   /**
-   * Create a new exception for missing fieldset
+   * Create a new exception if an archive already exists.
    *
    * @param *string $name
    *
    * @return SystemException
    */
-  public static function forFieldsetNotFound($name): SystemException
+  public static function forArchiveExists(string $name): SystemException
   {
-    $message = sprintf(static::ERROR_FIELDSET_NOT_FOUND, $name);
+    $message = sprintf(static::ERROR_ARCHIVE_EXISTS, $name);
     return new static($message);
   }
 
   /**
-   * Create a new exception if fieldset already exists
+   * Create a new exception for missing folder
    *
    * @param *string $name
    *
    * @return SystemException
    */
-  public static function forFieldsetAlreadyExists(string $name): SystemException
+  public static function forArchiveNotFound($name): SystemException
   {
-    $message = sprintf(static::ERROR_FIELDSET_EXISTS, $name);
+    $message = sprintf(static::ERROR_ARCHHIVE_NOT_FOUND, $name);
     return new static($message);
   }
 
   /**
-   * Create a new exception if an archived of the
-   * given fieldset already exists.
+   * Create a new exception if a file already exists.
    *
    * @param *string $name
    *
    * @return SystemException
    */
-  public static function forFieldsetArchiveExists(string $name): SystemException
+  public static function forFileExists(string $name): SystemException
   {
-    $message = sprintf(static::ERROR_FIELDSET_ARCHIVE_EXISTS, $name);
+    $message = sprintf(static::ERROR_FILE_EXISTS, $name);
+    return new static($message);
+  }
+
+  /**
+   * Create a new exception for missing folder
+   *
+   * @param *string $name
+   *
+   * @return SystemException
+   */
+  public static function forFileNotFound($name): SystemException
+  {
+    $message = sprintf(static::ERROR_FILE_NOT_FOUND, $name);
+    return new static($message);
+  }
+
+  /**
+   * Create a new exception for missing folder
+   *
+   * @param ?string $path
+   *
+   * @return SystemException
+   */
+  public static function forFolderNotFound(?string $path = null): SystemException
+  {
+    $message = sprintf(static::ERROR_FOLDER_NOT_FOUND, $path ? $path: '?');
     return new static($message);
   }
 
@@ -119,45 +138,5 @@ class SystemException extends BaseException
   public static function forNoSchema(): SystemException
   {
     return new static(static::ERROR_NO_SCHEMA);
-  }
-
-  /**
-   * Create a new exception for missing Schema
-   *
-   * @param *string $name
-   *
-   * @return SystemException
-   */
-  public static function forSchemaNotFound($name): SystemException
-  {
-    $message = sprintf(static::ERROR_SCHEMA_NOT_FOUND, $name);
-    return new static($message);
-  }
-
-  /**
-   * Create a new exception if schema already exists
-   *
-   * @param *string $name
-   *
-   * @return SystemException
-   */
-  public static function forSchemaAlreadyExists(string $name): SystemException
-  {
-    $message = sprintf(static::ERROR_SCHEMA_EXISTS, $name);
-    return new static($message);
-  }
-
-  /**
-   * Create a new exception if an archived of the
-   * given schema already exists.
-   *
-   * @param *string $name
-   *
-   * @return SystemException
-   */
-  public static function forSchemaArchiveExists(string $name): SystemException
-  {
-    $message = sprintf(static::ERROR_SCHEMA_ARCHIVE_EXISTS, $name);
-    return new static($message);
   }
 }
