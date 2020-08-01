@@ -260,7 +260,7 @@ return array (
     ),
     1 =>
     array (
-      'many' => '2',
+      'many' => '1',
       'name' => 'file',
     ),
   ),

@@ -21,6 +21,11 @@ use Cradle\Package\System\Schema\SchemaTypes;
 class Schema extends Fieldset
 {
   /**
+   * @var string $path
+   */
+  protected static $path;
+
+  /**
    * Returns fieldset classes that match the given filters
    *
    * @param array $filters Keys can be `path`, `active`, `name`
@@ -93,7 +98,7 @@ class Schema extends Fieldset
 
       try {
         $results[$key] = Schema::load($relation['name']);
-      } catch (Exception $e) {
+      } catch (SystemException $e) {
         //this is not a registered schema
         //lets make a best guess
         $results[$key] = Schema::i([
@@ -145,7 +150,7 @@ class Schema extends Fieldset
 
     $results = [];
     foreach ($rows as $key => $relation) {
-      $reversed = $relation->getRelations($many, $table);
+      $reversed = array_values($relation->getRelations($many, $table));
 
       if (!isset($reversed[0])
         || !trim($reversed[0]->get('table'))
@@ -153,7 +158,7 @@ class Schema extends Fieldset
         || !trim($reversed[0]->get('primary2'))
         || !trim($reversed[0]->get('many'))
         //dont do post_post
-        || $reversed[0]->getName() === $table
+        || $relation->getName() === $table
       ) {
         continue;
       }
@@ -168,50 +173,6 @@ class Schema extends Fieldset
     }
 
     return $results;
-  }
-
-  /**
-   * Based on the data will generate a suggestion format
-   *
-   * @param array
-   *
-   * @return string
-   */
-  public function getSuggestion(array $data): string
-  {
-    $suggestion = trim($this->get('suggestion'));
-    //if no suggestion format
-    if (!$suggestion) {
-      //use best guess
-      $suggestion = null;
-      foreach ($data as $key => $value) {
-        if (is_numeric($value)
-          || (
-            isset($value[0])
-            && is_numeric($value[0])
-          )
-        ) {
-          continue;
-        }
-
-        $suggestion = $value;
-        break;
-      }
-
-      //if still no suggestion
-      if (is_null($suggestion)) {
-        //just get the first one, i guess.
-        foreach ($data as $key => $value) {
-          $suggestion = $value;
-          break;
-        }
-      }
-
-      return $suggestion;
-    }
-
-    $template = cradle('global')->handlebars()->compile($suggestion);
-    return $template($data);
   }
 
   /**

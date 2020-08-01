@@ -28,7 +28,7 @@ class Cradle_Package_System_Fieldset_Test extends TestCase
     $packageRoot = dirname($testRoot);
 
     //set the schema folder
-    Schema::setFolder($testRoot . '/assets/config/schema');
+    Fieldset::setFolder($testRoot . '/assets/config/schema');
 
     //now register storm
     $cradle->register('cradlephp/cradle-system', $packageRoot);
@@ -242,5 +242,79 @@ class Cradle_Package_System_Fieldset_Test extends TestCase
     $this->assertEquals(1, $data['profile_active']);
     $this->assertContains('December 18, 1981', $data['profile_created']);
     $this->assertContains('December 18, 1982', $data['profile_updated']);
+  }
+
+  /**
+   * @covers Cradle\Package\System\Fieldset::save
+   */
+  public function testSave()
+  {
+    $source = __DIR__ . '/assets/post.php';
+    $destination = __DIR__ . '/assets/config/schema/post.php';
+
+    if (file_exists($destination)) {
+      unlink($destination);
+    }
+
+    $fieldset = new Fieldset(include $source);
+    $fieldset->save();
+
+    $this->assertTrue(file_exists($destination));
+  }
+
+  /**
+   * @covers Cradle\Package\System\Fieldset::archive
+   */
+  public function testArchive()
+  {
+    $source = __DIR__ . '/assets/config/schema/post.php';
+    $destination = __DIR__ . '/assets/config/schema/_post.php';
+
+    $fieldset = new Fieldset(include $source);
+    $fieldset->archive();
+
+    $this->assertFalse(file_exists($source));
+    $this->assertTrue(file_exists($destination));
+  }
+
+  /**
+   * @covers Cradle\Package\System\Fieldset::restore
+   */
+  public function testRestore()
+  {
+    $source = __DIR__ . '/assets/config/schema/_post.php';
+    $destination = __DIR__ . '/assets/config/schema/post.php';
+
+    $fieldset = new Fieldset(include $source);
+    $fieldset->restore();
+
+    $this->assertFalse(file_exists($source));
+    $this->assertTrue(file_exists($destination));
+  }
+
+  /**
+   * @covers Cradle\Package\System\Fieldset::delete
+   */
+  public function testDelete()
+  {
+    $source = __DIR__ . '/assets/config/schema/post.php';
+
+    $fieldset = new Fieldset(include $source);
+    $fieldset->delete();
+
+    $this->assertFalse(file_exists($source));
+  }
+
+  /**
+   * @covers Cradle\Package\System\Fieldset::search
+   */
+  public function testSearch()
+  {
+    $actual = Fieldset::search([
+      'active' => 1,
+      'name' => 'profile'
+    ]);
+
+    $this->assertEquals(1, count($actual));
   }
 }
