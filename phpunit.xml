@@ -15,6 +15,7 @@
     <testsuite name="Cradle System Test">
       <file>test/Fieldset.php</file>
       <file>test/Schema.php</file>
+      <file>test/Schema/Validator.php</file>
       <file>test/events/schema.php</file>
     </testsuite>
   </testsuites>
@@ -24,6 +25,7 @@
     <exclude>
       <directory>./vendor</directory>
       <directory>./test</directory>
+      <file>./src/Schema/SchemaTypes.php</file>
     </exclude>
   </whitelist>
   </filter>
