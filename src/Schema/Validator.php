@@ -47,9 +47,14 @@ class Validator
     }
 
     if (isset($data['name'])) {
+      $exists = true;
       try {
         Schema::load($data['name']);
       } catch (SystemException $e) {
+        $exists = false;
+      }
+
+      if ($exists) {
         $errors['name'] = 'Schema already exists';
       }
     }
