@@ -8,7 +8,7 @@
 require_once __DIR__ . '/src/bootstrap/methods.php';
 
 require_once __DIR__ . '/src/events/collection.php';
-//require_once __DIR__ . '/src/events/fieldset.php';
+require_once __DIR__ . '/src/events/fieldset.php';
 require_once __DIR__ . '/src/events/model.php';
 require_once __DIR__ . '/src/events/schema.php';
 

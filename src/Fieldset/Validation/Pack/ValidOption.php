@@ -32,6 +32,6 @@ class ValidOption extends AbstractValidator implements ValidatorInterface
    */
   public function valid($value = null): bool
   {
-    return in_array($value, $this->parameters);
+    return is_null($value) || in_array($value, $this->parameters);
   }
 }

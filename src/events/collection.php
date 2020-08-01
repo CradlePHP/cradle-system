@@ -68,7 +68,7 @@ $this('event')->on('system-collection-create', function (RequestInterface $reque
   if (!empty($errors)) {
     return $response
       ->setError(true, 'Invalid Parameters')
-      ->addValidation('rows', $errors);
+      ->set('json', 'validation', 'rows', $errors);
   }
 
   //----------------------------//
@@ -84,7 +84,7 @@ $this('event')->on('system-collection-create', function (RequestInterface $reque
   //for each row
   foreach ($data['rows'] as $i => $row) {
     //prepare the data
-    $data['rows'][$i] = $schema->prepare($row);
+    $data['rows'][$i] = $schema->prepare($row, true);
     //dont allow to insert the primary id
     unset($data['rows'][$i][$primary]);
   }
@@ -220,6 +220,11 @@ $this('event')->on('system-collection-link', function (RequestInterface $request
     return $response->setError(true, 'No relation.');
   }
 
+  //get the relation table
+  $table = array_keys($relation)[0];
+  //single out the relation
+  $relation = array_values($relation)[0];
+
   $primary1 = $relation['primary1'];
   //ID should be set
   if (!isset($data[$primary1])) {
@@ -270,8 +275,6 @@ $this('event')->on('system-collection-link', function (RequestInterface $request
   $emitter = $this('event');
   //make a new payload
   $payload = $request->clone(true);
-  //get the relation table
-  $table = array_keys($relation)[0];
 
   $rows = [];
   //make all combinations
@@ -346,7 +349,7 @@ $this('event')->on('system-collection-remove', function (RequestInterface $reque
   //load system package now
   $system = $this('cradlephp/cradle-system');
   //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
-  $filters = $system->mapQuery($data);
+  $filters = $system->mapQuery($schema, $data);
   if (empty($filters)) {
     return $response->setError(true, 'Missing Filters');
   }
@@ -447,7 +450,7 @@ $this('event')->on('system-collection-restore', function (RequestInterface $requ
   //eg. joins = [['type' => 'inner', 'table' => 'product', 'where' => 'product_id']]
   $joins = $system->getInnerJoins($schema, $data['join']);
   //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
-  $filters = $system->mapQuery($data);
+  $filters = $system->mapQuery($schema, $data);
 
   //set the payload
   $payload->setStage([
@@ -523,7 +526,7 @@ $this('event')->on('system-collection-search', function (RequestInterface $reque
   //eg. joins = [['type' => 'inner', 'table' => 'product', 'where' => 'product_id']]
   $joins = $system->getInnerJoins($schema, $data['join']);
   //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
-  $filters = $system->mapQuery($data);
+  $filters = $system->mapQuery($schema, $data);
 
   //set the payload
   $payload->setStage([
@@ -607,6 +610,11 @@ $this('event')->on('system-collection-unlink', function (RequestInterface $reque
     return $response->setError(true, 'No relation.');
   }
 
+  //get the relation table
+  $table = array_keys($relation)[0];
+  //single out the relation
+  $relation = array_values($relation)[0];
+
   $primary1 = $relation['primary1'];
   //ID should be set
   if (!isset($data[$primary1])) {
@@ -657,8 +665,6 @@ $this('event')->on('system-collection-unlink', function (RequestInterface $reque
   $emitter = $this('event');
   //make a new payload
   $payload = $request->clone(true);
-  //get the relation table
-  $table = array_keys($relation)[0];
 
   $where = [];
   //make all combinations
@@ -674,7 +680,7 @@ $this('event')->on('system-collection-unlink', function (RequestInterface $reque
   //set the payload
   $payload->setStage([
     'table' => $table,
-    'fiilter' => $filters
+    'filter' => $filters
   ]);
 
   //----------------------------//
@@ -745,7 +751,7 @@ $this('event')->on('system-collection-update', function (RequestInterface $reque
   //eg. joins = [['type' => 'inner', 'table' => 'product', 'where' => 'product_id']]
   $joins = $system->getInnerJoins($schema, $data['join']);
   //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
-  $filters = $system->mapQuery($data);
+  $filters = $system->mapQuery($schema, $data);
 
   //prepare data
   $prepared = $schema->prepare($data);

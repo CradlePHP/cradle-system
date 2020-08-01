@@ -23,7 +23,10 @@
       <file>test/Fieldset/Format/FormatHandler.php</file>
       <file>test/Fieldset/Validation/AbstractValidator.php</file>
       <file>test/Fieldset/Validation/ValidationHandler.php</file>
+      <file>test/events/fieldset.php</file>
       <file>test/events/schema.php</file>
+      <file>test/events/collection.php</file>
+      <file>test/events/model.php</file>
     </testsuite>
   </testsuites>
   <filter>

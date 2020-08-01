@@ -8,7 +8,7 @@
 namespace Cradle\Package\System\Fieldset;
 
 use Cradle\Package\System\Fieldset;
-use Cradle\Package\System\Exception;
+use Cradle\Package\System\SystemException;
 
 /**
  * Validator layer
@@ -47,10 +47,15 @@ class Validator
     }
 
     if (isset($data['name'])) {
-      $exists = cradle('global')->fieldset($data['name']);
+      $exists = true;
+      try {
+        Fieldset::load($data['name']);
+      } catch (SystemException $e) {
+        $exists = false;
+      }
 
-      if (!empty($exists)) {
-        $errors['name'] = 'Keyword is already used.';
+      if ($exists) {
+        $errors['name'] = 'Fieldset already exists';
       }
     }
 

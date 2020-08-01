@@ -132,7 +132,7 @@ class Cradle_Package_System_Fieldset_Test extends TestCase
     $this->assertTrue(!isset($errors['profile_image']));
     $this->assertTrue(isset($errors['profile_name']));
     $this->assertTrue(!isset($errors['profile_last_name']));
-    $this->assertTrue(isset($errors['profile_gender']));
+    $this->assertTrue(!isset($errors['profile_gender']));
     $this->assertTrue(isset($errors['profile_birthday']));
     $this->assertTrue(!isset($errors['profile_bio']));
     $this->assertTrue(!isset($errors['profile_active']));
@@ -186,7 +186,7 @@ class Cradle_Package_System_Fieldset_Test extends TestCase
       'profile_last_name' => null,
       'profile_bio' => null,
       'profile_birthday' => 'December 18, 1981',
-    ]);
+    ], true);
 
     $this->assertEquals('ok', $data['profile_name']);
     $this->assertNull($data['profile_last_name']);
@@ -201,11 +201,26 @@ class Cradle_Package_System_Fieldset_Test extends TestCase
       'profile_last_name' => null,
       'profile_bio' => null,
       'profile_birthday' => 'December 18, 1981',
+    ], false);
+
+    $this->assertEquals('ok', $data['profile_name']);
+    $this->assertNull($data['profile_last_name']);
+    $this->assertTrue(!isset($data['profile_gender']));
+    $this->assertEquals('1981-12-18', $data['profile_birthday']);
+    $this->assertTrue(!isset($data['profile_active']));
+    $this->assertTrue(!isset($data['profile_created']));
+    $this->assertContains(date('Y-m'), $data['profile_updated']);
+
+    $data = $this->object->prepare([
+      'profile_name' => 'ok',
+      'profile_last_name' => null,
+      'profile_bio' => null,
+      'profile_birthday' => 'December 18, 1981',
       'profile_gender' => 'male',
       'profile_active' => false, //should be 0
       'profile_created' => '2020-12-18 01:01:01', //should not change
       'profile_updated' => '2020-12-18 01:01:01' //should ignore this
-    ]);
+    ], true);
 
     $this->assertEquals('ok', $data['profile_name']);
     $this->assertNull($data['profile_last_name']);

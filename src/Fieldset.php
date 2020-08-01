@@ -435,16 +435,18 @@ class Fieldset extends Registry
   public function prepare(array $data, bool $defaults = false): array
   {
     $prepped = [];
+    $original = $data;
     //loop through each field
     $fields = $this->getFields();
     foreach ($fields as $key => $field) {
       //if it's not set
-      if (!array_key_exists($key, $data)
-        && isset($field['default'])
-        && $field['default']
-      ) {
-        //use the default
-        $data[$key] = $field['default'];
+      if (!array_key_exists($key, $data)) {
+        $data[$key] = null;
+        //if theres a default
+        if ($defaults && isset($field['default']) && $field['default']) {
+          //use the default
+          $data[$key] = $field['default'];
+        }
       }
 
       //if there is no type
@@ -460,7 +462,34 @@ class Fieldset extends Registry
         continue;
       }
 
-      $prepped[$key] = $field->prepare($data[$key]);
+      $prepared = $field->prepare($data[$key]);
+
+      //if it does not exists in the original
+      if (!array_key_exists($key, $original)) {
+        //if prepared is null
+        if (is_null($prepared)) {
+          //dont add
+          continue;
+        }
+
+        //in the case that prepared gave a value,
+        //even if it does not exists in the original
+        //let's add it (eg. post_updated)
+        $prepped[$key] = $prepared;
+        continue;
+      }
+
+      //it does exist in the original ...
+
+      //if prepared is null and the original has a value
+      if (is_null($prepared) && !is_null($original[$key])) {
+        //it means that we should reject thhis value
+        continue;
+      }
+
+      //the last case is the original value is null
+      //so lets add it
+      $prepped[$key] = $prepared;
     }
 
     return $prepped;

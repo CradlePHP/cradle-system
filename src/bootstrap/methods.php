@@ -13,12 +13,12 @@ $this('cradlephp/cradle-system')
   ->addMethod('getInnerJoins', function (Schema $schema, $filters = []): array {
     $joins = [];
     $primary = $schema->getPrimaryName();
-    $filter = $this->getJoinFilters($filter);
+    $filters = $this->getJoinFilters($schema, $filters);
 
     foreach ($schema->getRelations(1) as $table => $relation) {
       $name = $relation->getName();
       $primary2 = $relation->getPrimaryName();
-      if (!in_array($name, $data['joins'])) {
+      if (!in_array($name, $filters)) {
         continue;
       }
 
@@ -30,7 +30,7 @@ $this('cradlephp/cradle-system')
     foreach ($schema->getReverseRelations(1) as $table => $relation) {
       $name = $relation->getName();
       $primary2 = $relation->getName();
-      if (!in_array($name, $data['joins'])) {
+      if (!in_array($name, $filters)) {
         continue;
       }
 
@@ -50,22 +50,22 @@ $this('cradlephp/cradle-system')
    * @return array
    */
   ->addMethod('getJoinFilters', function (Schema $schema, $filters = []): array {
-    if ($filter === 'all') {
-      $filter = [];
+    if ($filters === 'all') {
+      $filters = [];
       foreach ($schema->getRelations() as $relation) {
-        $filter[] = $relation->getName();
+        $filters[] = $relation->getName();
       }
 
       foreach ($schema->getReverseRelations() as $relation) {
-        $filter[] = $relation->getName();
+        $filters[] = $relation->getName();
       }
     }
 
-    if (!is_array($filter)) {
-      $filter = [];
+    if (!is_array($filters)) {
+      $filters = [];
     }
 
-    return $filter;
+    return $filters;
   })
 
   /**

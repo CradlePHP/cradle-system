@@ -71,7 +71,7 @@ $this('event')->on('system-model-create', function (RequestInterface $request, R
   //set the payload
   $payload->setStage([
     'table' => $data['schema'],
-    'data' => $schema->prepare($data)
+    'data' => $schema->prepare($data, true)
   ]);
 
   //----------------------------//
@@ -405,6 +405,11 @@ $this('event')->on('system-model-link', function (RequestInterface $request, Res
     return $response->setError(true, 'No relation.');
   }
 
+  //get the relation table
+  $table = array_keys($relation)[0];
+  //single out the relation
+  $relation = array_values($relation)[0];
+
   $primary1 = $relation['primary1'];
   //ID should be set
   if (!isset($data[$primary1]) && !is_numeric($data[$primary1])) {
@@ -442,8 +447,6 @@ $this('event')->on('system-model-link', function (RequestInterface $request, Res
   $emitter = $this('event');
   //make a new payload
   $payload = $request->clone(true);
-  //get the relation table
-  $table = array_keys($relation)[0];
 
   $rows = [];
   $id1 = $data[$primary1];
@@ -509,7 +512,7 @@ $this('event')->on('system-model-remove', function (RequestInterface $request, R
   //get the primary column name
   $primary = $schema->getPrimaryName();
   //get the ID of the model
-  $id = $response->getResults($primary);
+  $id = $response->getResults($schema->getName(), $primary);
   //we need active to determine if we should update or delete
   $active = $schema->getFields('active');
   //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
@@ -517,7 +520,7 @@ $this('event')->on('system-model-remove', function (RequestInterface $request, R
 
   //set the payload
   $payload->setStage([
-    'table' => $data['schema'],
+    'table' => $request->getStage('schema'),
     'filters' => $filters
   ]);
 
@@ -585,7 +588,7 @@ $this('event')->on('system-model-restore', function (RequestInterface $request, 
   //get the primary column name
   $primary = $schema->getPrimaryName();
   //get the ID of the model
-  $id = $response->getResults($primary);
+  $id = $response->getResults($schema->getName(), $primary);
   //get the active field name
   $active = array_keys($active)[0];
   //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
@@ -593,7 +596,7 @@ $this('event')->on('system-model-restore', function (RequestInterface $request, 
 
   //set the payload
   $payload->setStage([
-    'table' => $data['schema'],
+    'table' => $request->getStage('schema'),
     'data' => [ $active => 1 ],
     'filters' => $filters
   ]);
@@ -666,6 +669,11 @@ $this('event')->on('system-model-unlink', function (RequestInterface $request, R
     return $response->setError(true, 'No relation.');
   }
 
+  //get the relation table
+  $table = array_keys($relation)[0];
+  //single out the relation
+  $relation = array_values($relation)[0];
+
   $primary1 = $relation['primary1'];
   //ID should be set
   if (!isset($data[$primary1]) && !is_numeric($data[$primary1])) {
@@ -703,8 +711,6 @@ $this('event')->on('system-model-unlink', function (RequestInterface $request, R
   $emitter = $this('event');
   //make a new payload
   $payload = $request->clone(true);
-  //get the relation table
-  $table = array_keys($relation)[0];
 
   $where = [];
   $id1 = $data[$primary1];
@@ -718,7 +724,7 @@ $this('event')->on('system-model-unlink', function (RequestInterface $request, R
   //set the payload
   $payload->setStage([
     'table' => $table,
-    'fiilter' => $filters
+    'filter' => $filters
   ]);
 
   //----------------------------//
@@ -779,7 +785,7 @@ $this('event')->on('system-model-update', function (RequestInterface $request, R
   //get the primary column name
   $primary = $schema->getPrimaryName();
   //get the ID of the model
-  $id = $response->getResults($primary);
+  $id = $response->getResults($schema->getName(), $primary);
   //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
   $filters = [['where' => $primary . ' = %s', 'binds' => [ $id ]]];
 
