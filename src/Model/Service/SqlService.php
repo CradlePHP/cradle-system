@@ -1340,6 +1340,8 @@ class SqlService
                 $circular['primary2']
             )
         );
+
+        return $this;
     }
 
     /**
