@@ -1,4 +1,10 @@
 <?php //-->
+/**
+ * This file is part of a package designed for the CradlePHP Project.
+ *
+ * Copyright and license information can be found at LICENSE.txt
+ * distributed with this package.
+ */
 
 namespace Cradle\Package\System\Fieldset\Validation;
 
@@ -8,17 +14,6 @@ class ValidationHandler
    * @var array $validators
    */
   protected static $validators = [];
-
-  /**
-   * Registers a validator
-   *
-   * @param *ValidatorInterface $validator
-   */
-  public static function register(ValidatorInterface $validator)
-  {
-    $name = $validator->getConfigName();
-    self::$validators[$name] = $validator;
-  }
 
   /**
    * Returns a validator
@@ -34,5 +29,50 @@ class ValidationHandler
     }
 
     return null;
+  }
+
+  /**
+   * Returns all validators
+   *
+   * @return array
+   */
+  public static function getValidators(): array
+  {
+    return self::$validators;
+  }
+
+  /**
+   * Returns a validator instance
+   *
+   * @param *string $name
+   *
+   * @return ?ValidatorInterface
+   */
+  public static function makeValidator(string $name): ?ValidatorInterface
+  {
+    if (isset(self::$validators[$name])) {
+      return cradle()->resolve(self::$validators[$name]);
+    }
+
+    return null;
+  }
+
+  /**
+   * Registers a validator
+   *
+   * @param *string $validator
+   *
+   * @return bool true if was registered successfully
+   */
+  public static function register(string $validator)
+  {
+    if (!is_subclass_of($validator, ValidatorInterface::class)
+      || !$validator::NAME
+    ) {
+      return false;
+    }
+
+    self::$validators[$validator::NAME] = $validator;
+    return true;
   }
 }

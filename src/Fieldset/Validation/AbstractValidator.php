@@ -1,4 +1,10 @@
 <?php //-->
+/**
+ * This file is part of a package designed for the CradlePHP Project.
+ *
+ * Copyright and license information can be found at LICENSE.txt
+ * distributed with this package.
+ */
 
 namespace Cradle\Package\System\Fieldset\Validation;
 
@@ -27,54 +33,15 @@ abstract class AbstractValidator
   protected $parameters = [];
 
   /**
-   * In the schema form we need to provide a label for this validator
-   *
-   * @return string
-   */
-  public function getConfigLabel(): string
-  {
-    return static::LABEL;
-  }
-
-  /**
-   * In the schema form we need to provide a unique slug name
-   *
-   * @return string
-   */
-  public function getConfigName(): string
-  {
-    return static::NAME;
-  }
-
-  /**
    * When they choose this validator in a schema form,
    * we need to know what parameters to ask them for
    *
    * @return array
    */
-  public function getConfigParameters(): array
+  public static function getConfigFieldset(): array
   {
     return [];
   }
-
-  /**
-   * Returns data type
-   *
-   * @return string
-   */
-  public function getConfigType(): string
-  {
-    return static::TYPE;
-  }
-
-  /**
-   * Renders the executes the validation for model forms
-   *
-   * @param ?mixed $value
-   *
-   * @return bool
-   */
-  abstract public function valid($value = null): bool;
 
   /**
    * Sets the parameters that will be
@@ -89,4 +56,27 @@ abstract class AbstractValidator
     $this->parameters = $parameters;
     return $this;
   }
+
+  /**
+   * Converts instance to an array
+   *
+   * @return array
+   */
+  public static function toConfigArray(): array
+  {
+    return [
+      'name' => static::NAME,
+      'type' => static::TYPE,
+      'label' => static::LABEL
+    ];
+  }
+
+  /**
+   * Renders the executes the validation for model forms
+   *
+   * @param ?mixed $value
+   *
+   * @return bool
+   */
+  abstract public function valid($value = null): bool;
 }

@@ -6,488 +6,488 @@ return array (
   'group' => 'Users',
   'icon' => 'fas fa-map-marker-alt',
   'detail' => 'Manages Addresses',
-  'fields' => 
+  'fields' =>
   array (
-    0 => 
+    0 =>
     array (
       'label' => 'Label',
       'name' => 'label',
-      'field' => 
+      'field' =>
       array (
         'type' => 'text',
-        'attributes' => 
+        'attributes' =>
         array (
           'placeholder' => 'eg. My Home',
         ),
       ),
-      'validation' => 
+      'validation' =>
       array (
-        0 => 
+        0 =>
         array (
           'method' => 'required',
           'message' => 'Label is required',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'none',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'none',
       ),
       'default' => '',
       'searchable' => '1',
     ),
-    1 => 
+    1 =>
     array (
       'label' => 'Street 1',
       'name' => 'street_1',
-      'field' => 
+      'field' =>
       array (
         'type' => 'text',
-        'attributes' => 
+        'attributes' =>
         array (
           'placeholder' => '123 Sesame Street',
         ),
       ),
-      'validation' => 
+      'validation' =>
       array (
-        0 => 
+        0 =>
         array (
           'method' => 'required',
           'message' => 'Street 1 is required',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'none',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'none',
       ),
       'default' => '',
     ),
-    2 => 
+    2 =>
     array (
       'label' => 'Street 2',
       'name' => 'street_2',
-      'field' => 
+      'field' =>
       array (
         'type' => 'text',
-        'attributes' => 
+        'attributes' =>
         array (
           'placeholder' => 'eg. Unit 100, Building B',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'none',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'none',
       ),
       'default' => '',
     ),
-    3 => 
+    3 =>
     array (
       'label' => 'Neighborhood',
       'name' => 'neighborhood',
-      'field' => 
+      'field' =>
       array (
         'type' => 'text',
-        'attributes' => 
+        'attributes' =>
         array (
           'placeholder' => 'eg. Skyler Plains',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'none',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'none',
       ),
       'default' => '',
     ),
-    4 => 
+    4 =>
     array (
       'label' => 'City',
       'name' => 'city',
-      'field' => 
+      'field' =>
       array (
         'type' => 'text',
-        'attributes' => 
+        'attributes' =>
         array (
           'placeholder' => 'eg. White Plains',
         ),
       ),
-      'validation' => 
+      'validation' =>
       array (
-        0 => 
+        0 =>
         array (
           'method' => 'required',
           'message' => 'City is required',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'capital',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'capital',
       ),
       'default' => '',
       'filterable' => '1',
     ),
-    5 => 
+    5 =>
     array (
       'label' => 'State',
       'name' => 'state',
-      'field' => 
+      'field' =>
       array (
         'type' => 'text',
-        'attributes' => 
+        'attributes' =>
         array (
           'placeholder' => 'eg. New York',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'none',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'none',
       ),
       'default' => '',
       'filterable' => '1',
     ),
-    6 => 
+    6 =>
     array (
       'label' => 'Region',
       'name' => 'region',
-      'field' => 
+      'field' =>
       array (
         'type' => 'text',
-        'attributes' => 
+        'attributes' =>
         array (
           'placeholder' => 'eg. North East',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'none',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'none',
       ),
       'default' => '',
       'filterable' => '1',
     ),
-    7 => 
+    7 =>
     array (
       'label' => 'Country',
       'name' => 'country',
-      'field' => 
+      'field' =>
       array (
         'type' => 'select',
-        'attributes' => 
+        'attributes' =>
         array (
           'data-do' => 'country-dropdown',
         ),
       ),
-      'validation' => 
+      'validation' =>
       array (
-        0 => 
+        0 =>
         array (
           'method' => 'required',
           'message' => 'Country is required',
         ),
-        1 => 
+        1 =>
         array (
           'method' => 'regexp',
           'parameters' => '#^[A-Z]{2}$#',
           'message' => 'Should be a valid country code format',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'upper',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'upper',
       ),
       'default' => '',
       'filterable' => '1',
     ),
-    8 => 
+    8 =>
     array (
       'label' => 'Postal Code',
       'name' => 'postal_code',
-      'field' => 
+      'field' =>
       array (
         'type' => 'text',
-        'attributes' => 
+        'attributes' =>
         array (
           'placeholder' => 'eg. 12345',
         ),
       ),
-      'validation' => 
+      'validation' =>
       array (
-        0 => 
+        0 =>
         array (
           'method' => 'required',
           'message' => 'Postal code is required',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'none',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'none',
       ),
       'default' => '',
       'filterable' => '1',
     ),
-    9 => 
+    9 =>
     array (
       'label' => 'Landmarks',
       'name' => 'landmarks',
-      'field' => 
+      'field' =>
       array (
         'type' => 'text',
-        'attributes' => 
+        'attributes' =>
         array (
           'placeholder' => 'eg. Near McDonalds',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'none',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'none',
       ),
       'default' => '',
     ),
-    10 => 
+    10 =>
     array (
       'label' => 'Contact Name',
       'name' => 'contact_name',
-      'field' => 
+      'field' =>
       array (
         'type' => 'text',
-        'attributes' => 
+        'attributes' =>
         array (
           'placeholder' => 'eg. John Doe',
         ),
       ),
-      'validation' => 
+      'validation' =>
       array (
-        0 => 
+        0 =>
         array (
           'method' => 'required',
           'message' => 'Contact name is required',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'none',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'none',
       ),
       'default' => '',
       'searchable' => '1',
     ),
-    11 => 
+    11 =>
     array (
       'label' => 'Contact Email',
       'name' => 'contact_email',
-      'field' => 
+      'field' =>
       array (
         'type' => 'email',
-        'attributes' => 
+        'attributes' =>
         array (
           'placeholder' => 'eg. John Doe',
         ),
       ),
-      'validation' => 
+      'validation' =>
       array (
-        0 => 
+        0 =>
         array (
           'method' => 'email',
           'message' => 'Should be a valid email format',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'email',
         'parameters' => '{{address_contact_email}}',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'email',
         'parameters' => '{{address_contact_email}}',
       ),
       'default' => '',
     ),
-    12 => 
+    12 =>
     array (
       'label' => 'Contact Phone',
       'name' => 'contact_phone',
-      'field' => 
+      'field' =>
       array (
         'type' => 'text',
-        'attributes' => 
+        'attributes' =>
         array (
           'placeholder' => 'eg. 555-2424',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'phone',
         'parameters' => '{{address_contact_phone}}',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'phone',
         'parameters' => '{{address_contact_phone}}',
       ),
       'default' => '',
     ),
-    13 => 
+    13 =>
     array (
       'label' => 'Latitude',
       'name' => 'latitude',
-      'field' => 
+      'field' =>
       array (
         'type' => 'float',
-        'attributes' => 
+        'attributes' =>
         array (
           'min' => '-90',
           'max' => '90',
           'step' => '0.00000001',
         ),
       ),
-      'validation' => 
+      'validation' =>
       array (
-        0 => 
+        0 =>
         array (
           'method' => 'number',
           'message' => 'Should be a valid number',
         ),
-        1 => 
+        1 =>
         array (
           'method' => 'lte',
           'parameters' => '90',
           'message' => 'Should be less than 90',
         ),
-        2 => 
+        2 =>
         array (
           'method' => 'gte',
           'parameters' => '-90',
           'message' => 'Should be greater than -90',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'none',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'none',
       ),
       'default' => '0.00000000',
     ),
-    14 => 
+    14 =>
     array (
       'label' => 'Longitude',
       'name' => 'longitude',
-      'field' => 
+      'field' =>
       array (
         'type' => 'float',
-        'attributes' => 
+        'attributes' =>
         array (
           'min' => '-180',
           'max' => '180',
           'step' => '0.00000001',
         ),
       ),
-      'validation' => 
+      'validation' =>
       array (
-        0 => 
+        0 =>
         array (
           'method' => 'number',
           'message' => 'Should be a valid number',
         ),
-        1 => 
+        1 =>
         array (
           'method' => 'lte',
           'parameters' => '180',
           'message' => 'Should be less than 180',
         ),
-        2 => 
+        2 =>
         array (
           'method' => 'gte',
           'parameters' => '-180',
           'message' => 'Should be greater than -180',
         ),
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'none',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'none',
       ),
       'default' => '0.00000000',
     ),
-    15 => 
+    15 =>
     array (
       'label' => 'Active',
       'name' => 'active',
-      'field' => 
+      'field' =>
       array (
         'type' => 'active',
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'hide',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'hide',
       ),
       'default' => '1',
       'sortable' => '1',
     ),
-    16 => 
+    16 =>
     array (
       'label' => 'Created',
       'name' => 'created',
-      'field' => 
+      'field' =>
       array (
         'type' => 'created',
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'date',
         'parameters' => 'F d, Y g:iA',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'date',
         'parameters' => 'F d, Y g:iA',
@@ -495,20 +495,20 @@ return array (
       'default' => 'NOW()',
       'sortable' => '1',
     ),
-    17 => 
+    17 =>
     array (
       'label' => 'Updated',
       'name' => 'updated',
-      'field' => 
+      'field' =>
       array (
         'type' => 'updated',
       ),
-      'list' => 
+      'list' =>
       array (
         'format' => 'date',
         'parameters' => 'F d, Y g:iA',
       ),
-      'detail' => 
+      'detail' =>
       array (
         'format' => 'date',
         'parameters' => 'F d, Y g:iA',

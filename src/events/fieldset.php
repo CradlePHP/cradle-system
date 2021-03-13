@@ -57,7 +57,7 @@ $this('event')->on('system-fieldset-create', function (RequestInterface $request
   if (!empty($errors)) {
     return $response
       ->setError(true, 'Invalid Parameters')
-      ->set('json', 'validation', $errors);
+      ->invalidate($errors);
   }
 
   //----------------------------//
@@ -321,7 +321,7 @@ $this('event')->on('system-fieldset-update', function (RequestInterface $request
   if (!empty($errors)) {
     return $response
       ->setError(true, 'Invalid Parameters')
-      ->set('json', 'validation', $errors);
+      ->invalidate($errors);
   }
 
   //----------------------------//

@@ -1,4 +1,10 @@
 <?php //-->
+/**
+ * This file is part of a package designed for the CradlePHP Project.
+ *
+ * Copyright and license information can be found at LICENSE.txt
+ * distributed with this package.
+ */
 
 use Cradle\Package\System\Schema;
 use Cradle\Package\System\SystemException;
@@ -32,7 +38,7 @@ $this('event')->on('system-collection-create', function (RequestInterface $reque
   if (!isset($data['schema'])) {
     return $response
       ->setError(true, 'Invalid Parameters')
-      ->addValidation('schema', 'Schema is required.');
+      ->invalidate('schema', 'Schema is required.');
   }
 
   //must have rows
@@ -42,7 +48,7 @@ $this('event')->on('system-collection-create', function (RequestInterface $reque
   ) {
     return $response
       ->setError(true, 'Invalid Parameters')
-      ->addValidation('rows', 'Missing rows.');
+      ->invalidate('rows', 'Missing rows.');
   }
 
   try { //to load schema
@@ -50,25 +56,22 @@ $this('event')->on('system-collection-create', function (RequestInterface $reque
   } catch (SystemException $e) {
     return $response
       ->setError(true, 'Invalid Parameters')
-      ->addValidation('schema', $e->getMessage());
+      ->invalidate('schema', $e->getMessage());
   }
 
-  $errors = [];
   //get errors per row
   foreach ($data['rows'] as $i => $row) {
     $error = $schema->getErrors($row);
     //if there is an error
     if (!empty($error)) {
       //add it to the errors list
-      $errors[$i] = $error;
+      $response->invalidate('rows', $i, $error);
     }
   }
 
   //if there are errors
-  if (!empty($errors)) {
-    return $response
-      ->setError(true, 'Invalid Parameters')
-      ->set('json', 'validation', 'rows', $errors);
+  if (!$response->isValid()) {
+    return $response->setError(true, 'Invalid Parameters');
   }
 
   //----------------------------//
@@ -186,21 +189,20 @@ $this('event')->on('system-collection-link', function (RequestInterface $request
 
   //----------------------------//
   // 2. Validate Data
-  $errors = [];
   if (!isset($data['schema1'])) {
-    $errors['schema1'] = 'Schema is required.';
+    $response->invalidate('schema1', 'Schema is required.');
   }
 
   try {
     $schema = Schema::load($data['schema1']);
   } catch (SystemException $e) {
-    $errors['schema1'] = $e->getMessage();
+    $response->invalidate('schema1', $e->getMessage());
   }
 
   try {
     $relation = $schema->getRelations(null, $data['schema2']);
   } catch (SystemException $e) {
-    $errors['schema2'] = $e->getMessage();
+    $response->invalidate('schema2', $e->getMessage());
   }
 
   //if no relation
@@ -209,7 +211,7 @@ $this('event')->on('system-collection-link', function (RequestInterface $request
     try {
       $schema = Schema::load($data['schema1']);
     } catch (SystemException $e) {
-      $errors['schema2'] = $e->getMessage();
+      $response->invalidate('schema2', $e->getMessage());
     }
 
     $relation = $schema->getRelations(null, $data['schema1']);
@@ -228,7 +230,7 @@ $this('event')->on('system-collection-link', function (RequestInterface $request
   $primary1 = $relation['primary1'];
   //ID should be set
   if (!isset($data[$primary1])) {
-    $errors[$primary1] = 'Invailid ID';
+    $response->invalidate($primary1, 'Invailid ID');
   } else {
     //make sure we are dealing with an array
     if (!is_array($data[$primary1])) {
@@ -238,7 +240,7 @@ $this('event')->on('system-collection-link', function (RequestInterface $request
     //make sure all IDs are numbers
     foreach ($data[$primary1] as $id) {
       if (!is_numeric($id)) {
-        $errors[$primary1] = 'Invailid ID';
+        $response->invalidate($primary1, 'Invailid ID');
         break;
       }
     }
@@ -247,7 +249,7 @@ $this('event')->on('system-collection-link', function (RequestInterface $request
   $primary2 = $relation['primary2'];
   //ID should be set
   if (!isset($data[$primary2])) {
-    $errors[$primary2] = 'Invailid ID';
+    $response->invalidate($primary2, 'Invailid ID');
   } else {
     //make sure we are dealing with an array
     if (!is_array($data[$primary2])) {
@@ -257,16 +259,15 @@ $this('event')->on('system-collection-link', function (RequestInterface $request
     //make sure all IDs are numbers
     foreach ($data[$primary2] as $id) {
       if (!is_numeric($id)) {
-        $errors[$primary2] = 'Invailid ID';
+        $response->invalidate($primary2, 'Invailid ID');
         break;
       }
     }
   }
 
-  if (!empty($errors)) {
-    return $response
-      ->setError(true, 'Invalid Parameters')
-      ->set('json', 'validation', $errors);
+  //if there are errors
+  if (!$response->isValid()) {
+    return $response->setError(true, 'Invalid Parameters');
   }
 
   //----------------------------//
@@ -335,7 +336,7 @@ $this('event')->on('system-collection-remove', function (RequestInterface $reque
   if (!isset($data['schema'])) {
     return $response
       ->setError(true, 'Invalid Parameters')
-      ->addValidation('schema', 'Schema is required.');
+      ->invalidate('schema', 'Schema is required.');
   }
 
   try { //to load schema
@@ -343,7 +344,7 @@ $this('event')->on('system-collection-remove', function (RequestInterface $reque
   } catch (SystemException $e) {
     return $response
       ->setError(true, 'Invalid Parameters')
-      ->addValidation('schema', $e->getMessage());
+      ->invalidate('schema', $e->getMessage());
   }
 
   //load system package now
@@ -419,7 +420,7 @@ $this('event')->on('system-collection-restore', function (RequestInterface $requ
   if (!isset($data['schema'])) {
     return $response
       ->setError(true, 'Invalid Parameters')
-      ->addValidation('schema', 'Schema is required.');
+      ->invalidate('schema', 'Schema is required.');
   }
 
   try { //to load schema
@@ -427,7 +428,7 @@ $this('event')->on('system-collection-restore', function (RequestInterface $requ
   } catch (SystemException $e) {
     return $response
       ->setError(true, 'Invalid Parameters')
-      ->addValidation('schema', $e->getMessage());
+      ->invalidate('schema', $e->getMessage());
   }
 
   //get active
@@ -501,7 +502,7 @@ $this('event')->on('system-collection-search', function (RequestInterface $reque
   if (!isset($data['schema'])) {
     return $response
       ->setError(true, 'Invalid Parameters')
-      ->addValidation('schema', 'Schema is required.');
+      ->invalidate('schema', 'Schema is required.');
   }
 
   try { //to load schema
@@ -509,7 +510,7 @@ $this('event')->on('system-collection-search', function (RequestInterface $reque
   } catch (SystemException $e) {
     return $response
       ->setError(true, 'Invalid Parameters')
-      ->addValidation('schema', $e->getMessage());
+      ->invalidate('schema', $e->getMessage());
   }
 
   //----------------------------//
@@ -576,21 +577,20 @@ $this('event')->on('system-collection-unlink', function (RequestInterface $reque
 
   //----------------------------//
   // 2. Validate Data
-  $errors = [];
   if (!isset($data['schema1'])) {
-    $errors['schema1'] = 'Schema is required.';
+    $response->invalidate('schema1', 'Schema is required.');
   }
 
   try {
     $schema = Schema::load($data['schema1']);
   } catch (SystemException $e) {
-    $errors['schema1'] = $e->getMessage();
+    $response->invalidate('schema1', $e->getMessage());
   }
 
   try {
     $relation = $schema->getRelations(null, $data['schema2']);
   } catch (SystemException $e) {
-    $errors['schema2'] = $e->getMessage();
+    $response->invalidate('schema2', $e->getMessage());
   }
 
   //if no relation
@@ -599,7 +599,7 @@ $this('event')->on('system-collection-unlink', function (RequestInterface $reque
     try {
       $schema = Schema::load($data['schema1']);
     } catch (SystemException $e) {
-      $errors['schema2'] = $e->getMessage();
+      $response->invalidate('schema2', $e->getMessage());
     }
 
     $relation = $schema->getRelations(null, $data['schema1']);
@@ -618,7 +618,7 @@ $this('event')->on('system-collection-unlink', function (RequestInterface $reque
   $primary1 = $relation['primary1'];
   //ID should be set
   if (!isset($data[$primary1])) {
-    $errors[$primary1] = 'Invailid ID';
+    $response->invalidate($primary1, 'Invailid ID');
   } else {
     //make sure we are dealing with an array
     if (!is_array($data[$primary1])) {
@@ -628,7 +628,7 @@ $this('event')->on('system-collection-unlink', function (RequestInterface $reque
     //make sure all IDs are numbers
     foreach ($data[$primary1] as $id) {
       if (!is_numeric($id)) {
-        $errors[$primary1] = 'Invailid ID';
+        $response->invalidate($primary1, 'Invailid ID');
         break;
       }
     }
@@ -637,7 +637,7 @@ $this('event')->on('system-collection-unlink', function (RequestInterface $reque
   $primary2 = $relation['primary2'];
   //ID should be set
   if (!isset($data[$primary2])) {
-    $errors[$primary2] = 'Invailid ID';
+    $response->invalidate($primary2, 'Invailid ID');
   } else {
     //make sure we are dealing with an array
     if (!is_array($data[$primary2])) {
@@ -647,16 +647,15 @@ $this('event')->on('system-collection-unlink', function (RequestInterface $reque
     //make sure all IDs are numbers
     foreach ($data[$primary2] as $id) {
       if (!is_numeric($id)) {
-        $errors[$primary2] = 'Invailid ID';
+        $response->invalidate($primary2, 'Invailid ID');
         break;
       }
     }
   }
 
-  if (!empty($errors)) {
-    return $response
-      ->setError(true, 'Invalid Parameters')
-      ->set('json', 'validation', $errors);
+  //if there are errors
+  if (!$response->isValid()) {
+    return $response->setError(true, 'Invalid Parameters');
   }
 
   //----------------------------//
@@ -728,7 +727,7 @@ $this('event')->on('system-collection-update', function (RequestInterface $reque
   if (!isset($data['schema'])) {
     return $response
       ->setError(true, 'Invalid Parameters')
-      ->addValidation('schema', 'Schema is required.');
+      ->invalidate('schema', 'Schema is required.');
   }
 
   try { //to load schema
@@ -736,7 +735,7 @@ $this('event')->on('system-collection-update', function (RequestInterface $reque
   } catch (SystemException $e) {
     return $response
       ->setError(true, 'Invalid Parameters')
-      ->addValidation('schema', $e->getMessage());
+      ->invalidate('schema', $e->getMessage());
   }
 
   //----------------------------//

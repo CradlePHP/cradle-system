@@ -1,23 +1,55 @@
 <?php //-->
+/**
+ * This file is part of a package designed for the CradlePHP Project.
+ *
+ * Copyright and license information can be found at LICENSE.txt
+ * distributed with this package.
+ */
 
 namespace Cradle\Package\System\Fieldset\Field;
 
 abstract class AbstractField
 {
   /**
-   * @const bool FORCE_FILTERABLE Whether or not to force the field to filterable
+   * @const mixed DEFAULT_VALUE
    */
-  const FORCE_FILTERABLE = false;
+  const DEFAULT_VALUE = null;
 
   /**
-   * @const bool FORCE_SEARCHABLE Whether or not to force the field to searchable
+   * @const int FORCE_FILTERABLE Whether or not to force the field to filterable
+   *                             1 means force check,
+   *                             0 means force uncheck,
+   *                             -1 means do not force
    */
-  const FORCE_SEARCHABLE = false;
+  const FORCE_FILTERABLE = -1;
 
   /**
-   * @const bool FORCE_SORTABLE Whether or not to force the field to sortable
+   * @const ?string FORCE_LABEL the label here will be used as
+   *                            the label of the field.
    */
-  const FORCE_SORTABLE = false;
+  const FORCE_LABEL = null;
+
+  /**
+   * @const ?string FORCE_NAME the name here will be used as the name of
+   *                           the field. Dont confuse this with the type name.
+   */
+  const FORCE_NAME = null;
+
+  /**
+   * @const int FORCE_SEARCHABLE Whether or not to force the field to searchable
+   *                             1 means force check,
+   *                             0 means force uncheck,
+   *                             -1 means do not force
+   */
+  const FORCE_SEARCHABLE = -1;
+
+  /**
+   * @const int FORCE_SORTABLE Whether or not to force the field to sortable
+   *                             1 means force check,
+   *                             0 means force uncheck,
+   *                             -1 means do not force
+   */
+  const FORCE_SORTABLE = -1;
 
   /**
    * @const bool HAS_ATTRIBUTES Whether or not to show attribute fieldset
@@ -26,7 +58,7 @@ abstract class AbstractField
   const HAS_ATTRIBUTES = false;
 
   /**
-   * @const bool HAS_ATTRIBUTES Whether or not to show options fieldset
+   * @const bool HAS_OPTIONS Whether or not to show options fieldset
    * on the schema form if the field was chosen
    */
   const HAS_OPTIONS = false;
@@ -60,6 +92,17 @@ abstract class AbstractField
   const LABEL = 'Unknown';
 
   /**
+   * @const bool NO_VALIDATION Whether or not to show the validation fieldset
+   * on the schema form if the field was chosen
+   */
+  const NO_VALIDATION = false;
+
+  /**
+   * @const string TYPE Config Type
+   */
+  const TYPE = FieldTypes::TYPE_STRING;
+
+  /**
    * @const array TYPES List of possible data types
    */
   const TYPES = [];
@@ -70,9 +113,9 @@ abstract class AbstractField
   const FORMATS = [];
 
   /**
-   * @var *string $name The applied field name
+   * @var ?string $name The applied field name
    */
-  protected $name;
+  protected $name = null;
 
   /**
    * @var array $attributes Hash of attributes to consider when rendering
@@ -90,112 +133,24 @@ abstract class AbstractField
   protected $parameters = [];
 
   /**
-   * Returns recommended output formats
-   *
-   * @return array
-   */
-  public function getConfigFormats(): array
-  {
-    return static::FORMATS;
-  }
-
-  /**
-   * In the schema form we need to provide a label for this field
-   *
-   * @return string
-   */
-  public function getConfigLabel(): string
-  {
-    return static::LABEL;
-  }
-
-  /**
-   * In the schema form we need to provide a unique slug name
-   *
-   * @return string
-   */
-  public function getConfigName(): string
-  {
-    return static::NAME;
-  }
-
-  /**
    * When they choose this field in a schema form,
    * we need to know what parameters to ask them for
    *
    * @return array
    */
-  public function getConfigParameters(): array
+  public static function getConfigFieldset(): array
   {
     return [];
   }
 
   /**
-   * Returns possible data types so schema
-   * based stores know how to interpret this field
+   * Returns the name of the field
    *
-   * @return array
+   * @return ?string
    */
-  public function getConfigTypes(): array
+  public function getName(): ?string
   {
-    $types = static::TYPES;
-    $types[] = static::NAME;
-    return $types;
-  }
-
-  /**
-   * Returns whether or not to show attribute fieldset
-   * on the schema form if the field was chosen
-   *
-   * @return bool
-   */
-  public function hasAttributes(): bool
-  {
-    return static::HAS_ATTRIBUTES;
-  }
-
-  /**
-   * Returns whether or not to show options fieldset
-   * on the schema form if the field was chosen
-   *
-   * @return bool
-   */
-  public function hasOptions(): bool
-  {
-    return static::HAS_OPTIONS;
-  }
-
-  /**
-   * Returns whether or not to enable the filterable checkbox
-   * on the schema form if the field was chosen
-   *
-   * @return bool
-   */
-  public function isFilterable(): bool
-  {
-    return static::IS_FILTERABLE;
-  }
-
-  /**
-   * Returns whether or not to enable the searchable checkbox
-   * on the schema form if the field was chosen
-   *
-   * @return bool
-   */
-  public function isSearchable(): bool
-  {
-    return static::IS_SEARCHABLE;
-  }
-
-  /**
-   * Returns whether or not to enable the sortable checkbox
-   * on the schema form if the field was chosen
-   *
-   * @return bool
-   */
-  public function isSortable(): bool
-  {
-    return static::IS_SORTABLE;
+    return $this->name;
   }
 
   /**
@@ -215,22 +170,9 @@ abstract class AbstractField
    *
    * @param ?mixed $value
    *
-   * @return string
+   * @return ?string
    */
   abstract public function render($value = null): ?string;
-
-  /**
-   * Returns the name of the field
-   *
-   * @param *string $name
-   *
-   * @return FieldConfigInterface
-   */
-  public function setName(string $name): FieldInterface
-  {
-    $this->name = $name;
-    return $this;
-  }
 
   /**
    * Sets the attributes that will be
@@ -238,11 +180,24 @@ abstract class AbstractField
    *
    * @param *array $attributes
    *
-   * @return FieldConfigInterface
+   * @return FieldInterface
    */
   public function setAttributes(array $attributes): FieldInterface
   {
     $this->attributes = $attributes;
+    return $this;
+  }
+
+  /**
+   * Sets the name of the field
+   *
+   * @param *string $name
+   *
+   * @return FieldInterface
+   */
+  public function setName(string $name): FieldInterface
+  {
+    $this->name = $name;
     return $this;
   }
 
@@ -252,7 +207,7 @@ abstract class AbstractField
    *
    * @param *array $options
    *
-   * @return FieldConfigInterface
+   * @return FieldInterface
    */
   public function setOptions(array $options): FieldInterface
   {
@@ -266,12 +221,75 @@ abstract class AbstractField
    *
    * @param *array $parameters
    *
-   * @return FieldConfigInterface
+   * @return FieldInterface
    */
   public function setParameters(array $parameters): FieldInterface
   {
     $this->parameters = $parameters;
     return $this;
+  }
+
+  /**
+   * Returns the name of the field
+   *
+   * @param *mixed $value
+   *
+   * @return FieldInterface
+   */
+  public function setValue($value): FieldInterface
+  {
+    $this->value = $value;
+    return $this;
+  }
+
+  /**
+   * Converts instance to an array
+   *
+   * @return array
+   */
+  public static function toConfigArray(): array
+  {
+    $data = [
+      'name' => static::NAME,
+      'type' => static::TYPE,
+      'label' => static::LABEL,
+      'default' => static::DEFAULT_VALUE,
+      'formats' => static::FORMATS,
+      'validation' => !static::NO_VALIDATION,
+      'force' => [
+        'name' => static::FORCE_NAME,
+        'label' => static::FORCE_LABEL,
+        'filterable' => static::FORCE_FILTERABLE,
+        'searchable' => static::FORCE_SEARCHABLE,
+        'sortable' => static::FORCE_SORTABLE
+      ]
+    ];
+
+    //indexes
+    $data['indexes'] = [];
+    if (static::IS_FILTERABLE) {
+      $data['indexes'][] = 'filterable';
+    }
+
+    if (static::IS_SEARCHABLE) {
+      $data['indexes'][] = 'searchable';
+    }
+
+    if (static::IS_SORTABLE) {
+      $data['indexes'][] = 'sortable';
+    }
+
+    //fieldset
+    $data['fieldsets'] = [];
+    if (static::HAS_ATTRIBUTES) {
+      $data['fieldsets'][] = 'attributes';
+    }
+
+    if (static::HAS_OPTIONS) {
+      $data['fieldsets'][] = 'options';
+    }
+
+    return $data;
   }
 
   /**

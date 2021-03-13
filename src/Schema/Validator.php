@@ -5,6 +5,7 @@
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
+
 namespace Cradle\Package\System\Schema;
 
 use Cradle\Package\System\Schema;

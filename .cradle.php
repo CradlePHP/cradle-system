@@ -5,6 +5,7 @@
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
+
 require_once __DIR__ . '/src/bootstrap/methods.php';
 
 require_once __DIR__ . '/src/events/collection.php';
@@ -12,149 +13,71 @@ require_once __DIR__ . '/src/events/fieldset.php';
 require_once __DIR__ . '/src/events/model.php';
 require_once __DIR__ . '/src/events/schema.php';
 
-//require_once __DIR__ . '/src/controller/schema/search.php';
-//require_once __DIR__ . '/src/controller/schema/create.php';
-//require_once __DIR__ . '/src/controller/schema/remove.php';
-//require_once __DIR__ . '/src/controller/schema/restore.php';
-//require_once __DIR__ . '/src/controller/schema/update.php';
-
 use Cradle\Package\System\Fieldset\Field\FieldHandler;
 use Cradle\Package\System\Fieldset\Validation\ValidationHandler;
 use Cradle\Package\System\Fieldset\Format\FormatHandler;
 
-//register types
-FieldHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Field\Pack\Text::class
-));
+//register fields
+FieldHandler::register(Cradle\Package\System\Fieldset\Field\None::class);
 
-FieldHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Field\Pack\Email::class
-));
+FieldHandler::register(Cradle\Package\System\Fieldset\Field\Input::class);
 
-FieldHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Field\Pack\Password::class
-));
+FieldHandler::register(Cradle\Package\System\Fieldset\Field\Datetime::class);
 
-FieldHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Field\Pack\Url::class
-));
+FieldHandler::register(Cradle\Package\System\Fieldset\Field\Number::class);
 
-FieldHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Field\Pack\Color::class
-));
+FieldHandler::register(Cradle\Package\System\Fieldset\Field\Textarea::class);
 
-FieldHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Field\Pack\Checkbox::class
-));
+FieldHandler::register(Cradle\Package\System\Fieldset\Field\Select::class);
 
-FieldHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Field\Pack\Date::class
-));
+FieldHandler::register(Cradle\Package\System\Fieldset\Field\TextList::class);
 
-FieldHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Field\Pack\Time::class
-));
+FieldHandler::register(Cradle\Package\System\Fieldset\Field\Meta::class);
 
-FieldHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Field\Pack\Datetime::class
-));
+FieldHandler::register(Cradle\Package\System\Fieldset\Field\Active::class);
 
-FieldHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Field\Pack\Number::class
-));
+FieldHandler::register(Cradle\Package\System\Fieldset\Field\Created::class);
 
-FieldHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Field\Pack\Textarea::class
-));
+FieldHandler::register(Cradle\Package\System\Fieldset\Field\Updated::class);
 
-FieldHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Field\Pack\Select::class
-));
+//register validators
+ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\Required::class);
 
-FieldHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Field\Pack\Active::class
-));
+ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\NotEmpty::class);
 
-FieldHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Field\Pack\Created::class
-));
+ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\NotEqual::class);
 
-FieldHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Field\Pack\Updated::class
-));
+ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\ValidOption::class);
 
-ValidationHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Validation\Pack\Required::class
-));
+ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\NumberLessThan::class);
 
-ValidationHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Validation\Pack\NotEmpty::class
-));
+ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\NumberLessThanEqual::class);
 
-ValidationHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Validation\Pack\NotEqual::class
-));
+ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\NumberGreaterThan::class);
 
-ValidationHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Validation\Pack\ValidOption::class
-));
+ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\NumberGreaterThanEqual::class);
 
-ValidationHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Validation\Pack\NumberLessThan::class
-));
+ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\ValidPastDate::class);
 
-ValidationHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Validation\Pack\NumberLessThanEqual::class
-));
+ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\ValidDate::class);
 
-ValidationHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Validation\Pack\NumberGreaterThan::class
-));
+ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\ValidFutureDate::class);
 
-ValidationHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Validation\Pack\NumberGreaterThanEqual::class
-));
+ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\ValidExpression::class);
 
-ValidationHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Validation\Pack\ValidPastDate::class
-));
+//register formats
+FormatHandler::register(Cradle\Package\System\Fieldset\Format\None::class);
 
-ValidationHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Validation\Pack\ValidDate::class
-));
+FormatHandler::register(Cradle\Package\System\Fieldset\Format\Lowercase::class);
 
-ValidationHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Validation\Pack\ValidFutureDate::class
-));
+FormatHandler::register(Cradle\Package\System\Fieldset\Format\Hide::class);
 
-ValidationHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Validation\Pack\ValidExpression::class
-));
+FormatHandler::register(Cradle\Package\System\Fieldset\Format\Uppercase::class);
 
-FormatHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Format\Pack\None::class
-));
+FormatHandler::register(Cradle\Package\System\Fieldset\Format\Capitalize::class);
 
-FormatHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Format\Pack\Lowercase::class
-));
+FormatHandler::register(Cradle\Package\System\Fieldset\Format\Number::class);
 
-FormatHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Format\Pack\Uppercase::class
-));
+FormatHandler::register(Cradle\Package\System\Fieldset\Format\YesNo::class);
 
-FormatHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Format\Pack\Capitalize::class
-));
-
-FormatHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Format\Pack\NumberComma::class
-));
-
-FormatHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Format\Pack\YesNo::class
-));
-
-FormatHandler::register($this('resolver')->resolve(
-  Cradle\Package\System\Fieldset\Format\Pack\Date::class
-));
+FormatHandler::register(Cradle\Package\System\Fieldset\Format\Date::class);

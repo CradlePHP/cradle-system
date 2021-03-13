@@ -1,4 +1,10 @@
 <?php //-->
+/**
+ * This file is part of a package designed for the CradlePHP Project.
+ *
+ * Copyright and license information can be found at LICENSE.txt
+ * distributed with this package.
+ */
 
 namespace Cradle\Package\System\Fieldset\Format;
 
@@ -27,47 +33,6 @@ abstract class AbstractFormatter
   protected $parameters = [];
 
   /**
-   * In the schema form we need to provide a label for this format
-   *
-   * @return string
-   */
-  public function getConfigLabel(): string
-  {
-    return static::LABEL;
-  }
-
-  /**
-   * In the schema form we need to provide a unique slug name
-   *
-   * @return string
-   */
-  public function getConfigName(): string
-  {
-    return static::NAME;
-  }
-
-  /**
-   * When they choose this format in a schema form,
-   * we need to know what parameters to ask them for
-   *
-   * @return array
-   */
-  public function getConfigParameters(): array
-  {
-    return [];
-  }
-
-  /**
-   * Returns data type
-   *
-   * @return string
-   */
-  public function getConfigType(): string
-  {
-    return static::TYPE;
-  }
-
-  /**
    * Renders the output format for model forms
    *
    * @param ?mixed $value
@@ -75,6 +40,17 @@ abstract class AbstractFormatter
    * @return ?string
    */
   abstract public function format($value = null): ?string;
+
+  /**
+   * When they choose this format in a schema form,
+   * we need to know what parameters to ask them for
+   *
+   * @return array
+   */
+  public static function getConfigFieldset(): array
+  {
+    return [];
+  }
 
   /**
    * Sets the parameters that will be
@@ -88,5 +64,19 @@ abstract class AbstractFormatter
   {
     $this->parameters = $parameters;
     return $this;
+  }
+
+  /**
+   * Converts instance to an array
+   *
+   * @return array
+   */
+  public static function toConfigArray(): array
+  {
+    return [
+      'name' => static::NAME,
+      'type' => static::TYPE,
+      'label' => static::LABEL
+    ];
   }
 }

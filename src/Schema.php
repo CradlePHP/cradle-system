@@ -5,6 +5,7 @@
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
+
 namespace Cradle\Package\System;
 
 use Cradle\Package\System\Schema\SchemaTypes;
@@ -124,6 +125,8 @@ class Schema extends Fieldset
           ->set('primary1', $primary1 . '_1')
           ->set('primary2', $primary2 . '_2');
       }
+
+      $results[$key] = $results[$key]->get();
     }
 
     return $results;

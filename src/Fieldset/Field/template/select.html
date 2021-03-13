@@ -1,0 +1,20 @@
+<select
+  class="form-control system-form-control"
+  {{#if name}}
+    name="{{name}}"
+  {{/if}}
+  {{#each attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+  {{#not_empty value}}
+    data-value="{{value}}"
+  {{/not_empty}}
+>
+  {{#each options}}
+    {{#when ../value '==' ./key}}
+      <option value="{{./key}}" selected>{{value}}</option>
+    {{else}}
+      <option value="{{./key}}">{{value}}</option>
+    {{/when}}
+  {{/each}}
+</select>

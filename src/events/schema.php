@@ -74,15 +74,11 @@ $this('event')->on('system-schema-create', function (RequestInterface $request, 
 
   //if there are errors
   if (!empty($errors)) {
-    return $response
-      ->setError(true, 'Invalid Parameters')
-      ->set('json', 'validation', $errors);
+    return $response->invalidate($errors);
   }
 
   //----------------------------//
   // 3. Prepare Data
-  //load the emitter
-  $emitter = $this('event');
   //make a new payload
   $payload = $request->clone(true);
 
@@ -109,7 +105,7 @@ $this('event')->on('system-schema-create', function (RequestInterface $request, 
   $payload->setStage('relations', $schema->getRelations());
 
   //trigger the store create
-  $emitter->emit('system-store-create', $payload, $response);
+  $this('event')->emit('system-store-create', $payload, $response);
 
   if ($response->isError()) {
     return;
@@ -182,11 +178,8 @@ $this('event')->on('system-schema-remove', function (RequestInterface $request, 
 
   //----------------------------//
   // 1. Get Data
-  //load the emitter
-  $emitter = $this('event');
-
   //get the system detail
-  $emitter->emit('system-schema-detail', $request, $response);
+  $this('event')->emit('system-schema-detail', $request, $response);
 
   //----------------------------//
   // 2. Validate Data
@@ -223,7 +216,7 @@ $this('event')->on('system-schema-remove', function (RequestInterface $request, 
   //make sure restorable is set
   $request->setStage('restorable', $restorable);
   //trigger the store drop
-  $emitter->emit('system-store-drop', $request, $response);
+  $this('event')->emit('system-store-drop', $request, $response);
 
   if ($response->isError()) {
     return;
@@ -247,11 +240,8 @@ $this('event')->on('system-schema-restore', function (RequestInterface $request,
 
   //----------------------------//
   // 1. Get Data
-  //load the emitter
-  $emitter = $this('event');
-
   //get the system detail
-  $emitter->method('system-schema-detail', [
+  $this('event')->method('system-schema-detail', [
     'name' => '_' . $request->getStage('name')
   ], $response);
 
@@ -281,7 +271,7 @@ $this('event')->on('system-schema-restore', function (RequestInterface $request,
   //make sure schema is set
   $request->setStage('schema', $schema->getName());
   //trigger the store recover
-  $emitter->emit('system-store-recover', $request, $response);
+  $this('event')->emit('system-store-recover', $request, $response);
 
   if ($response->isError()) {
     return;
@@ -318,12 +308,16 @@ $this('event')->on('system-schema-search', function (RequestInterface $request, 
 
   //----------------------------//
   // 4. Process Data
-  $results = Schema::search($filters);
+  $rows = Schema::search($filters);
+
+  foreach ($rows as $i => $row) {
+    $rows[$i] = $row->get();
+  }
 
   //set response format
   $response->setError(false)->setResults([
-    'rows' => $results,
-    'total' => count($results)
+    'rows' => $rows,
+    'total' => count($rows)
   ]);
 });
 
@@ -382,11 +376,8 @@ $this('event')->on('system-schema-update', function (RequestInterface $request, 
     }
   }
 
-  //load the emitter
-  $emitter = $this('event');
-
   //get the system detail
-  $emitter->emit('system-schema-detail', $request, $response);
+  $this('event')->emit('system-schema-detail', $request, $response);
 
   //----------------------------//
   // 2. Validate Data
@@ -399,15 +390,14 @@ $this('event')->on('system-schema-update', function (RequestInterface $request, 
 
   //if there are errors
   if (!empty($errors)) {
-    return $response
-      ->setError(true, 'Invalid Parameters')
-      ->set('json', 'validation', $errors);
+    return $response->invalidate($errors);
   }
 
   //----------------------------//
   // 3. Prepare Data
   //get the original for later
   $original = Schema::i($response->getResults());
+  $response->remove('json', 'results');
 
   //----------------------------//
   // 4. Process Data
@@ -443,7 +433,7 @@ $this('event')->on('system-schema-update', function (RequestInterface $request, 
   $payload->setStage('original', 'relations', $original->getRelations());
 
   //trigger the store create
-  $emitter->emit('system-store-alter', $payload, $response);
+  $this('event')->emit('system-store-alter', $payload, $response);
 
   if ($response->isError()) {
     return;

@@ -1,0 +1,57 @@
+<div
+  data-do="meta-field"
+  class="meta-field"
+  {{#if name}}
+    data-name="{{name}}"
+  {{/if}}
+  {{#each config.attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+>
+  {{#each value}}
+    <div class="field-row input-group mb-3">
+      <input
+        class="meta-input key form-control system-form-control"
+        type="text"
+        placeholder="{{../attributes.data-placeholder-key}}"
+        value="{{@key}}"
+      />
+      {{#when ../attributes.data-field '===' 'input'}}
+        <input
+          class="meta-input value form-control system-form-control"
+          type="text"
+          placeholder="{{../attributes.data-placeholder-value}}"
+          value="{{thhis}}"
+        />
+      {{else}}
+        <textarea
+          class="meta-input value form-control system-form-control"
+          placeholder="{{../attributes.data-placeholder-value}}"
+          rows="1"
+        >{{this}}</textarea>
+      {{/when}}
+      <input
+        class="system-form-control"
+        type="hidden"
+        name="{{../name}}[{{@key}}]"
+        value="{{this}}"
+      />
+      <div class="input-group-append">
+        <a
+          class="input-group-text text-danger remove"
+          href="javascript:void(0)"
+        >
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+  {{/each}}
+  <a class="field-add btn btn-success" href="javascript:void(0)">
+    <i class="fas fa-plus"></i>
+    {{#if attributes.data-label-add}}
+      <span>{{attributes.data-label-add}}</span>
+    {{else}}
+      <span>{{_ 'Add'}}</span>
+    {{/if}}
+  </a>
+</div>

@@ -1,0 +1,12 @@
+<input
+  class="form-control system-form-control"
+  {{#if name}}
+    name="{{name}}"
+  {{/if}}
+  {{#not_empty value}}
+    value="{{value}}"
+  {{/not_empty}}
+  {{#each attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+/>

@@ -8,15 +8,28 @@
 
 namespace Cradle\Package\System\Fieldset\Validation;
 
-interface ValidatorInterface
+
+class ValidFutureDate extends ValidDate
 {
+  /**
+   * @const string NAME Config name
+   */
+  const NAME = 'futuredate';
+
+  /**
+   * @const string LABEL Config label
+   */
+  const LABEL = 'Valid Future Date';
+
   /**
    * Renders the executes the validation for model forms
    *
    * @param ?mixed $value
-   * @param ?array $parameters
    *
    * @return bool
    */
-  public function valid($value = null): bool;
+  public function valid($value = null): bool
+  {
+    return parent::valid($value) && strtotime($value) > time();
+  }
 }

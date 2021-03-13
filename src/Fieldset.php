@@ -5,6 +5,7 @@
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
+
 namespace Cradle\Package\System;
 
 use Cradle\Data\Registry;
@@ -56,6 +57,16 @@ class Fieldset extends Registry
   }
 
   /**
+   * Returns folder where fieldset is located
+   *
+   * @returnn ?string
+   */
+  public static function getFolder(): ?string
+  {
+    return static::$path;
+  }
+
+  /**
    * Sets folder where fieldset is located
    *
    * @param *string $path
@@ -78,7 +89,7 @@ class Fieldset extends Registry
    */
   public static function search(array $filters = []): array
   {
-    $path = self::$path;
+    $path = static::$path;
     if (isset($filters['path']) && is_dir($filters['path'])) {
       $path = $filters['path'];
     }
@@ -540,7 +551,9 @@ class Fieldset extends Registry
     $types = [];
     $schema = FieldHandler::getField($field['field']['type']);
     if ($schema) {
-      $types = $schema->getConfigTypes();
+      $types = $schema::TYPES;
+      //add name as a type
+      $types[] = $schema::NAME;
     }
 
     if (isset($field['list']['format'])
