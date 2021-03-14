@@ -15,7 +15,6 @@ use Exception as BaseException;
  *
  * @package  Cradle
  * @category Resolver
- * @author   Christian Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
 class SystemException extends BaseException

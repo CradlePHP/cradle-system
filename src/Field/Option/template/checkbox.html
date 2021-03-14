@@ -1,0 +1,27 @@
+<input
+  class="system-form-control"
+  {{#if name}}
+    name="{{name}}"
+  {{/if}}
+  type="hidden"
+  value="0"
+/>
+<label class="checkbox checkbox-2">
+  <input
+    class="system-form-control"
+    {{#if name}}
+      name="{{name}}"
+    {{/if}}
+    type="checkbox"
+    value="1"
+    {{#when value '==' 1}}
+      checked
+    {{/when}}
+    {{#each.attributes}}
+      {{#when @key '!==' 'placeholder'}}
+        {{@key}}="{{this}}"
+      {{/when}}
+    {{/each}}
+  />
+  <span>{{attributes.placeholder}}</span>
+</label>

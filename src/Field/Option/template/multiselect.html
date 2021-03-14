@@ -1,0 +1,19 @@
+<select
+  class="form-control system-form-control"
+  data-do="select-field"
+  multiple="multiple"
+  {{#if name}}
+    name="{{name}}[]"
+  {{/if}}
+  {{#each attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+>
+  {{#each options}}
+    {{#when ../value '==' @key}}
+      <option value="{{@key}}" selected>{{this}}</option>
+    {{else}}
+      <option value="{{@key}}">{{this}}</option>
+    {{/when}}
+  {{/each}}
+</select>

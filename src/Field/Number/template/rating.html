@@ -1,0 +1,51 @@
+<div
+  class="stars-field"
+  data-do="stars-field"
+  {{#each attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+>
+  {{#if attributes.max}}
+    {{#stars value attributes.max}}
+      <div class="star d-inline-block">
+        {{#when value '===' 'half'}}
+          <i class="fas fa-star-half-alt text-warning"></i>
+        {{/when}}
+
+        {{#when value '===' 'whole'}}
+          <i class="fas fa-star text-warning"></i>
+        {{/when}}
+
+        {{#when value '===' 'empty'}}
+          <i class="far fa-star"></i>
+        {{/when}}
+      </div>
+    {{/stars}}
+  {{else}}
+    {{#stars value 5}}
+      <div class="star d-inline-block">
+        {{#when value '===' 'half'}}
+          <i class="fas fa-star-half-alt text-warning"></i>
+        {{/when}}
+
+        {{#when value '===' 'whole'}}
+          <i class="fas fa-star text-warning"></i>
+        {{/when}}
+
+        {{#when value '===' 'empty'}}
+          <i class="far fa-star"></i>
+        {{/when}}
+      </div>
+    {{/stars}}
+  {{/if}}
+
+  <input
+    {{#if name}}
+      name="{{name}}"
+    {{/if}}
+    type="hidden"
+    {{#not_empty value}}
+      value="{{value}}"
+    {{/not_empty}}
+  />
+</div>

@@ -1,0 +1,92 @@
+<table
+  class="table table-striped file-field"
+  data-do="file-field"
+  {{#if name}}
+    data-name="{{name}}"
+  {{/if}}
+  data-multiple="1"
+  {{#each attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+>
+  <thead>
+    <tr>
+      <th>{{_ 'Preview'}}</th>
+      <th>{{_ 'Name'}}</th>
+      <th>{{_ 'Actions'}}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#if this.length}}
+      {{#each value}}
+        <tr class="file-field-none" style="display:none;">
+          <td colspan="5">
+            <div class="alert alert-info">{{_ 'No Files Selected'}}</div>
+          </td>
+        </tr>
+        <tr class="file-field-item" data-index="{{@index}}">
+          <td class="file-field-preview">
+            {{#fileinfo this}}
+              {{#in 'jpg,jpeg,png,gif' extension}}
+                <div class="file-field-preview-container">
+                  <img src="{{../this}}" height="50" />
+                </div>
+              {{else}}
+                <div class="file-field-preview-container">
+                  <i class="fas fa-file text-info"></i>
+                  <span class="file-field-extension">{{extension}}</span>
+                </div>
+              {{/in}}
+            {{/fileinfo}}
+          </td>
+          <td class="file-field-name">
+            {{this}}
+            <input
+              class="system-form-control system-file-input"
+              name="{{../name}}[]"
+              type="hidden"
+              value="{{this}}"
+            />
+          </td>
+          <td class="file-field-actions">
+            <a class="text-info file-field-move-up" href="javascript:void(0)">
+              <i class="fas fa-arrow-up"></i>
+            </a>
+            &nbsp;&nbsp;&nbsp;
+            <a class="text-info file-field-move-down" href="javascript:void(0)">
+              <i class="fas fa-arrow-down"></i>
+            </a>
+            &nbsp;&nbsp;&nbsp;
+            <a class="btn btn-danger file-field-remove" href="javascript:void(0)">
+              <i class="fas fa-times"></i>
+            </a>
+          </td>
+        </tr>
+      {{/each}}
+    {{else}}
+      <tr class="file-field-none">
+        <td colspan="5">
+          <div class="alert alert-info">{{_ 'No Files Selected'}}</div>
+        </td>
+      </tr>
+    {{/if}}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="5">
+        <button
+          class="file-field-upload btn btn-info"
+          type="button"
+        >
+          {{_ 'Choose Files'}}
+        </button>
+        <button
+          class="file-field-link btn btn-success"
+          type="button"
+        >
+          {{_ 'Add URL'}}
+        </button>
+      </td>
+    </tr>
+  </tfoot>
+</table>

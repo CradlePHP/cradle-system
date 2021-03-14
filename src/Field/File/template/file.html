@@ -1,0 +1,75 @@
+<table
+  class="table table-striped file-field"
+  data-do="file-field"
+  {{#if name}}
+    data-name="{{name}}"
+  {{/if}}
+  {{#each attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+>
+  <thead>
+    <tr>
+      <th>{{_ 'Preview'}}</th>
+      <th>{{_ 'Name'}}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#if value}}
+      <tr class="file-field-none" style="display:none;">
+        <td colspan="5">
+          <div class="alert alert-info">{{_ 'No File Selected'}}</div>
+        </td>
+      </tr>
+      <tr class="file-field-item" data-index="{INDEX}">
+        <td class="file-field-preview">
+          {{#fileinfo this}}
+            {{#in 'jpg,jpeg,png,gif' extension}}
+              <div class="file-field-preview-container">
+                <img src="{{../value}}" height="50" />
+              </div>
+            {{else}}
+              <div class="file-field-preview-container">
+                <i class="fas fa-file text-info"></i>
+                <span class="file-field-extension">{{extension}}</span>
+              </div>
+            {{/in}}
+          {{/fileinfo}}
+        </td>
+        <td class="file-field-name">
+          {{value}}
+          <input
+            class="system-form-control"
+            name="{{../name}}"
+            type="hidden"
+            value="{{value}}"
+          />
+        </td>
+      </tr>
+    {{else}}
+      <tr class="file-field-none">
+        <td colspan="5">
+          <div class="alert alert-info">{{_ 'No File Selected'}}</div>
+        </td>
+      </tr>
+    {{/if}}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="5">
+        <button
+          class="file-field-upload btn btn-info"
+          type="button"
+        >
+          {{_ 'Choose File'}}
+        </button>
+        <button
+          class="file-field-link btn btn-success"
+          type="button"
+        >
+          {{_ 'Choose URL'}}
+        </button>
+      </td>
+    </tr>
+  </tfoot>
+</table>

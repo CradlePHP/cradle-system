@@ -9,10 +9,10 @@
 namespace Cradle\Package\System;
 
 use Cradle\Data\Registry;
-use Cradle\Package\System\Fieldset\Field\FieldHandler;
+use Cradle\Package\System\Field\FieldRegistry;
 use Cradle\Package\System\Fieldset\FieldsetTypes;
-use Cradle\Package\System\Fieldset\Validation\ValidationHandler;
-use Cradle\Package\System\Fieldset\Format\FormatHandler;
+use Cradle\Package\System\Validation\ValidatorRegistry;
+use Cradle\Package\System\Format\FormatterRegistry;
 
 /**
  * Model Fieldset Manager. This was made
@@ -211,7 +211,7 @@ class Fieldset extends Registry
       }
 
       //load up the formatter
-      $formatter = FormatHandler::getFormatter($field[$format]['format']);
+      $formatter = FormatterRegistry::getFormatter($field[$format]['format']);
       //if no formatter
       if (!$formatter) {
         continue;
@@ -280,7 +280,7 @@ class Fieldset extends Registry
       }
 
       //load up the field
-      $fieldSchema = FieldHandler::getField($field['field']['type']);
+      $fieldSchema = FieldRegistry::getField($field['field']['type']);
       //if no field
       if (!$fieldSchema) {
         continue;
@@ -375,7 +375,7 @@ class Fieldset extends Registry
         //if the value is not set, dont field validate..
       } else {
         //load up the field
-        $fieldSchema = FieldHandler::getField($field['field']['type']);
+        $fieldSchema = FieldRegistry::getField($field['field']['type']);
         //if it's not valid
         if ($fieldSchema && !$fieldSchema->valid($data[$key])) {
           //set an error
@@ -402,7 +402,7 @@ class Fieldset extends Registry
         }
 
         //load up the validator
-        $validator = ValidationHandler::getValidator($validation['method']);
+        $validator = ValidatorRegistry::getValidator($validation['method']);
         //if no validator
         if (!$validator) {
           //set an error
@@ -467,7 +467,7 @@ class Fieldset extends Registry
       }
 
       //load up the field
-      $field = FieldHandler::getField($field['field']['type']);
+      $field = FieldRegistry::getField($field['field']['type']);
       //if no field
       if (!$field) {
         continue;
@@ -549,7 +549,7 @@ class Fieldset extends Registry
   protected function getTypes(array $field): array
   {
     $types = [];
-    $schema = FieldHandler::getField($field['field']['type']);
+    $schema = FieldRegistry::getField($field['field']['type']);
     if ($schema) {
       $types = $schema::TYPES;
       //add name as a type

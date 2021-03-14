@@ -1,0 +1,21 @@
+<div
+  class="radio-fieldset"
+  {{#each attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+>
+  {{#each options}}
+    <label class="radio radio-2">
+      <input
+        class="system-form-control"
+        {{#if ../name}}
+          name="{{../name}}"
+        {{/if}}
+        type="radio"
+        value="{{@key}}"
+        {{#when ../value '==' @key}}checked{{/when}}
+      />
+      <span>{{this}}</span>
+    </label>
+  {{/each}}
+</div>

@@ -1,0 +1,21 @@
+<div
+  class="checkbox-fieldset"
+  {{#each attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+>
+  {{#each options}}
+    <label class="checkbox checkbox-2">
+      <input
+        class="system-form-control"
+        {{#if ../name}}
+          name="{{../name}}[]"
+        {{/if}}
+        type="checkbox"
+        value="{{@key}}"
+        {{#when ../value '==' @key}}checked{{/when}}
+      />
+      <span>{{this}}</span>
+    </label>
+  {{/each}}
+</div>
