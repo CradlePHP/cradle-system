@@ -13,71 +13,133 @@ require_once __DIR__ . '/src/events/fieldset.php';
 require_once __DIR__ . '/src/events/model.php';
 require_once __DIR__ . '/src/events/schema.php';
 
-use Cradle\Package\System\Fieldset\Field\FieldHandler;
-use Cradle\Package\System\Fieldset\Validation\ValidationHandler;
-use Cradle\Package\System\Fieldset\Format\FormatHandler;
+use Cradle\Package\System\Field\FieldRegistry;
+use Cradle\Package\System\Validation\ValidatorRegistry;
+use Cradle\Package\System\Format\FormatterRegistry;
 
 //register fields
-FieldHandler::register(Cradle\Package\System\Fieldset\Field\None::class);
+FieldRegistry::register(Cradle\Package\System\Field\General\None::class);
 
-FieldHandler::register(Cradle\Package\System\Fieldset\Field\Input::class);
+FieldRegistry::register(Cradle\Package\System\Field\Input\Input::class);
 
-FieldHandler::register(Cradle\Package\System\Fieldset\Field\Datetime::class);
+FieldRegistry::register(Cradle\Package\System\Field\Input\Text::class);
 
-FieldHandler::register(Cradle\Package\System\Fieldset\Field\Number::class);
+FieldRegistry::register(Cradle\Package\System\Field\Input\Color::class);
 
-FieldHandler::register(Cradle\Package\System\Fieldset\Field\Textarea::class);
+FieldRegistry::register(Cradle\Package\System\Field\Input\Email::class);
 
-FieldHandler::register(Cradle\Package\System\Fieldset\Field\Select::class);
+FieldRegistry::register(Cradle\Package\System\Field\Input\Url::class);
 
-FieldHandler::register(Cradle\Package\System\Fieldset\Field\TextList::class);
+FieldRegistry::register(Cradle\Package\System\Field\Input\Slug::class);
 
-FieldHandler::register(Cradle\Package\System\Fieldset\Field\Meta::class);
+FieldRegistry::register(Cradle\Package\System\Field\Input\Mask::class);
 
-FieldHandler::register(Cradle\Package\System\Fieldset\Field\Active::class);
+FieldRegistry::register(Cradle\Package\System\Field\Input\Password::class);
 
-FieldHandler::register(Cradle\Package\System\Fieldset\Field\Created::class);
+FieldRegistry::register(Cradle\Package\System\Field\Date\Date::class);
 
-FieldHandler::register(Cradle\Package\System\Fieldset\Field\Updated::class);
+FieldRegistry::register(Cradle\Package\System\Field\Date\Time::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Date\Datetime::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Date\Week::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Date\Month::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Number\Number::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Number\Floating::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Number\Price::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Number\Range::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Number\Rating::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Number\Small::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Number\Knob::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Textarea\Textarea::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Textarea\Wysiwyg::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Textarea\Markdown::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Textarea\Code::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Option\Select::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Option\Radio::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Option\Country::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Option\Currency::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Option\Checkbox::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Option\SwitchField::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Option\CheckList::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Option\Multiselect::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\File\File::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\File\Image::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\File\FileList::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\File\ImageList::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Json\TextList::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Json\Meta::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Custom\Active::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Custom\Created::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Custom\Updated::class);
 
 //register validators
-ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\Required::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\General\Required::class);
 
-ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\NotEmpty::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\General\NotEmpty::class);
 
-ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\NotEqual::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\General\ValidOption::class);
 
-ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\ValidOption::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\Number\NotEqual::class);
 
-ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\NumberLessThan::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\Number\LessThan::class);
 
-ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\NumberLessThanEqual::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\Number\LessThanEqual::class);
 
-ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\NumberGreaterThan::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\Number\GreaterThan::class);
 
-ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\NumberGreaterThanEqual::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\Number\GreaterThanEqual::class);
 
-ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\ValidPastDate::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\Date\ValidPastDate::class);
 
-ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\ValidDate::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\Date\ValidDate::class);
 
-ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\ValidFutureDate::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\Date\ValidFutureDate::class);
 
-ValidationHandler::register(Cradle\Package\System\Fieldset\Validation\ValidExpression::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\Custom\ValidExpression::class);
 
 //register formats
-FormatHandler::register(Cradle\Package\System\Fieldset\Format\None::class);
+FormatterRegistry::register(Cradle\Package\System\Format\General\None::class);
 
-FormatHandler::register(Cradle\Package\System\Fieldset\Format\Lowercase::class);
+FormatterRegistry::register(Cradle\Package\System\Format\String\Lowercase::class);
 
-FormatHandler::register(Cradle\Package\System\Fieldset\Format\Hide::class);
+FormatterRegistry::register(Cradle\Package\System\Format\Custom\Hide::class);
 
-FormatHandler::register(Cradle\Package\System\Fieldset\Format\Uppercase::class);
+FormatterRegistry::register(Cradle\Package\System\Format\String\Uppercase::class);
 
-FormatHandler::register(Cradle\Package\System\Fieldset\Format\Capitalize::class);
+FormatterRegistry::register(Cradle\Package\System\Format\String\Capitalize::class);
 
-FormatHandler::register(Cradle\Package\System\Fieldset\Format\Number::class);
+FormatterRegistry::register(Cradle\Package\System\Format\Number\Number::class);
 
-FormatHandler::register(Cradle\Package\System\Fieldset\Format\YesNo::class);
+FormatterRegistry::register(Cradle\Package\System\Format\Number\YesNo::class);
 
-FormatHandler::register(Cradle\Package\System\Fieldset\Format\Date::class);
+FormatterRegistry::register(Cradle\Package\System\Format\Date\Date::class);
