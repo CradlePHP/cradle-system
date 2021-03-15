@@ -8,11 +8,6 @@
 
 namespace Cradle\Package\System\Field\Option;
 
-use Cradle\Handlebars\HandlebarsHandler;
-
-use Cradle\Package\System\Field\FieldTypes;
-use Cradle\Package\System\Format\FormatTypes;
-
 /**
  * Radio Fieldset
  *
@@ -41,8 +36,9 @@ class Radio extends Select
    */
   public function render($value = null): ?string
   {
-    $handlebars = HandlebarsHandler::i();
-    $template = $handlebars->compile(file_get_contents(__DIR__ . '/template/radio.html'));
+    $template = cradle('handlebars')->compile(
+      file_get_contents(__DIR__ . '/template/radio.html')
+    );
     return $template([
       'name' => $this->name,
       'value' => $value,

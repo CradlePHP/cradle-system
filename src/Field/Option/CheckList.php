@@ -8,8 +8,6 @@
 
 namespace Cradle\Package\System\Field\Option;
 
-use Cradle\Handlebars\HandlebarsHandler;
-
 use Cradle\Package\System\Field\AbstractField;
 use Cradle\Package\System\Field\FieldInterface;
 use Cradle\Package\System\Field\FieldTypes;
@@ -74,7 +72,7 @@ class CheckList extends AbstractField implements FieldInterface
    *
    * @return ?scalar
    */
-  public function prepare($value)
+  public function prepare($value = null)
   {
     return json_encode($value);
   }
@@ -88,8 +86,9 @@ class CheckList extends AbstractField implements FieldInterface
    */
   public function render($value = null): ?string
   {
-    $handlebars = HandlebarsHandler::i();
-    $template = $handlebars->compile(file_get_contents(__DIR__ . '/template/checklist.html'));
+    $template = cradle('handlebars')->compile(
+      file_get_contents(__DIR__ . '/template/checklist.html')
+    );
     return $template([
       'name' => $this->name,
       'value' => $value,

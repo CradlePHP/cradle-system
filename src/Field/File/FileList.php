@@ -8,8 +8,6 @@
 
 namespace Cradle\Package\System\Field\File;
 
-use Cradle\Handlebars\HandlebarsHandler;
-
 use Cradle\Package\System\Field\AbstractField;
 use Cradle\Package\System\Field\FieldInterface;
 use Cradle\Package\System\Field\FieldTypes;
@@ -68,9 +66,15 @@ class FileList extends AbstractField implements FieldInterface
    *
    * @return ?scalar
    */
-  public function prepare($value)
+  public function prepare($value = null)
   {
-    return json_encode($value);
+    $files = cradle('event')->method('file-upload', [ 'data' => $value ]);
+
+    if (!isset($files['data'])) {
+      return json_encode($value);
+    }
+
+    return json_encode($file['data']);
   }
 
   /**
@@ -82,8 +86,9 @@ class FileList extends AbstractField implements FieldInterface
    */
   public function render($value = null): ?string
   {
-    $handlebars = HandlebarsHandler::i();
-    $template = $handlebars->compile(file_get_contents(__DIR__ . '/template/filelist.html'));
+    $template = cradle('handlebars')->compile(
+      file_get_contents(__DIR__ . '/template/filelist.html')
+    );
     return $template([
       'name' => $this->name,
       'value' => $value,

@@ -42,11 +42,13 @@ abstract class AbstractFormatter
   /**
    * Renders the output format for model forms
    *
-   * @param ?mixed $value
+   * @param ?mixed  $value
+   * @param ?string $name  name of the field formatting
+   * @param ?array  $row   the row submitted with the value
    *
    * @return ?string
    */
-  abstract public function format($value = null): ?string;
+  abstract public function format($value = null, string $name = null, array $row = []): bool;
 
   /**
    * When they choose this format in a schema form,

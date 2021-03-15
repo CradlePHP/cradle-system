@@ -8,8 +8,6 @@
 
 namespace Cradle\Package\System\Field\File;
 
-use Cradle\Handlebars\HandlebarsHandler;
-
 use Cradle\Package\System\Field\AbstractField;
 use Cradle\Package\System\Field\FieldInterface;
 use Cradle\Package\System\Field\FieldTypes;
@@ -74,8 +72,29 @@ class File extends AbstractField implements FieldInterface
    * @const array FORMATS List of possible formats
    */
   const FORMATS = [
-    FormatTypes::TYPE_STRING
+    FormatTypes::TYPE_GENERAL,
+    FormatTypes::TYPE_STRING,
+    FormatTypes::TYPE_HTML,
+    FormatTypes::TYPE_CUSTOM
   ];
+
+  /**
+   * Prepares the value for some sort of insertion
+   *
+   * @param *mixed $value
+   *
+   * @return ?scalar
+   */
+  public function prepare($value = null)
+  {
+    $file = cradle('event')->method('file-upload', [ 'data' => $value ]);
+
+    if (!isset($file['data'])) {
+      return $value;
+    }
+
+    return $file['data'];
+  }
 
   /**
    * Renders the field for model forms
@@ -86,8 +105,7 @@ class File extends AbstractField implements FieldInterface
    */
   public function render($value = null): ?string
   {
-    $handlebars = HandlebarsHandler::i();
-    $template = $handlebars->compile(
+    $template = cradle('handlebars')->compile(
       file_get_contents(__DIR__ . '/template/file.html')
     );
     return $template([

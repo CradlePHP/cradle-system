@@ -109,7 +109,9 @@ class Active extends AbstractField implements FieldInterface
    * @const array FORMATS List of possible formats
    */
   const FORMATS = [
-    FormatTypes::TYPE_NUMBER
+    FormatTypes::TYPE_GENERAL,
+    FormatTypes::TYPE_NUMBER,
+    FormatTypes::TYPE_CUSTOM
   ];
 
   /**
@@ -119,7 +121,7 @@ class Active extends AbstractField implements FieldInterface
    *
    * @return ?scalar
    */
-  public function prepare($value)
+  public function prepare($value = null)
   {
     return (int) !!$value;
   }

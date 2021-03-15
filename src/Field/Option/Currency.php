@@ -8,9 +8,8 @@
 
 namespace Cradle\Package\System\Field\Option;
 
-use Cradle\Handlebars\HandlebarsHandler;
-
 use Cradle\Package\System\Field\FieldInterface;
+use Cradle\Package\System\Format\FormatTypes;
 
 /**
  * Currency Drop Down Field
@@ -36,6 +35,16 @@ class Currency extends Select
    * @const string LABEL Config label
    */
   const LABEL = 'Currency Field';
+
+  /**
+   * @const array FORMATS List of possible formats
+   */
+  const FORMATS = [
+    FormatTypes::TYPE_GENERAL,
+    FormatTypes::TYPE_STRING,
+    FormatTypes::TYPE_HTML,
+    FormatTypes::TYPE_CUSTOM
+  ];
 
   /**
    * @var array $attributes Hash of attributes to consider when rendering

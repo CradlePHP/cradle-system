@@ -8,8 +8,6 @@
 
 namespace Cradle\Package\System\Field\Option;
 
-use Cradle\Handlebars\HandlebarsHandler;
-
 use Cradle\Package\System\Field\AbstractField;
 use Cradle\Package\System\Field\FieldInterface;
 use Cradle\Package\System\Field\FieldTypes;
@@ -81,7 +79,12 @@ class Select extends AbstractField implements FieldInterface
    * @const array FORMATS List of possible formats
    */
   const FORMATS = [
-    FormatTypes::TYPE_STRING
+    FormatTypes::TYPE_GENERAL,
+    FormatTypes::TYPE_STRING,
+    FormatTypes::TYPE_NUMBER,
+    FormatTypes::TYPE_DATE,
+    FormatTypes::TYPE_HTML,
+    FormatTypes::TYPE_CUSTOM
   ];
 
   /**
@@ -112,8 +115,9 @@ class Select extends AbstractField implements FieldInterface
    */
   public function render($value = null): ?string
   {
-    $handlebars = HandlebarsHandler::i();
-    $template = $handlebars->compile(file_get_contents(__DIR__ . '/template/select.html'));
+    $template = cradle('handlebars')->compile(
+      file_get_contents(__DIR__ . '/template/select.html')
+    );
     return $template([
       'name' => $this->name,
       'value' => $value,

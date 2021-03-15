@@ -167,7 +167,7 @@ abstract class AbstractField
    *
    * @return ?scalar
    */
-  public function prepare($value)
+  public function prepare($value = null)
   {
     return $value;
   }

@@ -41,11 +41,13 @@ class Number extends AbstractFormatter implements FormatterInterface
   /**
    * Renders the output format for model forms
    *
-   * @param ?mixed $value
+   * @param ?mixed  $value
+   * @param ?string $name  name of the field formatting
+   * @param ?array  $row   the row submitted with the value
    *
    * @return ?string
    */
-  public function format($value = null): ?string
+  public function format($value = null, string $name = null, array $row = []): bool
   {
     $parameters = $this->parameters;
     if (!isset($parameters[0])) {
@@ -77,22 +79,15 @@ class Number extends AbstractFormatter implements FormatterInterface
   public static function getConfigFieldset(): array
   {
     return [
-      FieldRegistry::makeField('input')
+      FieldRegistry::makeField('text')
         ->setName('{NAME}[parameters][0]')
-        ->setAttributes([
-          'type' => 'text',
-          'placeholder' => 'Thousands separator eg. ,'
-        ]),
-      FieldRegistry::makeField('input')
+        ->setAttributes([ 'placeholder' => 'Thousands separator eg. ,' ]),
+      FieldRegistry::makeField('text')
         ->setName('{NAME}[parameters][1]')
-        ->setAttributes([
-          'type' => 'text',
-          'placeholder' => 'Decimal separator eg. .'
-        ]),
+        ->setAttributes([ 'placeholder' => 'Decimal separator eg. .' ]),
       FieldRegistry::makeField('number')
         ->setName('{NAME}[parameters][2]')
         ->setAttributes([
-          'type' => 'number',
           'min' => 0,
           'max' => 10,
           'step' => 1,

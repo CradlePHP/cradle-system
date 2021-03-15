@@ -8,12 +8,6 @@
 
 namespace Cradle\Package\System\Field\Option;
 
-use Cradle\Handlebars\HandlebarsHandler;
-
-use Cradle\Package\System\Format\FormatTypes;
-
-use Cradle\Package\System\Field\FieldTypes;
-
 /**
  * Switch Field
  *
@@ -50,8 +44,9 @@ class SwitchField extends Checkbox
       'parameters' => $this->parameters
     ];
 
-    $handlebars = HandlebarsHandler::i();
-    $template = $handlebars->compile(file_get_contents(__DIR__ . '/template/switch.html'));
+    $template = cradle('handlebars')->compile(
+      file_get_contents(__DIR__ . '/template/switch.html')
+    );
     return $template($data);
   }
 }

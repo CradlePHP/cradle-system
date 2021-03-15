@@ -1,0 +1,29 @@
+<div
+  data-do="tag-field"
+  class="tag-field"
+  {{#if name}}
+    data-name="{{name}}"
+  {{/if}}
+  {{#each attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+>
+  {{#each value}}
+    <div class="tag">
+      <input
+        class="tag-input text-field system-form-control"
+        type="text"
+        {{#if ../name}}
+          name="{{../name}}[]"
+        {{/if}}
+        value="{{this}}"
+      />
+      <a
+        class="remove"
+        href="javascript:void(0)"
+      >
+        <i class="fa fa-times"></i>
+      </a>
+    </div>
+  {{/each}}
+</div>

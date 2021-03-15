@@ -6,7 +6,7 @@
  * distributed with this package.
  */
 
-namespace Cradle\Package\System\Validation\Number;
+namespace Cradle\Package\System\Validation\String;
 
 use Cradle\Package\System\Field\FieldRegistry;
 
@@ -15,28 +15,28 @@ use Cradle\Package\System\Validation\ValidatorInterface;
 use Cradle\Package\System\Validation\ValidationTypes;
 
 /**
- * Not Equal Validator
+ * Characters Less Than Equal Validator
  *
  * @vendor   Cradle
  * @package  System
  * @standard PSR-2
  */
-class NotEqual extends AbstractValidator implements ValidatorInterface
+class CharLessThanEqual extends AbstractValidator implements ValidatorInterface
 {
   /**
    * @const string NAME Config name
    */
-  const NAME = 'ne';
+  const NAME = 'char_lte';
 
   /**
    * @const string LABEL Config label
    */
-  const LABEL = 'Not Equal';
+  const LABEL = 'Characters Less Than Equal';
 
   /**
    * @const string TYPE Config Type
    */
-  const TYPE = ValidationTypes::TYPE_NUMBER;
+  const TYPE = ValidationTypes::TYPE_STRING;
 
   /**
    * When they choose this validator in a schema form,
@@ -50,8 +50,8 @@ class NotEqual extends AbstractValidator implements ValidatorInterface
       FieldRegistry::makeField('number')
         ->setName('{NAME}[parameters][0]')
         ->setAttributes([
-          'type' => 'text',
-          'placeholder' => 'Enter Number'
+          'placeholder' => 'Enter Number',
+          'required' => 'required'
         ])
     ];
   }
@@ -59,12 +59,14 @@ class NotEqual extends AbstractValidator implements ValidatorInterface
   /**
    * Renders the executes the validation for model forms
    *
-   * @param ?mixed $value
+   * @param ?mixed  $value
+   * @param ?string $name  name of the field validating
+   * @param ?array  $row   the row submitted with the value
    *
    * @return bool
    */
-  public function valid($value = null): bool
+  public function valid($value = null, string $name = null, array $row = []): bool
   {
-    return isset($this->parameters[0]) && $this->parameters[0] == $value;
+    return isset($this->parameters[0]) && strlen($value) <= $this->parameters[0];
   }
 }

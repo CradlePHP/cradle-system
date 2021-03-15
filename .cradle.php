@@ -82,7 +82,7 @@ FieldRegistry::register(Cradle\Package\System\Field\Option\SwitchField::class);
 
 FieldRegistry::register(Cradle\Package\System\Field\Option\CheckList::class);
 
-FieldRegistry::register(Cradle\Package\System\Field\Option\Multiselect::class);
+FieldRegistry::register(Cradle\Package\System\Field\Option\MultiSelect::class);
 
 FieldRegistry::register(Cradle\Package\System\Field\File\File::class);
 
@@ -92,9 +92,25 @@ FieldRegistry::register(Cradle\Package\System\Field\File\FileList::class);
 
 FieldRegistry::register(Cradle\Package\System\Field\File\ImageList::class);
 
+FieldRegistry::register(Cradle\Package\System\Field\Json\TagList::class);
+
 FieldRegistry::register(Cradle\Package\System\Field\Json\TextList::class);
 
+FieldRegistry::register(Cradle\Package\System\Field\Json\TextareaList::class);
+
 FieldRegistry::register(Cradle\Package\System\Field\Json\Meta::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Json\Table::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Json\MultiRange::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Json\LatLng::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Json\Json::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Custom\Uuid::class);
+
+FieldRegistry::register(Cradle\Package\System\Field\Custom\IpAddress::class);
 
 FieldRegistry::register(Cradle\Package\System\Field\Custom\Active::class);
 
@@ -102,28 +118,68 @@ FieldRegistry::register(Cradle\Package\System\Field\Custom\Created::class);
 
 FieldRegistry::register(Cradle\Package\System\Field\Custom\Updated::class);
 
+FieldRegistry::register(Cradle\Package\System\Field\Custom\Fieldset::class);
+
 //register validators
 ValidatorRegistry::register(Cradle\Package\System\Validation\General\Required::class);
 
 ValidatorRegistry::register(Cradle\Package\System\Validation\General\NotEmpty::class);
 
+ValidatorRegistry::register(Cradle\Package\System\Validation\General\NotEqual::class);
+
 ValidatorRegistry::register(Cradle\Package\System\Validation\General\ValidOption::class);
 
-ValidatorRegistry::register(Cradle\Package\System\Validation\Number\NotEqual::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\General\Unique::class);
 
-ValidatorRegistry::register(Cradle\Package\System\Validation\Number\LessThan::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\Number\ValidNumber::class);
 
-ValidatorRegistry::register(Cradle\Package\System\Validation\Number\LessThanEqual::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\Number\ValidFloat::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\Number\ValidPrice::class);
 
 ValidatorRegistry::register(Cradle\Package\System\Validation\Number\GreaterThan::class);
 
 ValidatorRegistry::register(Cradle\Package\System\Validation\Number\GreaterThanEqual::class);
 
-ValidatorRegistry::register(Cradle\Package\System\Validation\Date\ValidPastDate::class);
+ValidatorRegistry::register(Cradle\Package\System\Validation\Number\LessThan::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\Number\LessThanEqual::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\String\CharGreaterThan::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\String\CharGreaterThanEqual::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\String\CharLessThan::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\String\CharLessThanEqual::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\String\WordGreaterThan::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\String\WordGreaterThanEqual::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\String\WordLessThan::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\String\WordLessThanEqual::class);
 
 ValidatorRegistry::register(Cradle\Package\System\Validation\Date\ValidDate::class);
 
+ValidatorRegistry::register(Cradle\Package\System\Validation\Date\ValidTime::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\Date\ValidDatetime::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\Date\ValidPastDate::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\Date\ValidPresentDate::class);
+
 ValidatorRegistry::register(Cradle\Package\System\Validation\Date\ValidFutureDate::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\Type\ValidEmail::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\Type\ValidUrl::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\Type\ValidHex::class);
+
+ValidatorRegistry::register(Cradle\Package\System\Validation\Type\ValidCC::class);
 
 ValidatorRegistry::register(Cradle\Package\System\Validation\Custom\ValidExpression::class);
 
@@ -132,14 +188,64 @@ FormatterRegistry::register(Cradle\Package\System\Format\General\None::class);
 
 FormatterRegistry::register(Cradle\Package\System\Format\String\Lowercase::class);
 
-FormatterRegistry::register(Cradle\Package\System\Format\Custom\Hide::class);
-
 FormatterRegistry::register(Cradle\Package\System\Format\String\Uppercase::class);
 
 FormatterRegistry::register(Cradle\Package\System\Format\String\Capitalize::class);
 
+FormatterRegistry::register(Cradle\Package\System\Format\String\CharLength::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\String\WordLength::class);
+
 FormatterRegistry::register(Cradle\Package\System\Format\Number\Number::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Number\Price::class);
 
 FormatterRegistry::register(Cradle\Package\System\Format\Number\YesNo::class);
 
+FormatterRegistry::register(Cradle\Package\System\Format\Number\Rating::class);
+
 FormatterRegistry::register(Cradle\Package\System\Format\Date\Date::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Date\Relative::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Date\RelativeShort::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Html\EscapeHtml::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Html\StripHtml::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Html\Markdown::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Html\Link::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Html\Image::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Html\Email::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Html\Phone::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Json\CommaSeparate::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Json\SpaceSeparate::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Json\LineSeparate::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Json\OrderedList::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Json\UnorderedList::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Json\TagList::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Json\Meta::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Json\Table::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Json\Carousel::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Json\Json::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Custom\Custom::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Custom\Formula::class);
+
+FormatterRegistry::register(Cradle\Package\System\Format\Custom\Hide::class);

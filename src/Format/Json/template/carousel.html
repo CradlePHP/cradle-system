@@ -1,0 +1,28 @@
+{{#if value.length}}
+  <div
+    class="carousel slide"
+    data-do="carousel"
+    data-width="{{parameters.0}}"
+    data-height="{{parameters.1}}"
+  >
+    <div class="carousel-inner">
+      {{#each value}}
+        <div class="carousel-item text-center {{#if @first}} active{{/if}}">
+          <img
+            class="m-auto"
+            src="{{this}}"
+            {{#if ../parameters.1}}
+              height="{{../parameters.1}}"
+            {{/if}}
+          />
+        </div>
+      {{/each}}
+    </div>
+    <a class="carousel-control-prev" role="button">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <a class="carousel-control-next" role="button">
+      <i class="fas fa-chevron-right"></i>
+    </a>
+  </div>
+{{/if}}

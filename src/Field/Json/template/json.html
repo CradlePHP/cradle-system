@@ -1,0 +1,11 @@
+<textarea
+  class="form-control hidden system-form-control"
+  data-do="code-editor"
+  data-mode="json"
+  {{#if name}}
+    name="{{name}}"
+  {{/if}}
+  {{#each config.attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+>{{{jsonify value 1}}}</textarea>

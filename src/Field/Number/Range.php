@@ -8,8 +8,6 @@
 
 namespace Cradle\Package\System\Field\Number;
 
-use Cradle\Handlebars\HandlebarsHandler;
-
 /**
  * Range Field
  *
@@ -50,8 +48,7 @@ class Range extends Number
     $data['attributes']['data-do'] = 'multirange-field';
     $data['attributes']['tabindex'] = -1;
 
-    $handlebars = HandlebarsHandler::i();
-    $template = $handlebars->compile(file_get_contents(__DIR__ . '/template/range.html'));
+    $template = cradle('handlebars')->compile(file_get_contents(__DIR__ . '/template/range.html'));
     return $template($data);
   }
 }

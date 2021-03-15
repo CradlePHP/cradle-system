@@ -53,7 +53,9 @@ class Number extends Input
    * @const array FORMATS List of possible formats
    */
   const FORMATS = [
-    FormatTypes::TYPE_NUMBER
+    FormatTypes::TYPE_GENERAL,
+    FormatTypes::TYPE_NUMBER,
+    FormatTypes::TYPE_CUSTOM
   ];
 
   /**

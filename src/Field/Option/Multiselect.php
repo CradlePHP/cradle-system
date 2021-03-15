@@ -8,8 +8,6 @@
 
 namespace Cradle\Package\System\Field\Option;
 
-use Cradle\Handlebars\HandlebarsHandler;
-
 use Cradle\Package\System\Field\AbstractField;
 use Cradle\Package\System\Field\FieldInterface;
 use Cradle\Package\System\Field\FieldTypes;
@@ -22,7 +20,7 @@ use Cradle\Package\System\Format\FormatTypes;
  * @package  System
  * @standard PSR-2
  */
-class Multiselect extends AbstractField implements FieldInterface
+class MultiSelect extends AbstractField implements FieldInterface
 {
   /**
    * @const bool HAS_ATTRIBUTES Whether or not to show attribute fieldset
@@ -74,7 +72,7 @@ class Multiselect extends AbstractField implements FieldInterface
    *
    * @return ?scalar
    */
-  public function prepare($value)
+  public function prepare($value = null)
   {
     return json_encode($value);
   }
@@ -88,8 +86,9 @@ class Multiselect extends AbstractField implements FieldInterface
    */
   public function render($value = null): ?string
   {
-    $handlebars = HandlebarsHandler::i();
-    $template = $handlebars->compile(file_get_contents(__DIR__ . '/template/multiselect.html'));
+    $template = cradle('handlebars')->compile(
+      file_get_contents(__DIR__ . '/template/multiselect.html')
+    );
     return $template([
       'name' => $this->name,
       'value' => $value,

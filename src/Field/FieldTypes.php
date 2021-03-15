@@ -31,6 +31,7 @@ class FieldTypes
   const TYPE_JSON = 'json';
   const TYPE_NUMBER = 'number';
   const TYPE_OBJECT = 'object';
+  const TYPE_TABLE = 'object';
   const TYPE_URL = 'url';
 
   const TYPE_FILE_LIST = 'file[]';

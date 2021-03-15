@@ -24,7 +24,7 @@ interface FieldInterface
    *
    * @return ?scalar
    */
-  public function prepare($value);
+  public function prepare($value = null);
 
   /**
    * Renders the field for model forms

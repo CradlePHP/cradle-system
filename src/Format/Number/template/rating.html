@@ -1,0 +1,15 @@
+<span class="stars-rating text-warning">
+  {{#stars value}}
+    {{#when value '===' 'half'}}
+      <i class="fas fa-star-half-alt"></i>
+    {{/when}}
+
+    {{#when value '===' 'whole'}}
+      <i class="fas fa-star"></i>
+    {{/when}}
+
+    {{#when value '===' 'empty'}}
+      <i class="far fa-star"></i>
+    {{/when}}
+  {{/stars}}
+</span>

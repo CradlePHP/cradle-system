@@ -1,0 +1,54 @@
+<div
+  data-do="table-field"
+  class="table-field"
+  {{#if name}}
+    data-name="{{name}}"
+  {{/if}}
+  data-columns="{{#each columns}}{{this}}{{#unless @last}}|{{/unless}}{{/each}}"
+  {{#each attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>{{_ 'Actions'}}</th>
+        {{#each columns}}
+          <th>{{this}}</th>
+        {{/each}}
+      </tr>
+    </thead>
+    <tbody>
+      {{#each value}}
+        <tr data-index="{{@index}}">
+          <td>
+            <a
+              class="btn btn-danger row-remove"
+              href="javascript:void(0)"
+            >
+              <i class="fas fa-times"></i>
+            </a>
+          </td>
+          {{#each this}}
+            <td>
+              <input
+                class="input-column form-control system-form-control"
+                type="text"
+                name="{{../../name}}[{{../@index}}][{{scope ../../columns @index}}]"
+                placeholder="{{scope ../../columns @index}}"
+                value="{{this}}"
+              />
+            </td>
+          {{/each}}
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <a
+    class="row-add btn btn-success"
+    href="javascript:void(0)"
+  >
+    <i class="fas fa-plus"></i>
+    <span>{{_ 'Add Row'}}</span>
+  </a>
+</div>

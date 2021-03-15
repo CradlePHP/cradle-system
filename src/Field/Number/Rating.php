@@ -8,8 +8,6 @@
 
 namespace Cradle\Package\System\Field\Number;
 
-use Cradle\Handlebars\HandlebarsHandler;
-
 /**
  * Rating Field
  *
@@ -50,8 +48,9 @@ class Rating extends Floating
     $data['attributes']['min'] = 0;
     $data['attributes']['step'] = 0.5;
 
-    $handlebars = HandlebarsHandler::i();
-    $template = $handlebars->compile(file_get_contents(__DIR__ . '/template/rating.html'));
+    $template = cradle('handlebars')->compile(
+      file_get_contents(__DIR__ . '/template/rating.html')
+    );
     return $template($data);
   }
 }

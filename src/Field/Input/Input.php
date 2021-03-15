@@ -8,8 +8,6 @@
 
 namespace Cradle\Package\System\Field\Input;
 
-use Cradle\Handlebars\HandlebarsHandler;
-
 use Cradle\Package\System\Field\AbstractField;
 use Cradle\Package\System\Field\FieldInterface;
 use Cradle\Package\System\Field\FieldTypes;
@@ -74,7 +72,12 @@ class Input extends AbstractField implements FieldInterface
    * @const array FORMATS List of possible formats
    */
   const FORMATS = [
-    FormatTypes::TYPE_STRING
+    FormatTypes::TYPE_GENERAL,
+    FormatTypes::TYPE_STRING,
+    FormatTypes::TYPE_NUMBER,
+    FormatTypes::TYPE_DATE,
+    FormatTypes::TYPE_HTML,
+    FormatTypes::TYPE_CUSTOM
   ];
 
   /**
@@ -98,8 +101,9 @@ class Input extends AbstractField implements FieldInterface
       $data['attributes']['type'] = static::INPUT_TYPE;
     }
 
-    $handlebars = HandlebarsHandler::i();
-    $template = $handlebars->compile(file_get_contents(__DIR__ . '/template/input.html'));
+    $template = cradle('handlebars')->compile(
+      file_get_contents(__DIR__ . '/template/input.html')
+    );
     return $template($data);
   }
 }

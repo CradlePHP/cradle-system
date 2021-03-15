@@ -44,6 +44,18 @@ class Floating extends Number
   protected $attributes = [ 'step' => 0.0000000001 ];
 
   /**
+   * Prepares the value for some sort of insertion
+   *
+   * @param *mixed $value
+   *
+   * @return ?scalar
+   */
+  public function prepare($value = null)
+  {
+    return (float) sprintf('%.10F', $value);
+  }
+
+  /**
    * Sets the attributes that will be
    * considered when rendering the template
    *

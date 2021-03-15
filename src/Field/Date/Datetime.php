@@ -48,7 +48,9 @@ class Datetime extends Input
    * @const array FORMATS List of possible formats
    */
   const FORMATS = [
-    FormatTypes::TYPE_DATE
+    FormatTypes::TYPE_GENERAL,
+    FormatTypes::TYPE_DATE,
+    FormatTypes::TYPE_CUSTOM
   ];
 
   /**
@@ -58,10 +60,10 @@ class Datetime extends Input
    *
    * @return ?scalar
    */
-  public function prepare($value)
+  public function prepare($value = null)
   {
-    if (is_null($value)) {
-      return $value;
+    if (!$value) {
+      return null;
     }
 
     return date('Y-m-d H:i:s', strtotime($value));

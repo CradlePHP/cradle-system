@@ -47,11 +47,11 @@ class ValidExpression extends AbstractValidator implements ValidatorInterface
   public static function getConfigFieldset(): array
   {
     return [
-      FieldRegistry::makeField('input')
+      FieldRegistry::makeField('text')
         ->setName('{NAME}[parameters][0]')
         ->setAttributes([
-          'type' => 'text',
-          'placeholder' => 'Enter Regular Expression'
+          'placeholder' => 'Enter Regular Expression',
+          'required' => 'required'
         ])
     ];
   }
@@ -59,11 +59,13 @@ class ValidExpression extends AbstractValidator implements ValidatorInterface
   /**
    * Renders the executes the validation for model forms
    *
-   * @param ?mixed $value
+   * @param ?mixed  $value
+   * @param ?string $name  name of the field validating
+   * @param ?array  $row   the row submitted with the value
    *
    * @return bool
    */
-  public function valid($value = null): bool
+  public function valid($value = null, string $name = null, array $row = []): bool
   {
     return isset($this->parameters[0]) && preg_match($this->parameters[0], $value);
   }

@@ -8,28 +8,17 @@
 
 namespace Cradle\Package\System\Field\Json;
 
-use Cradle\Handlebars\HandlebarsHandler;
-
-use Cradle\Package\System\Field\AbstractField;
-use Cradle\Package\System\Field\FieldInterface;
 use Cradle\Package\System\Field\FieldTypes;
-use Cradle\Package\System\Format\FormatTypes;
 
 /**
- * Text List Field
+ * Text List Fieldset
  *
  * @vendor   Cradle
  * @package  System
  * @standard PSR-2
  */
-class TextList extends AbstractField implements FieldInterface
+class TextList extends Json
 {
-  /**
-   * @const bool HAS_ATTRIBUTES Whether or not to show attribute fieldset
-   * on the schema form if the field was chosen
-   */
-  const HAS_ATTRIBUTES = true;
-
   /**
    * @const string NAME Config name
    */
@@ -41,11 +30,6 @@ class TextList extends AbstractField implements FieldInterface
   const LABEL = 'Text List Fieldset';
 
   /**
-   * @const string TYPE Config Type
-   */
-  const TYPE = FieldTypes::TYPE_JSON;
-
-  /**
    * @const array TYPES List of possible data types
    */
   const TYPES = [
@@ -55,20 +39,13 @@ class TextList extends AbstractField implements FieldInterface
   ];
 
   /**
-   * @const array FORMATS List of possible formats
-   */
-  const FORMATS = [
-    FormatTypes::TYPE_JSON
-  ];
-
-  /**
    * Prepares the value for some sort of insertion
    *
    * @param *mixed $value
    *
    * @return ?scalar
    */
-  public function prepare($value)
+  public function prepare($value = null)
   {
     return json_encode($value);
   }
@@ -82,8 +59,9 @@ class TextList extends AbstractField implements FieldInterface
    */
   public function render($value = null): ?string
   {
-    $handlebars = HandlebarsHandler::i();
-    $template = $handlebars->compile(file_get_contents(__DIR__ . '/template/textlist.html'));
+    $template = cradle('handlebars')->compile(
+      file_get_contents(__DIR__ . '/template/textlist.html')
+    );
     return $template([
       'name' => $this->name,
       'value' => $value,

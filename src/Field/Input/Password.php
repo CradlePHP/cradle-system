@@ -39,7 +39,7 @@ class Password extends Text
    *
    * @return ?scalar
    */
-  public function prepare($value)
+  public function prepare($value = null)
   {
     if (is_null($value)) {
       return $value;

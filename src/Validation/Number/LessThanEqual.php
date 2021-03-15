@@ -10,6 +10,10 @@ namespace Cradle\Package\System\Validation\Number;
 
 use Cradle\Package\System\Field\FieldRegistry;
 
+use Cradle\Package\System\Validation\AbstractValidator;
+use Cradle\Package\System\Validation\ValidatorInterface;
+use Cradle\Package\System\Validation\ValidationTypes;
+
 /**
  * Number Less Than Equal Validator
  *
@@ -17,7 +21,7 @@ use Cradle\Package\System\Field\FieldRegistry;
  * @package  System
  * @standard PSR-2
  */
-class LessThanEqual extends NotEqual
+class LessThanEqual extends AbstractValidator implements ValidatorInterface
 {
   /**
    * @const string NAME Config name
@@ -28,6 +32,11 @@ class LessThanEqual extends NotEqual
    * @const string LABEL Config label
    */
   const LABEL = 'Less Than Equal';
+
+  /**
+   * @const string TYPE Config Type
+   */
+  const TYPE = ValidationTypes::TYPE_NUMBER;
 
   /**
    * When they choose this validator in a schema form,
@@ -41,8 +50,8 @@ class LessThanEqual extends NotEqual
       FieldRegistry::makeField('number')
         ->setName('{NAME}[parameters][0]')
         ->setAttributes([
-          'type' => 'text',
-          'placeholder' => 'Enter Number'
+          'placeholder' => 'Enter Number',
+          'required' => 'required'
         ])
     ];
   }
@@ -50,11 +59,13 @@ class LessThanEqual extends NotEqual
   /**
    * Renders the executes the validation for model forms
    *
-   * @param ?mixed $value
+   * @param ?mixed  $value
+   * @param ?string $name  name of the field validating
+   * @param ?array  $row   the row submitted with the value
    *
    * @return bool
    */
-  public function valid($value = null): bool
+  public function valid($value = null, string $name = null, array $row = []): bool
   {
     return isset($this->parameters[0]) && $value <= $this->parameters[0];
   }

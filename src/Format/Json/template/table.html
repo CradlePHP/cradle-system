@@ -1,0 +1,30 @@
+{{#if value.length}}
+  <table class="table table-striped table-bordered m-0">
+    {{#if columns.length}}
+      <thead>
+        <tr>
+          {{#each columns}}
+            <th>{{this}}</th>
+          {{/each}}
+        </tr>
+      </thead>
+    {{/if}}
+    <tbody>
+      {{#each value}}
+        <tr>
+          {{#if this.length}}
+            {{#each this}}
+              {{#is_array this}}
+                <td>{{_ 'Array'}}</td>
+              {{else}}
+                <td>{{{this}}}</td>
+              {{/is_array}}
+            {{/each}}
+          {{/if}}
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{else}}
+  <div class="alert alert-info m-0">{{_ 'Empty'}}</div>
+{{/if}}

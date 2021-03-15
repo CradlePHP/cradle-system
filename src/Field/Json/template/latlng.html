@@ -1,0 +1,32 @@
+<div class="latlng-field">
+  <input
+    class="form-control system-form-control"
+    {{#if name}}
+      name="{{name}}[0]"
+    {{/if}}
+    type="number"
+    value="{{value.0}}"
+    min="-90"
+    max="90"
+    step="0.00000001"
+    placeholder="Latitude"
+    {{#each config.attributes}}
+      {{@key}}="{{this}}"
+    {{/each}}
+  />
+  <input
+    class="form-control system-form-control"
+    {{#if name}}
+      name="{{name}}[1]"
+    {{/if}}
+    type="number"
+    value="{{this.1}}"
+    min="-180"
+    max="180"
+    step="0.00000001"
+    placeholder="Longitude"
+    {{#each config.attributes}}
+      {{@key}}="{{this}}"
+    {{/each}}
+  />
+</div>

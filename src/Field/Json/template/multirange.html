@@ -1,0 +1,14 @@
+<input
+  class="irs-hidden-input system-form-control"
+  data-do="multirange-field"
+  data-type="double"
+  {{#if name}}
+    name="{{name}}"
+  {{/if}}
+  tabindex="-1"
+  type="hidden"
+  value="{{join value ';'}}"
+  {{#each attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+/>

@@ -46,9 +46,9 @@ class Date extends Datetime
    *
    * @return ?scalar
    */
-  public function prepare($value)
+  public function prepare($value = null)
   {
-    if (is_null($value)) {
+    if (!$value) {
       return $value;
     }
 

@@ -8,8 +8,6 @@
 
 namespace Cradle\Package\System\Field\Textarea;
 
-use Cradle\Handlebars\HandlebarsHandler;
-
 use Cradle\Package\System\Field\AbstractField;
 use Cradle\Package\System\Field\FieldInterface;
 use Cradle\Package\System\Field\FieldTypes;
@@ -58,8 +56,30 @@ class Textarea extends AbstractField implements FieldInterface
    * @const array FORMATS List of possible formats
    */
   const FORMATS = [
-    FormatTypes::TYPE_STRING
+    FormatTypes::TYPE_GENERAL,
+    FormatTypes::TYPE_STRING,
+    FormatTypes::TYPE_NUMBER,
+    FormatTypes::TYPE_DATE,
+    FormatTypes::TYPE_HTML,
+    FormatTypes::TYPE_CUSTOM
   ];
+
+  /**
+   * Prepares the value for some sort of insertion
+   *
+   * @param *mixed $value
+   *
+   * @return ?scalar
+   */
+  public function prepare($value = null)
+  {
+    if (!$value) {
+      return $value;
+    }
+
+    //fix for textarea in textarea
+    return str_replace('<\/textarea>', '</textarea>', $value);
+  }
 
   /**
    * Renders the field for model forms
@@ -70,8 +90,9 @@ class Textarea extends AbstractField implements FieldInterface
    */
   public function render($value = null): ?string
   {
-    $handlebars = HandlebarsHandler::i();
-    $template = $handlebars->compile(file_get_contents(__DIR__ . '/template/textarea.html'));
+    $template = cradle('handlebars')->compile(
+      file_get_contents(__DIR__ . '/template/textarea.html')
+    );
     return $template([
       'name' => $this->name,
       'value' => $value,

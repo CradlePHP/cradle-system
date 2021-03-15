@@ -43,7 +43,9 @@
             {{this}}
             <input
               class="system-form-control system-file-input"
-              name="{{../name}}[]"
+              {{#if ../name}}
+                name="{{../name}}[]"
+              {{/if}}
               type="hidden"
               value="{{this}}"
             />

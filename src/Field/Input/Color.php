@@ -8,6 +8,8 @@
 
 namespace Cradle\Package\System\Field\Input;
 
+use Cradle\Package\System\Format\FormatTypes;
+
 /**
  * Color Field
  *
@@ -31,6 +33,17 @@ class Color extends Input
    * @const string INPUT_TYPE HTML input field type
    */
   const INPUT_TYPE = 'color';
+
+  /**
+   * @const array FORMATS List of possible formats
+   */
+  const FORMATS = [
+    FormatTypes::TYPE_GENERAL,
+    FormatTypes::TYPE_STRING,
+    FormatTypes::TYPE_NUMBER,
+    FormatTypes::TYPE_HTML,
+    FormatTypes::TYPE_CUSTOM
+  ];
 
   /**
    * Validation check

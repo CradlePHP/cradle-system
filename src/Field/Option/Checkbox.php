@@ -8,8 +8,6 @@
 
 namespace Cradle\Package\System\Field\Option;
 
-use Cradle\Handlebars\HandlebarsHandler;
-
 use Cradle\Package\System\Format\FormatTypes;
 
 use Cradle\Package\System\Field\AbstractField;
@@ -82,7 +80,7 @@ class Checkbox extends AbstractField implements FieldInterface
    *
    * @return ?scalar
    */
-  public function prepare($value)
+  public function prepare($value = null)
   {
     if (is_null($value)) {
       return $value;
@@ -108,8 +106,9 @@ class Checkbox extends AbstractField implements FieldInterface
       'parameters' => $this->parameters
     ];
 
-    $handlebars = HandlebarsHandler::i();
-    $template = $handlebars->compile(file_get_contents(__DIR__ . '/template/checkbox.html'));
+    $template = cradle('handlebars')->compile(
+      file_get_contents(__DIR__ . '/template/checkbox.html')
+    );
     return $template($data);
   }
 }

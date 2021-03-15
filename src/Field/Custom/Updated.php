@@ -46,7 +46,7 @@ class Updated extends Created
    *
    * @return ?scalar
    */
-  public function prepare($value)
+  public function prepare($value = null)
   {
     return date('Y-m-d H:i:s');
   }

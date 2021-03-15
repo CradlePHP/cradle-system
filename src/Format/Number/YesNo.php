@@ -41,11 +41,13 @@ class YesNo extends AbstractFormatter implements FormatterInterface
   /**
    * Renders the output format for model forms
    *
-   * @param ?mixed $value
+   * @param ?mixed  $value
+   * @param ?string $name  name of the field formatting
+   * @param ?array  $row   the row submitted with the value
    *
    * @return ?string
    */
-  public function format($value = null): ?string
+  public function format($value = null, string $name = null, array $row = []): bool
   {
     $parameters = $this->parameters;
     if (!isset($parameters[0])) {
@@ -68,18 +70,12 @@ class YesNo extends AbstractFormatter implements FormatterInterface
   public static function getConfigFieldset(): array
   {
     return [
-      FieldRegistry::makeField('input')
+      FieldRegistry::makeField('text')
         ->setName('{NAME}[parameters][0]')
-        ->setAttributes([
-          'type' => 'text',
-          'placeholder' => 'eg. Yes'
-        ]),
-      FieldRegistry::makeField('input')
+        ->setAttributes([ 'placeholder' => 'eg. Yes' ]),
+      FieldRegistry::makeField('text')
         ->setName('{NAME}[parameters][1]')
-        ->setAttributes([
-          'type' => 'text',
-          'placeholder' => 'eg. No'
-        ])
+        ->setAttributes([ 'placeholder' => 'eg. No' ])
     ];
   }
 }
