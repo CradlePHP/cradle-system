@@ -47,7 +47,11 @@ class StripHtml extends AbstractFormatter implements FormatterInterface
    *
    * @return ?string
    */
-  public function format($value = null, string $name = null, array $row = []): bool
+  public function format(
+    $value = null, 
+    string $name = null, 
+    array $row = []
+  ): ?string
   {
     if (isset($this->parameters[0]) && $this->parameters[0]) {
       return strip_tags($value, $this->parameters[0]);

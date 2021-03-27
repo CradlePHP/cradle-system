@@ -48,11 +48,17 @@ class Url extends Text
   /**
    * Validation check
    *
-   * @param *mixed $value
+   * @param ?mixed  $value
+   * @param ?string $name  name of the column in the row
+   * @param ?array  $row   the row submitted with the value
    *
    * @return bool
    */
-  public function valid($value): bool
+  public function valid(
+    $value = null,
+    string $name = null,
+    array $row = []
+  ): bool
   {
     return preg_match('/^(http|https|ftp):\/\/([A-Z0-9][A-Z0'.
     '-9_-]*(?:.[A-Z0-9][A-Z0-9_-]*)+):?(d+)?\/?/i', $value);

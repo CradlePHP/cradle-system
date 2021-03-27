@@ -1,0 +1,26 @@
+<fieldset
+  class="fieldset"
+  data-do="fieldset"
+  data-fieldset="{{parameters.0}}"
+  data-name="{{fieldset.nameplate}}"
+  data-label="{{fieldset.singular}}"
+  {{#each attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+>
+  <div class="fieldset-row">
+    {{#each fieldset.fields}}
+      {{#field ../fieldset fieldname ../value}}
+        <div class="form-group form-group-{{type}}">
+          <label class="control-label">{{label}}</label>
+          <div
+            class="form-field system-form-field"
+            data-name="{{../fieldname}}"
+          >
+            {{{control}}}
+          </div>
+        </div>
+      {{/field}}
+    {{/each}}
+  </div>
+</fieldset>

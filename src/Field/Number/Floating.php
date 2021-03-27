@@ -46,11 +46,13 @@ class Floating extends Number
   /**
    * Prepares the value for some sort of insertion
    *
-   * @param *mixed $value
+   * @param ?mixed  $value
+   * @param ?string $name  name of the column in the row
+   * @param ?array  $row   the row submitted with the value
    *
    * @return ?scalar
    */
-  public function prepare($value = null)
+  public function prepare($value = null, string $name = null, array $row = [])
   {
     return (float) sprintf('%.10F', $value);
   }

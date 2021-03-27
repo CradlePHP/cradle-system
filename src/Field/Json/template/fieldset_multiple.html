@@ -1,0 +1,60 @@
+<fieldset
+  class="fieldset"
+  data-do="fieldset"
+  data-fieldset="{{parameters.0}}"
+  data-name="{{fieldset.nameplate}}"
+  data-label="{{fieldset.singular}} {INDEX_0}"
+  {{#each attributes}}
+    {{@key}}="{{this}}"
+  {{/each}}
+>
+  <div class="d-none template-fieldset-row">
+    <div class="fieldset-row" data-multiple="1">
+      <a class="fieldset-remove" href="javscript:void(0)">
+        <i class="fa fa-times text-danger"></i>
+      </a>
+      {{#each fieldset.fields}}
+        {{#field ../fieldset nameplate ../value}}
+          <div class="form-group form-group-{{type}}">
+            <label class="control-label">{{label}}</label>
+            <div
+              class="form-field system-form-field"
+              data-name="{{../nameplate}}"
+            >
+              {{{control}}}
+            </div>
+          </div>
+        {{/field}}
+      {{/each}}
+    </div>
+  </div>
+
+  {{#each rows}}
+    <div class="fieldset-row" data-multiple="1">
+      <a class="fieldset-remove" href="javscript:void(0)">
+        <i class="fa fa-times text-danger"></i>
+      </a>
+      {{#each fields}}
+        {{#field ../../fieldset fieldname ../item}}
+          <div class="form-group form-group-{{type}}">
+            <label class="control-label">{{label}}</label>
+            <div
+              class="form-field system-form-field"
+              data-name="{{../nameplate}}"
+            >
+              {{{control}}}
+            </div>
+          </div>
+        {{/field}}
+      {{/each}}
+    </div>
+  {{/each}}
+
+  <a
+    class="btn btn-outline-secondary btn-block fieldset-add"
+    href="javascript:void(0)"
+  >
+    <i class="fas fa-plus"></i>
+    {{_ 'Add %s' fieldset.singular}}
+  </a>
+</fieldset>

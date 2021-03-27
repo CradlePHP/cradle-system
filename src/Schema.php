@@ -29,36 +29,13 @@ class Schema extends Fieldset
   protected static $path;
 
   /**
-   * Returns fieldset classes that match the given filters
+   * Returns true if there is an active field
    *
-   * @param array $filters Keys can be `path`, `active`, `name`
-   *
-   * @return array
+   * @return bool
    */
-  public static function search(array $filters = []): array
+  public function isRestorable(): bool
   {
-    $rows = parent::search($filters);
-
-    //ex. ?filter[relation]=product
-    //ex. ?filter[relation]=product,1
-    if (isset($filters['relation']) && trim($filters['relation'])) {
-      $many = null;
-      $relation = $filters['relation'];
-      if (strpos($filters['relation'], ',') !== false) {
-        [$relation, $many] = explode(',', $filters['relation'], 2);
-        $relation = trim($relation);
-        $many = (int) $many;
-      }
-
-      foreach ($rows as $key => $row) {
-        $relations = $row->getRelations($many, $relation);
-        if (empty($relations)) {
-          unset($rows[$key]);
-        }
-      }
-    }
-
-    return $rows;
+    return !!count($this->getFields('active'));
   }
 
   /**
@@ -125,8 +102,6 @@ class Schema extends Fieldset
           ->set('primary1', $primary1 . '_1')
           ->set('primary2', $primary2 . '_2');
       }
-
-      $results[$key] = $results[$key]->get();
     }
 
     return $results;
@@ -252,5 +227,38 @@ class Schema extends Fieldset
     }
 
     return $types;
+  }
+
+  /**
+   * Returns fieldset classes that match the given filters
+   *
+   * @param array $filters Keys can be `path`, `active`, `name`
+   *
+   * @return array
+   */
+  public static function search(array $filters = []): array
+  {
+    $rows = parent::search($filters);
+
+    //ex. ?filter[relation]=product
+    //ex. ?filter[relation]=product,1
+    if (isset($filters['relation']) && trim($filters['relation'])) {
+      $many = null;
+      $relation = $filters['relation'];
+      if (strpos($filters['relation'], ',') !== false) {
+        [$relation, $many] = explode(',', $filters['relation'], 2);
+        $relation = trim($relation);
+        $many = (int) $many;
+      }
+
+      foreach ($rows as $key => $row) {
+        $relations = $row->getRelations($many, $relation);
+        if (empty($relations)) {
+          unset($rows[$key]);
+        }
+      }
+    }
+
+    return $rows;
   }
 }

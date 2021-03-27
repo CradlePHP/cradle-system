@@ -68,11 +68,13 @@ class MultiSelect extends AbstractField implements FieldInterface
   /**
    * Prepares the value for some sort of insertion
    *
-   * @param *mixed $value
+   * @param ?mixed  $value
+   * @param ?string $name  name of the column in the row
+   * @param ?array  $row   the row submitted with the value
    *
    * @return ?scalar
    */
-  public function prepare($value = null)
+  public function prepare($value = null, string $name = null, array $row = [])
   {
     return json_encode($value);
   }
@@ -80,11 +82,17 @@ class MultiSelect extends AbstractField implements FieldInterface
   /**
    * Renders the field for model forms
    *
-   * @param ?mixed $value
+   * @param ?mixed  $value
+   * @param ?string $name  name of the column in the row
+   * @param ?array  $row   the row submitted with the value
    *
    * @return ?string
    */
-  public function render($value = null): ?string
+  public function render(
+    $value = null,
+    string $name = null,
+    array $row = []
+  ): ?string
   {
     $template = cradle('handlebars')->compile(
       file_get_contents(__DIR__ . '/template/multiselect.html')

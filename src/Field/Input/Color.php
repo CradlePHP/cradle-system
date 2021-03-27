@@ -48,11 +48,17 @@ class Color extends Input
   /**
    * Validation check
    *
-   * @param *mixed $value
+   * @param ?mixed  $value
+   * @param ?string $name  name of the column in the row
+   * @param ?array  $row   the row submitted with the value
    *
    * @return bool
    */
-  public function valid($value): bool
+  public function valid(
+    $value = null,
+    string $name = null,
+    array $row = []
+  ): bool
   {
     return preg_match('/^[0-9a-fA-F]{6}$/', $value);
   }

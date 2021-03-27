@@ -257,12 +257,16 @@ $this('event')->on('system-fieldset-search', function (RequestInterface $request
 
   //----------------------------//
   // 4. Process Data
-  $results = Fieldset::search($filters);
+  $rows = Fieldset::search($filters);
+
+  foreach ($rows as $i => $row) {
+    $rows[$i] = $row->get();
+  }
 
   //set response format
   $response->setError(false)->setResults([
-    'rows' => $results,
-    'total' => count($results)
+    'rows' => $rows,
+    'total' => count($rows)
   ]);
 });
 

@@ -87,5 +87,9 @@ abstract class AbstractValidator
    *
    * @return bool
    */
-  abstract public function valid($value = null, string $name = null, array $row = []): bool;
+  abstract public function valid(
+    $value = null,
+    string $name = null,
+    array $row = []
+  ): bool;
 }

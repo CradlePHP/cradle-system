@@ -27,9 +27,9 @@ class FormatterRegistry
    *
    * @param *string $name
    *
-   * @return ?FormatterInterface
+   * @return ?string
    */
-  public static function getFormatter(string $name): ?FormatterInterface
+  public static function getFormatter(string $name): ?string
   {
     if (isset(self::$formatters[$name])) {
       return self::$formatters[$name];

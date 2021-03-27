@@ -81,11 +81,13 @@ class IpAddress extends AbstractField implements FieldInterface
   /**
    * Prepares the value for some sort of insertion
    *
-   * @param *mixed $value
+   * @param ?mixed  $value
+   * @param ?string $name  name of the column in the row
+   * @param ?array  $row   the row submitted with the value
    *
    * @return ?scalar
    */
-  public function prepare($value = null)
+  public function prepare($value = null, string $name = null, array $row = [])
   {
     if ($value) {
       if (preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\z/', $value)) {
@@ -105,11 +107,17 @@ class IpAddress extends AbstractField implements FieldInterface
   /**
    * Renders the field for model forms
    *
-   * @param ?mixed $value
+   * @param ?mixed  $value
+   * @param ?string $name  name of the column in the row
+   * @param ?array  $row   the row submitted with the value
    *
    * @return ?string
    */
-  public function render($value = null): ?string
+  public function render(
+    $value = null,
+    string $name = null,
+    array $row = []
+  ): ?string
   {
     return null;
   }

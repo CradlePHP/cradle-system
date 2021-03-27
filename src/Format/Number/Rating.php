@@ -45,7 +45,11 @@ class Rating extends AbstractFormatter implements FormatterInterface
    *
    * @return ?string
    */
-  public function format($value = null, string $name = null, array $row = []): bool
+  public function format(
+    $value = null, 
+    string $name = null, 
+    array $row = []
+  ): ?string
   {
     $template = cradle('handlebars')->compile(
       file_get_contents(__DIR__ . '/template/rating.html')

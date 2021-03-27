@@ -108,6 +108,8 @@ FieldRegistry::register(Cradle\Package\System\Field\Json\LatLng::class);
 
 FieldRegistry::register(Cradle\Package\System\Field\Json\Json::class);
 
+FieldRegistry::register(Cradle\Package\System\Field\Json\Fieldset::class);
+
 FieldRegistry::register(Cradle\Package\System\Field\Custom\Uuid::class);
 
 FieldRegistry::register(Cradle\Package\System\Field\Custom\IpAddress::class);
@@ -117,8 +119,6 @@ FieldRegistry::register(Cradle\Package\System\Field\Custom\Active::class);
 FieldRegistry::register(Cradle\Package\System\Field\Custom\Created::class);
 
 FieldRegistry::register(Cradle\Package\System\Field\Custom\Updated::class);
-
-FieldRegistry::register(Cradle\Package\System\Field\Custom\Fieldset::class);
 
 //register validators
 ValidatorRegistry::register(Cradle\Package\System\Validation\General\Required::class);

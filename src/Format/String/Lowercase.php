@@ -45,7 +45,11 @@ class Lowercase extends AbstractFormatter implements FormatterInterface
    *
    * @return ?string
    */
-  public function format($value = null, string $name = null, array $row = []): bool
+  public function format(
+    $value = null, 
+    string $name = null, 
+    array $row = []
+  ): ?string
   {
     return strtolower($value);
   }

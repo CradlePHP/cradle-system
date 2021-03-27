@@ -168,9 +168,8 @@ $this('event')->on('system-model-detail', function (RequestInterface $request, R
     $data['columns'] = '*';
   }
 
-  //compute joins
   if (!isset($data['join'])) {
-    $data['join'] = [];
+    $data['join'] = 'forward';
   }
 
   //----------------------------//
@@ -228,7 +227,7 @@ $this('event')->on('system-model-detail', function (RequestInterface $request, R
   //get columns
   $columns = $data['columns'];
   //eg. joins = [['type' => 'inner', 'table' => 'product', 'where' => 'product_id']]
-  $joins = $system->getInnerJoins($schema, $data['join']);
+  $joins = $system->getInnerJoins($schema, $data);
   //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
   $filters = [['where' => $key . ' =%s', 'binds' => [$value]]];
 
@@ -255,18 +254,24 @@ $this('event')->on('system-model-detail', function (RequestInterface $request, R
   }
 
   //organize all the results
-  $results = $system->organizeRow($results[0]);
-  $id = $results[$data['schema']][$primary];
+  $results = $system->deflateRow($schema, $results[0]);
+  $id = $results[$primary];
 
-  //next, attach all the joins
-  $joins = $system->getJoinFilters($schema, $data['join']);
   //attach forward joins
   foreach ($schema->getRelations() as $relationTable => $relation) {
     $name = $group = $relation->getName();
     $primary2 = $relation->getPrimaryName();
+
+    $isJoin = $data['join'] === 'all'
+      || $data['join'] === 'forward'
+      || (
+        is_array($data['join'])
+        && in_array($name, $data['join'])
+      );
+
     //we already joined 1:1, dont do it again
     //if it's not on the join list
-    if ($relation['many'] == 1 || !in_array($name, $joins)) {
+    if ($relation['many'] == 1 || !$isJoin) {
       continue;
     }
 
@@ -302,7 +307,7 @@ $this('event')->on('system-model-detail', function (RequestInterface $request, R
       $payload->setStage('range', 1);
     }
 
-    $child = $emitter->method('storm-search', $payload);
+    $child = $emitter->method('system-store-search', $payload);
 
     //if 1:0
     if ($relation['many'] == 0 && isset($child[0])) {
@@ -318,9 +323,17 @@ $this('event')->on('system-model-detail', function (RequestInterface $request, R
   foreach ($schema->getReverseRelations() as $relation) {
     $name = $relation->getName();
     $primary2 = $relation->getPrimaryName();
+
+    $isJoin = $data['join'] === 'all'
+      || $data['join'] === 'forward'
+      || (
+        is_array($data['join'])
+        && in_array($name, $data['join'])
+      );
+
     //only join 1:N and N:N
     //if it's not on the join list
-    if ($relation['many'] < 2 || !in_array($name, $joins)) {
+    if ($relation['many'] < 2 || !$isJoin) {
       continue;
     }
 
@@ -342,7 +355,7 @@ $this('event')->on('system-model-detail', function (RequestInterface $request, R
       'range' => 0
     ]);
 
-    $results[$name] = $emitter->method('storm-search', $payload);
+    $results[$name] = $emitter->method('system-store-search', $payload);
   }
 
   $response->setError(false)->setResults($results);
@@ -611,6 +624,149 @@ $this('event')->on('system-model-restore', function (RequestInterface $request, 
 });
 
 /**
+ * System Model Search Job
+ *
+ * @param Request $request
+ * @param Response $response
+ */
+$this('event')->on('system-model-search', function (RequestInterface $request, ResponseInterface $response) {
+  //----------------------------//
+  // 0. Abort on Errors
+  if ($response->isError() || $response->hasResults()) {
+    return;
+  }
+
+  //----------------------------//
+  // 1. Get Data
+  $data = [];
+  if ($request->hasStage()) {
+    $data = $request->getStage();
+  }
+
+  //allow columns
+  if (!isset($data['columns'])) {
+    $data['columns'] = '*';
+  }
+
+  if (!isset($data['start'])) {
+    $data['start'] = 0;
+  }
+
+  if (!isset($data['range'])) {
+    $data['range'] = 50;
+  }
+
+  if (!isset($data['total'])) {
+    $data['total'] = 2;
+  }
+
+  //----------------------------//
+  // 2. Validate Data
+  //must have schema
+  if (!isset($data['schema'])) {
+    return $response
+      ->setError(true, 'Invalid Parameters')
+      ->invalidate('schema', 'Schema is required.');
+  }
+
+  try { //to load schema
+    $schema = Schema::load($data['schema']);
+  } catch (SystemException $e) {
+    return $response
+      ->setError(true, 'Invalid Parameters')
+      ->invalidate('schema', $e->getMessage());
+  }
+
+  //----------------------------//
+  // 3. Prepare Data
+  //load system package
+  $system = $this('cradlephp/cradle-system');
+  //load the emitter
+  $emitter = $this('event');
+  //make an input
+  $input = $request->clone(true);
+
+  //eg. joins = [['type' => 'inner', 'table' => 'product', 'where' => 'product_id']]
+  $joins = $system->getInnerJoins($schema, $data);
+  //from: filter[product_id]=1
+  //to: filters = [['where' => 'product_id =%s', 'binds' => [1]]]
+  $filters = $system->mapQuery($schema, $data);
+
+  //set the payload
+  $input->setStage([
+    'table' => $data['schema'],
+    'columns' => $columns,
+    'joins' => $joins,
+    'filters' => $filters,
+    'start' => $start,
+    'range' => $range
+  ]);
+
+  if (isset($data['group'])) {
+    //eg. group = ['product_id']
+    $input->setStage('group', $data['group']);
+  }
+
+  if (isset($data['having'])) {
+    //eg. having = [['where' => 'product_id =%s', 'binds' => [1]]]
+    $having = $system->mapQuery($schema, $data['having']);
+    $input->setStage('having', $having);
+  }
+
+  //----------------------------//
+  // 4. Process Data
+  //if not exclusively total
+  if ($data['total'] !== 1) {
+    //set the columns
+    $input->setStage('columns', $data['columns']);
+    //make an output
+    $output = $response->clone(true);
+    //get the rows
+    $rows = $emitter->method('system-store-search', $input, $output);
+
+    //if there's an error
+    if ($output->isError()) {
+      //copy the json
+      return $response->set('json', $output->get('json'));
+    }
+
+    //for each row
+    foreach ($rows as $i => $row) {
+      //change json string to array
+      $row = $system->deflateRow($schema, $row);
+    }
+
+    //set the rows overall in the main results
+    $response->setResults('rows', $rows);
+  }
+
+  //if total
+  if ($data['total'] > 0) {
+    //set the count column
+    $input->setStage('columns', sprintf(
+      'COUNT(%s) AS total',
+      $schema->getPrimaryName()
+    ));
+
+    //make an output
+    $output = $response->clone(true);
+    //get the total
+    $total = $emitter->method('system-store-search', $input, $output);
+    //if there's an error
+    if ($output->isError()) {
+      //copy the json
+      return $response->set('json', $output->get('json'));
+    }
+
+    //set the total overall in the main results
+    $response->setResults('total', $total[0]['total']);
+  }
+
+  //no error
+  $response->setError(false);
+});
+
+/**
  * Links model to relation
  *
  * @param Request $request
@@ -781,9 +937,11 @@ $this('event')->on('system-model-update', function (RequestInterface $request, R
   //get the primary column name
   $primary = $schema->getPrimaryName();
   //get the ID of the model
-  $id = $response->getResults($schema->getName(), $primary);
+  $id = $response->getResults($primary);
   //eg. filters = [['where' => 'product_id =%s', 'binds' => [1]]]
   $filters = [['where' => $primary . ' = %s', 'binds' => [ $id ]]];
+  //reset the json
+  $response->remove('json');
 
   //prepare data
   $prepared = $schema->prepare($data);

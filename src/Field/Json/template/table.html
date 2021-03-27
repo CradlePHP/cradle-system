@@ -4,7 +4,7 @@
   {{#if name}}
     data-name="{{name}}"
   {{/if}}
-  data-columns="{{#each columns}}{{this}}{{#unless @last}}|{{/unless}}{{/each}}"
+  data-columns="{{#each options}}{{this}}{{#unless @last}}|{{/unless}}{{/each}}"
   {{#each attributes}}
     {{@key}}="{{this}}"
   {{/each}}
@@ -13,7 +13,7 @@
     <thead>
       <tr>
         <th>{{_ 'Actions'}}</th>
-        {{#each columns}}
+        {{#each options}}
           <th>{{this}}</th>
         {{/each}}
       </tr>

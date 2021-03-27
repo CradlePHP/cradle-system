@@ -47,7 +47,11 @@ class WordLength extends AbstractFormatter implements FormatterInterface
    *
    * @return ?string
    */
-  public function format($value = null, string $name = null, array $row = []): bool
+  public function format(
+    $value = null, 
+    string $name = null, 
+    array $row = []
+  ): ?string
   {
     $length = $this->parameters[0];
     if (str_word_count($value, 0) > $length) {

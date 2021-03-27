@@ -4,21 +4,68 @@ use Cradle\Package\System\Schema;
 
 $this('cradlephp/cradle-system')
   /**
+   * Groups results by their table prefix ie. [table]_column
+   *
+   * @param mixed $filter
+   *
+   * @return array
+   */
+  ->addMethod('deflateRow', function (Schema $schema, array $row): array {
+    //get valid json fields
+    $jsons = array_keys($schema->getFields('json'));
+
+    foreach ($row as $key => $value) {
+      //name should be a json column type
+      if (!in_array($key, $jsons) || is_array($row[$key])) {
+        continue;
+      }
+
+      $row[$key] = json_decode($row[$key], true);
+    }
+
+    return $row;
+  })
+
+  /**
    * Generates an inner join clause
    *
    * @param mixed $filter
    *
    * @return array
    */
-  ->addMethod('getInnerJoins', function (Schema $schema, $filters = []): array {
+  ->addMethod('getInnerJoins', function (Schema $schema, array $data): array {
     $joins = [];
     $primary = $schema->getPrimaryName();
-    $filters = $this->getJoinFilters($schema, $filters);
+
+    if (!isset($data['join'])) {
+      $data['join'] = 'forward';
+    }
 
     foreach ($schema->getRelations(1) as $table => $relation) {
       $name = $relation->getName();
       $primary2 = $relation->getPrimaryName();
-      if (!in_array($name, $filters)) {
+
+      $isFilter = isset($data['filter'][$primary2]);
+      $isLike = isset($data['filter'][$primary2]);
+      $isIn = isset($data['filter'][$primary2]);
+      $isSpan = isset($data['filter'][$primary2]);
+
+      $isJoin = $data['join'] === 'all'
+        || $data['join'] === 'forward'
+        || (
+          is_array($data['join'])
+          && in_array($name, $data['join'])
+        );
+
+      $isEmpty = isset($data['empty'])
+        && is_array($data['empty'])
+        && in_array($primary2, $data['empty']);
+
+      $isNempty = isset($data['nempty'])
+        && is_array($data['nempty'])
+        && in_array($primary2, $data['nempty']);
+
+      if (!$isJoin && !$isFilter && !$isLike && !$isIn && !$isEmpty && !$isNempty) {
         continue;
       }
 
@@ -29,8 +76,29 @@ $this('cradlephp/cradle-system')
 
     foreach ($schema->getReverseRelations(1) as $table => $relation) {
       $name = $relation->getName();
-      $primary2 = $relation->getName();
-      if (!in_array($name, $filters)) {
+      $primary2 = $relation->getPrimaryName();
+
+      $isFilter = isset($data['filter'][$primary2]);
+      $isLike = isset($data['filter'][$primary2]);
+      $isIn = isset($data['filter'][$primary2]);
+      $isSpan = isset($data['filter'][$primary2]);
+
+      $isJoin = $data['join'] === 'all'
+        || $data['join'] === 'reverse'
+        || (
+          is_array($data['join'])
+          && in_array($name, $data['join'])
+        );
+
+      $isEmpty = isset($data['empty'])
+        && is_array($data['empty'])
+        && in_array($primary2, $data['empty']);
+
+      $isNempty = isset($data['nempty'])
+        && is_array($data['nempty'])
+        && in_array($primary2, $data['nempty']);
+
+      if (!$isJoin && !$isFilter && !$isLike && !$isIn && !$isEmpty && !$isNempty) {
         continue;
       }
 
@@ -40,32 +108,6 @@ $this('cradlephp/cradle-system')
     }
 
     return $joins;
-  })
-
-  /**
-   * Generates an inner join clause
-   *
-   * @param mixed $filter
-   *
-   * @return array
-   */
-  ->addMethod('getJoinFilters', function (Schema $schema, $filters = []): array {
-    if ($filters === 'all') {
-      $filters = [];
-      foreach ($schema->getRelations() as $relation) {
-        $filters[] = $relation->getName();
-      }
-
-      foreach ($schema->getReverseRelations() as $relation) {
-        $filters[] = $relation->getName();
-      }
-    }
-
-    if (!is_array($filters)) {
-      $filters = [];
-    }
-
-    return $filters;
   })
 
   /**
@@ -80,13 +122,20 @@ $this('cradlephp/cradle-system')
     $jsons = array_keys($schema->getFields('json'));
     //eg. map = [['where' => 'product_id =%s', 'binds' => [1]]]
     $map = [];
+    if (isset($query['filters']) && is_array($query['filters'])) {
+      $map = $query['filters'];
+    }
+
     //consider q
     //eg. q = 123
     if (isset($query['q'])) {
       $searchable = $schema->getFields('searchable');
-      foreach ($schema->getFields('searchable') as $name => $field) {
-        $query['like'][$name] = $query['q'];
+      $keywords = $query['q'];
+      if (!is_array($keywords)) {
+        $keywords = [ $keywords ];
       }
+
+      $map = array_merge($map, $this->mapKeywords($keywords, $searchable));
     }
 
     //consider filters
@@ -289,6 +338,33 @@ $this('cradlephp/cradle-system')
   })
 
   /**
+   * Translates safe q to serialized where
+   *
+   * @param array $filters
+   * @param array $jsons
+   *
+   * @return array
+   */
+  ->addMethod('mapKeywords', function (array $filters, array $searchable): array {
+    $map = [];
+
+    foreach ($filters as $keyword) {
+      $binds = $where = [];
+      foreach ($searchable as $name => $field) {
+        $where[] = sprintf('LOWER(%s) LIKE %%s', $name);
+        $binds[] = sprintf('%%%s%%', strtolower($keyword));
+      }
+
+      $map[] = [
+        'where' => sprintf('(%s)', implode(' OR ', $where)),
+        'binds' => $binds
+      ];
+    }
+
+    return $map;
+  })
+
+  /**
    * Translates safe spans to serialized where
    *
    * @param array $filters
@@ -447,7 +523,7 @@ $this('cradlephp/cradle-system')
   })
 
   /**
-   * Generates an inner join clause
+   * Groups results by their table prefix ie. [table]_column
    *
    * @param mixed $filter
    *

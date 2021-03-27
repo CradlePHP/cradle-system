@@ -30,11 +30,17 @@ class Range extends Number
   /**
    * Renders the field for model forms
    *
-   * @param ?mixed $value
+   * @param ?mixed  $value
+   * @param ?string $name  name of the column in the row
+   * @param ?array  $row   the row submitted with the value
    *
    * @return ?string
    */
-  public function render($value = null): ?string
+  public function render(
+    $value = null,
+    string $name = null,
+    array $row = []
+  ): ?string
   {
     $data = [
       'name' => $this->name,

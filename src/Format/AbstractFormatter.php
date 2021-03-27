@@ -48,7 +48,11 @@ abstract class AbstractFormatter
    *
    * @return ?string
    */
-  abstract public function format($value = null, string $name = null, array $row = []): bool;
+  abstract public function format(
+    $value = null,
+    string $name = null,
+    array $row = []
+  ): ?string;
 
   /**
    * When they choose this format in a schema form,
